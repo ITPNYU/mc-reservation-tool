@@ -15,7 +15,7 @@ import { DateSelectArg } from '@fullcalendar/core';
 ('c_96d0951fc59bf720396cb997a62564ef6f1f9d45ec5db6cded4a4bb95bfae02b@group.calendar.google.com');
 //const GOOGLE_CALENDAR_API_KEY = "AIzaSyAW6XcuDNSsJE_hkRJYHbZsWXgDc-Io-wg"
 const CALENDAR_ID = 'rh3555@nyu.edu';
-const GOOGLE_CALENDAR_API_KEY = 'AIzaSyDdFBW-MHSbBCHg-6TLBgJUmp1hacx7Vr8';
+const GOOGLE_CALENDAR_API_KEY = '';
 const FIRST_APPROVER = 'rh3555@nyu.edu';
 const APPROVER_EMAILS = [
   'ss12430@nyu.edu',
