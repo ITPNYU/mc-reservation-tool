@@ -22,12 +22,12 @@ const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
   const getActiveUserEmail = () => {
-    serverFunctions
-      .getActiveUserEmail()
-      .then((response) => setUserEmail(response));
+    serverFunctions.getActiveUserEmail().then((response) => {
+      console.log('userEmail response', response);
+      setUserEmail(response);
+    });
   };
   const [apiKey, setApiKey] = useState();
-  console.log('apiKey', apiKey);
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
@@ -64,7 +64,6 @@ const SheetEditor = () => {
     'hireSecurity',
   ];
 
-  console.log('selectedRoom', selectedRoom);
   useEffect(() => {
     getActiveUserEmail();
   }, []);
@@ -129,8 +128,6 @@ const SheetEditor = () => {
       calendarId: values[3],
     };
   };
-
-  console.log('mappingRoomSettings', mappingRoomSettings);
 
   // safety training users
   const getSafetyTrainingStudents = () => {
