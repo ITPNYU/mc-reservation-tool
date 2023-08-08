@@ -23,20 +23,27 @@ export type Inputs = {
   catering: string;
   hireSecurity: string;
   expectedAttendance: string;
+  chartfieldInformation: string;
+  cateringService: string;
 };
 
-enum GenderEnum {
-  female = 'female',
-  male = 'male',
-  other = 'other',
-}
-const FormInput = ({ handleParentSubmit }) => {
+const FormInput = ({ roomNumber, handleParentSubmit }) => {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Inputs>({ defaultValues: { setupDetails: '' } });
+  } = useForm<Inputs>({
+    defaultValues: {
+      setupDetails: '',
+      cateringService: '',
+      chartfieldInformation: '',
+      sponsorFirstName: '',
+      sponsorLastName: '',
+      sponsorEmail: '',
+      mediaServicesDetails: '',
+    },
+  });
   const [inputValue, setInputValue] = useState('');
   const [data, setData] = useState({});
   const [checklist, setChecklist] = useState(false);
@@ -50,17 +57,12 @@ const FormInput = ({ handleParentSubmit }) => {
     bookingPolicy
   );
 
-  const updateData = (e) => {
-    console.log('id', e.target.id);
-    console.log('value', e.target.value);
-    setData({
-      ...data,
-      [e.target.id]: e.target.value,
-    });
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const dumpMediaServices = data.mediaServices || [];
+    //@ts-ignore
+    data.mediaServices = dumpMediaServices?.join(', ');
+    handleParentSubmit(data);
   };
-
-  const onSubmit: SubmitHandler<Inputs> = (data) => handleParentSubmit(data);
-
   return (
     <form
       className="p-10 w-full mx-auto items-center"
@@ -216,58 +218,61 @@ const FormInput = ({ handleParentSubmit }) => {
           {...register('role')}
         >
           <option value="Student">Student</option>
-          <option value="resident">Resident / Fellow</option>
-          <option value="faculty">Faculty</option>
-          <option value="admin">Admin / Staff</option>
+          <option value="Resident/Fellow">Resident / Fellow</option>
+          <option value="Faculty">Faculty</option>
+          <option value="Admin/Staff">Admin / Staff</option>
         </select>
       </div>
-      <div className="mb-6">
-        <label
-          htmlFor="sponsorFirstName"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Sponsor First Name
-        </label>
-        <input
-          type="sponsorFirstName"
-          id="sponsorFirstName"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder=""
-          {...register('sponsorFirstName')}
-        />
-      </div>
-      <div className="mb-6">
-        <label
-          htmlFor="sponsorLastName"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Sponsor Last Name
-        </label>
-        <input
-          type="sponsorLastName"
-          id="sponsorLastName"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder=""
-          {...register('sponsorLastName')}
-        />
-      </div>
-      <div className="mb-6">
-        <label
-          htmlFor="sponsorEmail"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Sponsor Email
-        </label>
-        <p className="text-xs">Must be an nyu.edu email address</p>
-        <input
-          type="sponsorEmail"
-          id="sponsorEmail"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder=""
-          {...register('sponsorEmail')}
-        />
-      </div>
-
+      {watch('role') === 'Student' && (
+        <div>
+          <div className="mb-6">
+            <label
+              htmlFor="sponsorFirstName"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Sponsor First Name
+            </label>
+            <input
+              type="sponsorFirstName"
+              id="sponsorFirstName"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('sponsorFirstName')}
+            />
+          </div>
+          <div className="mb-6">
+            <label
+              htmlFor="sponsorLastName"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Sponsor Last Name
+            </label>
+            <input
+              type="sponsorLastName"
+              id="sponsorLastName"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('sponsorLastName')}
+            />
+          </div>
+          <div className="mb-6">
+            <label
+              htmlFor="sponsorEmail"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Sponsor Email
+            </label>
+            <p className="text-xs">Must be an nyu.edu email address</p>
+            <input
+              type="sponsorEmail"
+              id="sponsorEmail"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('sponsorEmail')}
+            />
+          </div>
+        </div>
+      )}
       <div className="mb-6">
         <label
           htmlFor="reservationTitle"
@@ -328,6 +333,7 @@ const FormInput = ({ handleParentSubmit }) => {
           visitor, vendor, and affiliate access,{' '}
           <a
             href="https://www.nyu.edu/life/safety-health-wellness/coronavirus-information/campus-visitors.html"
+            className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
             target="_blank"
           >
             click here
@@ -414,7 +420,7 @@ const FormInput = ({ handleParentSubmit }) => {
           <label key={'technicalTraining'}>
             <input
               type="checkbox"
-              value={'technicalTraining'}
+              value="Request technical training"
               name="mediaServices"
               {...register('mediaServices')}
             />
@@ -423,70 +429,81 @@ const FormInput = ({ handleParentSubmit }) => {
           <label key={'checkoutEquipment'}>
             <input
               type="checkbox"
-              value={'checkoutEquipment'}
+              value="Checkout equipment"
               name="mediaServices"
               {...register('mediaServices')}
             />
             Checkout equipment
           </label>
-          <label key={'103audioTechnician'}>
-            <input
-              type="checkbox"
-              value={'103audioTechnician'}
-              name="mediaServices"
-              {...register('mediaServices')}
-            />
-            (For Garage 103) Request an audio technician
-          </label>
-          <label key={'103lightingTechnician'}>
-            <input
-              type="checkbox"
-              value={'103lightingTechnician'}
-              name="mediaServices"
-              {...register('mediaServices')}
-            />
-            (For Garage 103) Request a lighting technician
-          </label>
-          <label key={'230lightingTechnician'}>
-            <input
-              type="checkbox"
-              value={'230lightingTechnician'}
-              name="mediaServices"
-              {...register('mediaServices')}
-            />
-            (For Audio Lab 230) Request an audio technician
-          </label>
+          {roomNumber === '103' && (
+            <label key={'103audioTechnician'}>
+              <input
+                type="checkbox"
+                value="(For Garage 103) Request an audio technician"
+                name="mediaServices"
+                {...register('mediaServices')}
+              />
+              (For Garage 103) Request an audio technician
+            </label>
+          )}
+          {roomNumber === '103' && (
+            <label key={'103lightingTechnician'}>
+              <input
+                type="checkbox"
+                value="(For Garage 103) Request a lighting technician"
+                name="mediaServices"
+                {...register('mediaServices')}
+              />
+              (For Garage 103) Request a lighting technician
+            </label>
+          )}
+          {roomNumber === '230' && (
+            <label key={'230lightingTechnician'}>
+              <input
+                type="checkbox"
+                value="(For Audio Lab 230) Request an audio technician"
+                name="mediaServices"
+                {...register('mediaServices')}
+              />
+              (For Audio Lab 230) Request an audio technician
+            </label>
+          )}
 
-          <label key={'support'}>
-            <input
-              type="checkbox"
-              value={'support'}
-              name="mediaServices"
-              {...register('mediaServices')}
-            />
-            (For 202 and 1201) Contact Campus Media for technical and event
-            support
-          </label>
+          {roomNumber === '202' ||
+            (roomNumber === '1201' && (
+              <label key={'support'}>
+                <input
+                  type="checkbox"
+                  value="(For 202 and 1201) Contact Campus Media for technical and event support"
+                  name="mediaServices"
+                  {...register('mediaServices')}
+                />
+                (For 202 and 1201) Contact Campus Media for technical and event
+                support
+              </label>
+            ))}
         </div>
       </div>
-      <div className="mb-6">
-        <label
-          htmlFor="mediaServicesDetails"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          If you selected any of the Media Services above, please describe your
-          needs in detail. (Ie. what kind of equipment you need to check out or
-          the type of assistance you need from an audio technician)
-        </label>
-        <p className="text-xs"></p>
-        <input
-          type="text"
-          id="mediaServicesDetails"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder=""
-          {...register('mediaServicesDetails')}
-        />
-      </div>
+      {watch('mediaServices') !== undefined && (
+        <div className="mb-6">
+          <label
+            htmlFor="mediaServicesDetails"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            If you selected any of the Media Services above, please describe
+            your needs in detail. (Ie. what kind of equipment you need to check
+            out or the type of assistance you need from an audio technician)
+          </label>
+          <p className="text-xs"></p>
+          <input
+            type="text"
+            id="mediaServicesDetails"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder=""
+            {...register('mediaServicesDetails')}
+          />
+        </div>
+      )}
       <div className="mb-6">
         <label
           htmlFor="catering"
@@ -506,6 +523,57 @@ const FormInput = ({ handleParentSubmit }) => {
           </select>
         </div>
       </div>
+      {watch('catering') === 'yes' && (
+        <div className="mb-6">
+          <label
+            htmlFor="cateringService"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Catering Information
+          </label>
+          <p className="text-xs">
+            Including catering in your event necessitates hiring CBS cleaning
+            services.
+          </p>
+          <div className="flex items-center mb-4">
+            <select
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              {...register('cateringService')}
+            >
+              <option value="Outside Catering">Outside Catering</option>
+              <option selected value="NYU Plated">
+                NYU Plated
+              </option>
+            </select>
+          </div>
+        </div>
+      )}
+      {watch('catering') === 'yes' && (
+        <div className="mb-6">
+          <label
+            htmlFor="chartfieldInformation"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Chartfield Information
+          </label>
+          <p className="text-xs">
+            It is required for the reservation holder to pay for CBS cleaning
+            services if the event includes catering. The 370J Operations team
+            will arrange for cleaning services with your chartfield information
+            entered below.
+          </p>
+          <div className="flex items-center mb-4">
+            <input
+              type="textarea"
+              id="chartfieldInformation"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('chartfieldInformation')}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <label
           htmlFor="hireSecurity"
@@ -518,10 +586,11 @@ const FormInput = ({ handleParentSubmit }) => {
           where the Willoughby entrance will be in use. Once your booking is
           confirmed, it is your responsibility to hire Campus Safety for your
           event. If appropriate, please coordinate with your departmental
-          Scheduling Liaison to hire Campus Safety, as there is a fee.{' '}
+          Scheduling Liaison to hire Campus Safety, as there is a fee.
           <a
             href="https://www.nyu.edu/life/safety-health-wellness/campus-safety.html"
             target="_blank"
+            className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
           >
             Click for Campus Safety Form
           </a>
@@ -548,6 +617,7 @@ const FormInput = ({ handleParentSubmit }) => {
           <a
             href="https://docs.google.com/document/d/1TIOl8f8-7o2BdjHxHYIYELSb4oc8QZMj1aSfaENWjR8/edit?usp=sharing"
             target="_blank"
+            className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
           >
             370J Pre-Event Checklist
           </a>
@@ -644,6 +714,7 @@ const FormInput = ({ handleParentSubmit }) => {
           <a
             href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit?usp=sharing"
             target="_blank"
+            className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
           >
             Booking Policy for 370 Jay Street Shared Spaces
           </a>

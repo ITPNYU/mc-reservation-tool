@@ -40,8 +40,7 @@ const serverEntry = './src/server/index.ts';
 
 // define appsscript.json file path
 const copyAppscriptEntry = './appsscript.json';
-const copyEmailTemplate =
-  './src/client/dialog-demo-tailwindcss/approval_email.html';
+const copyEmailTemplate = './src/client/booking/approval_email.html';
 
 const copyApprovalEntry = './src/client/admin-page/approval.html';
 const copyRejectedEntry = './src/client/admin-page/reject.html';
@@ -52,9 +51,9 @@ const devDialogEntry = './dev/index.js';
 const clientEntrypoints = [
   {
     name: 'CLIENT - Dialog Demo Tailwind CSS',
-    entry: './src/client/dialog-demo-tailwindcss/index.js',
-    filename: 'dialog-demo-tailwindcss',
-    template: './src/client/dialog-demo-tailwindcss/index.html',
+    entry: './src/client/booking/index.js',
+    filename: 'booking',
+    template: './src/client/booking/index.html',
   },
   {
     name: 'CLIENT - Admin',

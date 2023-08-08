@@ -1,13 +1,18 @@
-export const onOpen = () => {
-  const menu = SpreadsheetApp.getUi()
-    .createMenu('My Sample React Project') // edit me!
-    .addItem('Sheet Editor', 'openDialog')
-    .addItem('Sheet Editor (Bootstrap)', 'openDialogBootstrap')
-    .addItem('Sheet Editor (MUI)', 'openDialogMUI')
-    .addItem('Sheet Editor (Tailwind CSS)', 'openDialogTailwindCSS')
-    .addItem('About me', 'openAboutSidebar');
+import { approveBooking } from './admin';
 
-  menu.addToUi();
+export const getGoogleCalendarApiKey = () => {
+  const apiKey = PropertiesService.getScriptProperties().getProperty(
+    'GOOGLE_CALENDAR_API_KEY'
+  );
+  console.log(apiKey);
+  return apiKey;
+};
+
+export const request = (id, email) => {
+  const row = [id, email, new Date()];
+  SpreadsheetApp.openById(ACTIVE_SHEET_ID)
+    .getSheetByName(BOOKING_STATUS_SHEET_NAME)
+    .appendRow(row);
 };
 
 export const scriptURL = () => {
@@ -38,7 +43,7 @@ export const doGet = (e) => {
   console.log('action', action);
 
   if (action === 'approve') {
-    firstApprove(calendarId);
+    approveBooking(calendarId);
     return HtmlService.createHtmlOutputFromFile('approval');
   } else if (action === 'reject') {
     reject(calendarId);
@@ -48,39 +53,6 @@ export const doGet = (e) => {
   if (page === 'admin') {
     return HtmlService.createHtmlOutputFromFile('admin-page');
   } else {
-    return HtmlService.createHtmlOutputFromFile('dialog-demo-tailwindcss');
+    return HtmlService.createHtmlOutputFromFile('booking');
   }
-};
-
-export const openDialog = () => {
-  const html = HtmlService.createHtmlOutputFromFile('dialog-demo')
-    .setWidth(600)
-    .setHeight(600);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Sheet Editor');
-};
-
-export const openDialogBootstrap = () => {
-  const html = HtmlService.createHtmlOutputFromFile('dialog-demo-bootstrap')
-    .setWidth(600)
-    .setHeight(600);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Sheet Editor (Bootstrap)');
-};
-
-export const openDialogMUI = () => {
-  const html = HtmlService.createHtmlOutputFromFile('dialog-demo-mui')
-    .setWidth(600)
-    .setHeight(600);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Sheet Editor (MUI)');
-};
-
-export const openDialogTailwindCSS = () => {
-  const html = HtmlService.createHtmlOutputFromFile('dialog-demo-tailwindcss')
-    .setWidth(600)
-    .setHeight(600);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Sheet Editor (Tailwind CSS)');
-};
-
-export const openAboutSidebar = () => {
-  const html = HtmlService.createHtmlOutputFromFile('sidebar-about-page');
-  SpreadsheetApp.getUi().showSidebar(html);
 };

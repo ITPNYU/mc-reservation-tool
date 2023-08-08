@@ -1,29 +1,27 @@
 import {
-  onOpen,
-  openDialog,
-  openDialogBootstrap,
-  openDialogMUI,
-  openDialogTailwindCSS,
-  openAboutSidebar,
   doGet,
   getActiveUserEmail,
   scriptURL,
   approvalUrl,
   rejectUrl,
+  request,
+  getGoogleCalendarApiKey,
 } from './ui';
 
 import {
-  firstApprove,
+  approveBooking,
   secondApprove,
-  request,
   reject,
   cancel,
   checkin,
+  approveInstantBooking,
+  ACTIVE_SHEET_ID,
+  BOOKING_STATUS_SHEET_NAME,
+  BOOKING_SHEET_NAME,
 } from './admin';
 
 import {
   fetchRows,
-  getSheetsData,
   addSheet,
   deleteSheet,
   setActiveSpreadSheet,
@@ -42,13 +40,6 @@ import {
 
 // Public functions must be exported as named exports
 export {
-  onOpen,
-  openDialog,
-  openDialogBootstrap,
-  openDialogMUI,
-  openDialogTailwindCSS,
-  openAboutSidebar,
-  getSheetsData,
   addSheet,
   deleteSheet,
   setActiveSpreadSheet,
@@ -64,7 +55,7 @@ export {
   approvedBySecondPerson,
   sendTextEmail,
   fetchById,
-  firstApprove,
+  approveBooking,
   secondApprove,
   request,
   reject,
@@ -75,4 +66,9 @@ export {
   fetchRows_,
   approvalUrl,
   rejectUrl,
+  approveInstantBooking,
+  ACTIVE_SHEET_ID,
+  BOOKING_STATUS_SHEET_NAME,
+  BOOKING_SHEET_NAME,
+  getGoogleCalendarApiKey,
 };

@@ -41,6 +41,7 @@
     "@fullcalendar/google-calendar": "^6.1.8",
     "@fullcalendar/interaction": "^6.1.8",
     "@fullcalendar/react": "^6.1.8",
+    "@fullcalendar/resource-timeline": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.8",
     "@mui/material": "^5.11.11",
     "prop-types": "^15.8.1",

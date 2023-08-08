@@ -1,31 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import FormInput, { Inputs } from './FormInput';
-import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import FullCalendar from '@fullcalendar/react';
-import timeGridPlugin from '@fullcalendar/timeGrid'; // a plugin!
-import googleCalendarPlugin from '@fullcalendar/google-calendar';
-import dayGridPlugin from '@fullcalendar/daygrid';
 
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 import { set } from 'react-hook-form';
 import { DateSelectArg } from '@fullcalendar/core';
+import { Calendars } from './Calendars';
+type RoomSetting = {
+  roomId: string;
+  name: string;
+  capacity: string;
+  calendarId: string;
+};
 
-//const CALENDAR_ID =
-('c_96d0951fc59bf720396cb997a62564ef6f1f9d45ec5db6cded4a4bb95bfae02b@group.calendar.google.com');
-//const GOOGLE_CALENDAR_API_KEY = "AIzaSyAW6XcuDNSsJE_hkRJYHbZsWXgDc-Io-wg"
-const CALENDAR_ID = 'rh3555@nyu.edu';
-const GOOGLE_CALENDAR_API_KEY = '';
 const FIRST_APPROVER = 'rh3555@nyu.edu';
-const APPROVER_EMAILS = [
-  'ss12430@nyu.edu',
-  'nopivnick@nyu.edu',
-  'rh3555@nyu.edu',
-];
+const ROOM_SHEET_NAME = 'rooms';
 
 const BOOKING_SHEET_NAME = 'bookings';
-const BOOKING_STATUS_SHEET_NAME = 'booking_status';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
+const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
   const getActiveUserEmail = () => {
@@ -33,17 +26,18 @@ const SheetEditor = () => {
       .getActiveUserEmail()
       .then((response) => setUserEmail(response));
   };
-  const [names, setNames] = useState([]);
+  const [apiKey, setApiKey] = useState();
+  console.log('apiKey', apiKey);
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
-  const [calendarEvents, setCalendarEvents] = useState([]);
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
-  const [calendarId, setCalendarId] = useState('');
   const [enrolledThisis, setEnrolledThesis] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [rooms, setRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState([]);
+  const [roomSettings, setRoomSettings] = useState([]);
+  const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
   const [section, setSection] = useState('roomUsage');
   const [selectedPurpose, setSelectedPurpose] = useState('');
-  const [selectedRoom, setSelectedRoom] = useState('');
   const order: (keyof Inputs)[] = [
     'firstName',
     'lastName',
@@ -65,19 +59,80 @@ const SheetEditor = () => {
     'mediaServices',
     'mediaServicesDetails',
     'catering',
+    'cateringService',
+    'chartfieldInformation',
     'hireSecurity',
   ];
 
+  console.log('selectedRoom', selectedRoom);
   useEffect(() => {
-    // call the function
-    //getCalendarEvents();
-    // make sure to catch any error
     getActiveUserEmail();
   }, []);
   useEffect(() => {
     getSafetyTrainingStudents();
   }, [userEmail]);
 
+  // google api key for calendar
+
+  useEffect(() => {
+    fetchApiKey();
+  }, []);
+
+  const fetchApiKey = async () => {
+    const googleApiKey = await serverFunctions.getGoogleCalendarApiKey();
+    setApiKey(googleApiKey);
+  };
+
+  useEffect(() => {
+    const mappings = roomSettings
+      .map((roomSetting, index) => {
+        if (index !== 0) {
+          return mappingRoomSettingRows(roomSetting);
+        }
+      })
+      .filter((roomSetting) => roomSetting !== undefined);
+    setMappingRoomSettings(mappings);
+  }, [roomSettings]);
+
+  // rooms
+
+  useEffect(() => {
+    fetchRoomSettings();
+  }, []);
+
+  useEffect(() => {
+    const mappings = roomSettings
+      .map((roomSetting, index) => {
+        if (index !== 0) {
+          return mappingRoomSettingRows(roomSetting);
+        }
+      })
+      .filter((roomSetting) => roomSetting !== undefined);
+    setMappingRoomSettings(mappings);
+  }, [roomSettings]);
+
+  function findByRoomId(array, id) {
+    return array.find((room) => room.roomId === id);
+  }
+
+  const fetchRoomSettings = async () => {
+    serverFunctions.fetchRows(ROOM_SHEET_NAME).then((rows) => {
+      setRoomSettings(rows);
+    });
+  };
+
+  const mappingRoomSettingRows = (values: string[]): RoomSetting => {
+    return {
+      roomId: values[0],
+      name: values[1],
+      capacity: values[2],
+      calendarId: values[3],
+    };
+  };
+
+  console.log('mappingRoomSettings', mappingRoomSettings);
+
+  // safety training users
   const getSafetyTrainingStudents = () => {
     const students = serverFunctions
       .getSheetRows(SAFTY_TRAINING_SHEET_NAME)
@@ -93,41 +148,52 @@ const SheetEditor = () => {
 
   const handleSubmit = async (data) => {
     if (!bookInfo) return;
-    const calendarEventId = await serverFunctions.addEventToCalendar(
-      CALENDAR_ID,
-      `[REQUESTED] Room request from ${userEmail}`,
-      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
-      bookInfo.startStr,
-      bookInfo.endStr,
-      userEmail
-    );
-    const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
-    const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
-    Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
+    rooms.map(async (room) => {
+      const roomCalendarId = findByRoomId(
+        mappingRoomSettings,
+        room
+      )?.calendarId;
+      const calendarEventId = await serverFunctions.addEventToCalendar(
+        roomCalendarId,
+        `[REQUESTED] Room request from ${userEmail}`,
+        'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
+        bookInfo.startStr,
+        bookInfo.endStr,
+        userEmail
+      );
       const contents = order.map(function (key) {
         return data[key];
       });
-      const userEventInputs = {
-        calendarEventId: calendarEventId,
-        email: userEmail,
-        startDate: bookInfo?.startStr,
-        endDate: bookInfo?.endStr,
-        approvalUrl: values[0],
-        rejectedUrl: values[1],
-        ...data,
-      };
       serverFunctions.appendRow(BOOKING_SHEET_NAME, [
         calendarEventId,
+        room,
         userEmail,
         bookInfo.startStr,
         bookInfo.endStr,
         ...contents,
       ]);
-      serverFunctions.request(calendarEventId, userEmail);
-
-      sendApprovalEmail(FIRST_APPROVER, userEventInputs);
-
-      //alert('Your request has been submitted.');
+      serverFunctions.request(calendarEventId, userEmail).then(() => {
+        if (INSTANT_APPROVAL_ROOMS.includes(room)) {
+          serverFunctions.approveInstantBooking(calendarEventId);
+        } else {
+          const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
+          const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
+          Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
+            const userEventInputs = {
+              calendarEventId: calendarEventId,
+              roomId: room,
+              email: userEmail,
+              startDate: bookInfo?.startStr,
+              endDate: bookInfo?.endStr,
+              approvalUrl: values[0],
+              rejectedUrl: values[1],
+              ...data,
+            };
+            sendApprovalEmail(FIRST_APPROVER, userEventInputs);
+            alert('Your request has been submitted.');
+          });
+        }
+      });
     });
   };
 
@@ -142,8 +208,6 @@ const SheetEditor = () => {
       subject
     );
   };
-  console.log('section', section);
-  console.log('selectedRoom', selectedRoom);
 
   const UserSection = () => {
     if (section === 'roomUsage') {
@@ -202,23 +266,20 @@ const SheetEditor = () => {
             id="room"
             onChange={(e) => {
               e.stopPropagation();
-              setSelectedRoom(e.target.value);
+              setSelectedRoom([e.target.value]);
             }}
             className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="" selected>
               Select Room
             </option>
-            <option value="103">103 The Garage</option>
-            <option value="202">202 Lecture Hall</option>
-            <option value="220">Conference Room</option>
-            <option value="221">221 Ballroom</option>
-            <option value="222">222 Ballroom</option>
-            <option value="223">223 Ballroom</option>
-            <option value="224">224 Ballroom</option>
-            <option value="230">Audio Lab</option>
-            <option value="233">Co-Lab</option>
-            <option value="1201">Seminar Room</option>
+            {mappingRoomSettings.map((roomSetting, index) => {
+              return (
+                <option
+                  value={`${roomSetting.roomId}`}
+                >{`${roomSetting.roomId} ${roomSetting.name}`}</option>
+              );
+            })}
           </select>
           <button
             key="2"
@@ -226,8 +287,9 @@ const SheetEditor = () => {
             disabled={!selectedRoom}
             onClick={(e) => {
               e.stopPropagation();
-              if (selectedRoom !== '') {
+              if (selectedRoom.length !== 0) {
                 setSection('calendar');
+                setRooms(selectedRoom);
               }
             }}
             className={`px-4 py-2 text-white rounded-md focus:outline-none ${
@@ -253,16 +315,16 @@ const SheetEditor = () => {
             id="motionCaptureRoom"
             onChange={(e) => {
               e.stopPropagation();
-              setSelectedRoom(e.target.value);
+              setSelectedRoom(e.target.value.split(','));
             }}
             className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="" selected>
               Select Room
             </option>
-            <option value="motionCapture1">Motion capture1(221-222)</option>
-            <option value="motionCapture2">Motion capture2(223)</option>
-            <option value="motionCapture3">Motion capture3(224)</option>
+            <option value="221,222">Motion capture1(221-222)</option>
+            <option value="223">Motion capture2(223)</option>
+            <option value="224">Motion capture3(224)</option>
           </select>
           <button
             key="3"
@@ -270,9 +332,11 @@ const SheetEditor = () => {
             disabled={!selectedRoom}
             onClick={(e) => {
               e.stopPropagation();
-              if (selectedRoom !== '') {
-                setSection('calendar');
+              if (selectedRoom.length === 0) {
+                alert('Please select a room');
               }
+              setRooms(selectedRoom);
+              setSection('calendar');
             }}
             className={`px-4 py-2 text-white rounded-md focus:outline-none ${
               selectedRoom
@@ -290,22 +354,16 @@ const SheetEditor = () => {
           <button onClick={() => setSection('calendar')}>
             Back to Calendar
           </button>
-          <FormInput handleParentSubmit={handleSubmit} />
+
+          <FormInput
+            roomNumber={selectedRoom}
+            handleParentSubmit={handleSubmit}
+          />
         </div>
       );
     } else if (section === 'calendar') {
       return (
         <div>
-          <p className="mt-10">Email: {userEmail}</p>
-          <p>
-            Did you take safty training:
-            <span>{isSafetyTrained ? 'Yes' : 'No'}</span>
-            {!isSafetyTrained && (
-              <span className="text-red-500 text-bold  ">
-                You have to take safty training before booking!
-              </span>
-            )}
-          </p>
           <div className="flex items-center my-4">
             <input
               id="default-checkbox"
@@ -322,73 +380,31 @@ const SheetEditor = () => {
             </label>
           </div>
 
-          <div>
-            <div className="mt-5">
-              <div>
-                <FullCalendar
-                  selectable={true}
-                  plugins={[
-                    interactionPlugin,
-                    timeGridPlugin,
-                    googleCalendarPlugin,
-                    dayGridPlugin,
-                  ]}
-                  headerToolbar={{
-                    left: 'prev,next',
-                    center: 'title',
-                    right: 'dayGridYear,timeGridWeek,timeGridDay',
-                  }}
-                  themeSystem="bootstrap5"
-                  googleCalendarApiKey={GOOGLE_CALENDAR_API_KEY}
-                  events={{ googleCalendarId: CALENDAR_ID }}
-                  eventDidMount={function (info) {
-                    // Change the background color of the event depending on its title
-                    if (info.event.title.includes('REQUESTED')) {
-                      info.el.style.backgroundColor = '#d60000';
-                    } else if (info.event.title.includes('PRE-APPROVED')) {
-                      info.el.style.backgroundColor = '#f6c026';
-                    } else if (info.event.title.includes('APPROVED')) {
-                      info.el.style.backgroundColor = '#33b679';
-                    } else if (info.event.title.includes('CONFIRMED')) {
-                      info.el.style.backgroundColor = '#0b8043';
-                    } else if (info.event.title.includes('REJECTED')) {
-                      info.el.style.display = 'none';
-                    } else if (info.event.title.includes('CANCELLED')) {
-                      info.el.style.display = 'none';
-                    }
-                  }}
-                  eventOverlap={false}
-                  initialView="dayGridYear"
-                  businessHours={{
-                    startTime: '08:00', // a start time (10am in this example)
-                    endTime: '20:00', // an end time (6pm in this example)
-                  }}
-                  navLinks={true}
-                  select={function (info) {
-                    //TODO: Check buisiness hour
-                    if (!isSafetyTrained) {
-                      alert("You haven't taken safety training yet!");
-                    } else {
-                      setSection('form');
-
-                      setBookInfo(info);
-                    }
-                  }}
-                  selectAllow={function (e) {
-                    if (enrolledThisis) {
-                      return true;
-                    } else {
-                      if (
-                        e.end.getTime() / 1000 - e.start.getTime() / 1000 <=
-                        60 * 60 * 4
-                      ) {
-                        return true;
-                      }
-                    }
-                  }}
-                />
-              </div>
-            </div>
+          <div className="flex flex-col items-center ">
+            <Calendars
+              enrolledThisis={enrolledThisis}
+              setBookInfo={setBookInfo}
+              apiKey={apiKey}
+              rooms={selectedRoom.map((roomId) => {
+                return findByRoomId(mappingRoomSettings, roomId);
+              })}
+            />
+            <button
+              key="1"
+              value={'roomUsageButton'}
+              disabled={!bookInfo}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSection('form');
+              }}
+              className={`my-10 px-4 py-2 text-white rounded-md focus:outline-none ${
+                bookInfo
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-gray-300 pointer-events-none'
+              }`}
+            >
+              Next
+            </button>
           </div>
         </div>
       );
@@ -440,6 +456,16 @@ const SheetEditor = () => {
           </a>
           ) at least 24 hours before the date of the event. Failure to cancel
           may result in restricted use of event spaces.
+        </p>
+        <p className="mt-10">Email: {userEmail}</p>
+        <p>
+          Did you take safty training:
+          <span>{isSafetyTrained ? 'Yes' : 'No'}</span>
+          {!isSafetyTrained && (
+            <span className="text-red-500 text-bold  ">
+              You have to take safty training before booking!
+            </span>
+          )}
         </p>
       </div>
       {UserSection()}

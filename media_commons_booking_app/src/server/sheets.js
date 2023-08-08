@@ -11,10 +11,13 @@ export const fetchRows_ = (sheetName) => {
     .getValues();
 };
 export const fetchRows = (sheetName) => {
-  return SpreadsheetApp.openById(ACTIVE_SHEET_ID)
+  console.log(sheetName);
+  const values = SpreadsheetApp.openById(ACTIVE_SHEET_ID)
     .getSheetByName(sheetName)
     .getDataRange()
     .getValues();
+  console.log('values', values);
+  return (values || []).map((row) => row.map((cell) => `${cell}`));
 };
 
 function fetchById(sheetName, id) {
@@ -41,18 +44,6 @@ export const getSheetRows = (sheetName) => {
   const values = range.getValues();
   console.log('values', values);
   return values;
-};
-
-export const getSheetsData = () => {
-  const activeSheetName = getActiveSheetName();
-  return getSheets().map((sheet, index) => {
-    const name = sheet.getName();
-    return {
-      name,
-      index,
-      isActive: name === activeSheetName,
-    };
-  });
 };
 
 export const getEvents = async (id, startCalendarDate, endCalendarDate) => {
@@ -125,11 +116,6 @@ export const confirmEvent = (id) => {
   event.setColor(CalendarApp.EventColor.GREEN);
 };
 
-export const addSheet = (sheetTitle) => {
-  SpreadsheetApp.getActive().insertSheet(sheetTitle);
-  return getSheetsData();
-};
-
 export const sendTextEmail = (targetEmail, title, body) => {
   GmailApp.sendEmail(targetEmail, title, body);
 };
@@ -157,12 +143,6 @@ export const appendRow = (sheetName, row) => {
   SpreadsheetApp.openById(ACTIVE_SHEET_ID)
     .getSheetByName(sheetName)
     .appendRow(row);
-};
-
-export const deleteSheet = (sheetIndex) => {
-  const sheets = getSheets();
-  SpreadsheetApp.getActive().deleteSheet(sheets[sheetIndex]);
-  return getSheetsData();
 };
 
 export const setActiveSpreadSheet = (id, sheetName) => {
