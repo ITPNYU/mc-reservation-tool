@@ -188,6 +188,7 @@ const SheetEditor = () => {
             };
             sendApprovalEmail(FIRST_APPROVER, userEventInputs);
             alert('Your request has been submitted.');
+            setSection('roomUsage');
           });
         }
       });

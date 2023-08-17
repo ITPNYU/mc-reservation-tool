@@ -6,6 +6,8 @@ import {
   rejectUrl,
   request,
   getGoogleCalendarApiKey,
+  authCallback,
+  getUserEmail,
 } from './ui';
 
 import {
@@ -71,4 +73,6 @@ export {
   BOOKING_STATUS_SHEET_NAME,
   BOOKING_SHEET_NAME,
   getGoogleCalendarApiKey,
+  authCallback,
+  getUserEmail,
 };
