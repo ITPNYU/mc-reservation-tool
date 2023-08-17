@@ -80,13 +80,18 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           First Name
         </label>
+        {errors.firstName && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.firstName.message}
+          </p>
+        )}
         <input
           type="firstName"
           id="firstName"
           name="firstName"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('firstName')}
+          {...register('firstName', { required: true })}
         />
       </div>
       <div className="mb-6">
@@ -96,13 +101,18 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Last Name
         </label>
+        {errors.lastName && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.lastName.message}
+          </p>
+        )}
         <input
           type="lastName"
           id="lastName"
           name="lastName"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('lastName')}
+          {...register('lastName', { required: true })}
         />
       </div>
       <div className="mb-6">
@@ -117,12 +127,17 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
           the reservation, please add their name and contact information here
           (Ie Event organizer, faculty member, etc)
         </p>
+        {errors.secondaryName && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.secondaryName.message}
+          </p>
+        )}
         <input
           type="secondaryName"
           id="secondaryName"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('secondaryName')}
+          {...register('secondaryName', { required: true })}
         />
       </div>
       <div className="mb-6">
@@ -135,12 +150,24 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         <p className="text-xs">
           Your N-number begins with a capital 'N' followed by eight digits.
         </p>
+        {errors.nNumber && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.nNumber.message}
+          </p>
+        )}
         <input
           type="nNumber"
           id="nNumber"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('nNumber')}
+          {...register('nNumber', {
+            required: true,
+            pattern: {
+              value: /N[0-9]{8}/,
+              message:
+                "Your N-number begins with a capital 'N' followed by eight digits.",
+            },
+          })}
         />
       </div>
       <div className="mb-6">
@@ -154,13 +181,23 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
           Your Net ID is the username portion of your official NYU email
           address. It begins with your initials followed by one or more numbers.
         </p>
-
+        {errors.netId && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.netId.message}
+          </p>
+        )}
         <input
           type="netId"
           id="netId"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('netId')}
+          {...register('netId', {
+            required: true,
+            pattern: {
+              value: /[a-zA-Z]{1,3}[0-9]{1,6}/,
+              message: 'Invalid Net ID',
+            },
+          })}
         />
       </div>
       <div className="mb-6">
@@ -170,12 +207,24 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Phone Number
         </label>
+        {errors.phoneNumber && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.phoneNumber.message}
+          </p>
+        )}
         <input
           type="phoneNumber"
           id="phoneNumber"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('phoneNumber')}
+          {...register('phoneNumber', {
+            required: true,
+            pattern: {
+              value:
+                /^\(?([2-9][0-8][0-9])\)?[-. ]?([2-9][0-9]{2})[-. ]?([0-9]{4})$/,
+              message: 'Please enter a valid 10 digit telephone number.',
+            },
+          })}
         />
       </div>
       <div className="mb-6">
@@ -185,9 +234,14 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Department
         </label>
+        {errors.department && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.department.message}
+          </p>
+        )}
         <select
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('department')}
+          {...register('department', { required: true })}
         >
           <option value="ALT">ALT</option>
           <option value="GameCenter">Game Center</option>
@@ -213,9 +267,14 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Requestor's Role
         </label>
+        {errors.role && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.role.message}
+          </p>
+        )}
         <select
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('role')}
+          {...register('role', { required: true })}
         >
           <option value="Student">Student</option>
           <option value="Resident/Fellow">Resident / Fellow</option>
@@ -232,6 +291,11 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
             >
               Sponsor First Name
             </label>
+            {errors.sponsorFirstName && (
+              <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+                {errors.sponsorFirstName.message}
+              </p>
+            )}
             <input
               type="sponsorFirstName"
               id="sponsorFirstName"
@@ -263,12 +327,22 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
               Sponsor Email
             </label>
             <p className="text-xs">Must be an nyu.edu email address</p>
+            {errors.sponsorEmail && (
+              <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+                {errors.sponsorEmail.message}
+              </p>
+            )}
             <input
               type="sponsorEmail"
               id="sponsorEmail"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
-              {...register('sponsorEmail')}
+              {...register('sponsorEmail', {
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  message: 'Invalid email address',
+                },
+              })}
             />
           </div>
         </div>
@@ -280,12 +354,17 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Reservation Title
         </label>
+        {errors.reservationTitle && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.reservationTitle.message}
+          </p>
+        )}
         <input
           type="reservationTitle"
           id="reservationTitle"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('reservationTitle')}
+          {...register('reservationTitle', { required: true })}
         />
       </div>
       <div className="mb-6">
@@ -295,13 +374,17 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Reservation Description
         </label>
-        <p className="text-xs"></p>
+        {errors.reservationDescription && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.reservationDescription.message}
+          </p>
+        )}
         <input
           type="reservationDescription"
           id="reservationDescription"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('reservationDescription')}
+          {...register('reservationDescription', { required: true })}
         />
       </div>
       <div className="mb-6">
@@ -312,12 +395,17 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
           Expected Attendance
         </label>
         <p className="text-xs"></p>
+        {errors.expectedAttendance && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.expectedAttendance.message}
+          </p>
+        )}
         <input
           type="expectedAttendance"
           id="expectedAttendance"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="5"
-          {...register('expectedAttendance')}
+          {...register('expectedAttendance', { required: true })}
         />
       </div>
       <div className="mb-6">
@@ -340,11 +428,15 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
           </a>
           .
         </p>
-
+        {errors.attendeeAffiliation && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.attendeeAffiliation.message}
+          </p>
+        )}
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('attendeeAffiliation')}
+            {...register('attendeeAffiliation', { required: true })}
           >
             <option value="NYU Members">
               NYU Members with an Active NYU ID
@@ -375,11 +467,15 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
           room is reset after use. Failure to do either will result in the
           restriction of reservation privileges.
         </p>
-
+        {errors.roomSetup && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.roomSetup.message}
+          </p>
+        )}
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('roomSetup')}
+            {...register('roomSetup', { required: true })}
           >
             <option value="yes">Yes</option>
             <option selected value="no">
@@ -416,6 +512,11 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
           Media Services
         </label>
         <p className="text-xs"></p>
+        {errors.mediaServices && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.mediaServices.message}
+          </p>
+        )}
         <div className="flex flex-col mb-4">
           <label key={'technicalTraining'}>
             <input
@@ -511,10 +612,15 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
         >
           Catering
         </label>
+        {errors.catering && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.catering.message}
+          </p>
+        )}
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('catering')}
+            {...register('catering', { required: true })}
           >
             <option value="yes">Yes</option>
             <option selected value="no">
@@ -595,10 +701,15 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
             Click for Campus Safety Form
           </a>
         </p>
+        {errors.hireSecurity && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+            {errors.hireSecurity.message}
+          </p>
+        )}
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('hireSecurity')}
+            {...register('hireSecurity', { required: true })}
           >
             <option value="yes">Yes</option>
             <option selected value="no">
