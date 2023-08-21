@@ -48,7 +48,9 @@ export const Calendars = ({ apiKey, rooms, enrolledThisis, setBookInfo }) => {
   return (
     <div className="mt-5 flex justify-center">
       {rooms.map((room, i) => (
-        <div className="mx-5 h-[1000px]">
+        <div
+          className={`mx-5 h-[1000px] ${rooms.length === 1 && 'w-[1000px]'}`}
+        >
           <FullCalendar
             ref={calendarRefs[i]}
             height="100%"
@@ -83,16 +85,16 @@ export const Calendars = ({ apiKey, rooms, enrolledThisis, setBookInfo }) => {
                 info.el.style.display = 'none';
               }
             }}
-            eventOverlap={false}
             editable={true}
-            initialView="timeGridDay"
+            overlap={false}
+            initialView={rooms.length > 1 ? 'timeGridDay' : 'timeGridWeek'}
             businessHours={{
               startTime: '08:00', // a start time (10am in this example)
               endTime: '20:00', // an end time (6pm in this example)
             }}
             //@ts-ignore
             eventAllow={function (dropInfo, draggedEvent) {
-              draggedEvent.title.includes('Reserve') ? true : false;
+              //return draggedEvent.title.includes('Reserve') ? true : false;
             }}
             navLinks={true}
             select={function (info) {

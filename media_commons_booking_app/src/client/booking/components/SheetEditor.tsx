@@ -225,8 +225,12 @@ const SheetEditor = () => {
             <option value="" selected>
               Select Room Purpose
             </option>
-            <option value="singleRoom">Booking single room</option>
-            <option value="motionCapture">Booking motion capture</option>
+            <option key="single" value="singleRoom">
+              Booking single room
+            </option>
+            <option key="motion" value="motionCapture">
+              Booking motion capture
+            </option>
           </select>
           <button
             key="1"
@@ -274,6 +278,7 @@ const SheetEditor = () => {
             {mappingRoomSettings.map((roomSetting, index) => {
               return (
                 <option
+                  key={roomSetting.roomId}
                   value={`${roomSetting.roomId}`}
                 >{`${roomSetting.roomId} ${roomSetting.name}`}</option>
               );
@@ -379,6 +384,26 @@ const SheetEditor = () => {
           </div>
 
           <div className="flex flex-col items-center ">
+            <button
+              key="1"
+              value={'roomUsageButton'}
+              disabled={!bookInfo}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isSafetyTrained === false) {
+                  alert(' You have to take safty training before booking!');
+                  return;
+                }
+                setSection('form');
+              }}
+              className={`my-10 px-4 py-2 text-white rounded-md focus:outline-none ${
+                bookInfo
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-gray-300 pointer-events-none'
+              }`}
+            >
+              Next
+            </button>
             <Calendars
               enrolledThisis={enrolledThisis}
               setBookInfo={setBookInfo}
@@ -393,6 +418,10 @@ const SheetEditor = () => {
               disabled={!bookInfo}
               onClick={(e) => {
                 e.stopPropagation();
+                if (isSafetyTrained === false) {
+                  alert(' You have to take safty training before booking!');
+                  return;
+                }
                 setSection('form');
               }}
               className={`my-10 px-4 py-2 text-white rounded-md focus:outline-none ${
