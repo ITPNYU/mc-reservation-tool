@@ -37,16 +37,16 @@ export const getActiveUserEmail = () => {
   return user.getEmail();
 };
 
-//export function getOAuthService() {
-//  return OAuth2.createService('UserService')
-//    .setAuthorizationBaseUrl('https://accounts.google.com/o/oauth2/auth')
-//    .setTokenUrl('https://accounts.google.com/o/oauth2/token')
-//    .setClientId(CLIENT_ID)
-//    .setClientSecret(CLIENT_SECRET)
-//    .setCallbackFunction('authCallback')
-//    .setCache(CacheService.getUserCache())
-//    .setScope('https://www.googleapis.com/auth/userinfo.email');
-//}
+export function getOAuthService() {
+  return OAuth2.createService('UserService')
+    .setAuthorizationBaseUrl('https://accounts.google.com/o/oauth2/auth')
+    .setTokenUrl('https://accounts.google.com/o/oauth2/token')
+    .setClientId(CLIENT_ID)
+    .setClientSecret(CLIENT_SECRET)
+    .setCallbackFunction('authCallback')
+    .setCache(CacheService.getUserCache())
+    .setScope('https://www.googleapis.com/auth/userinfo.email');
+}
 
 // client calls by sending a HTTP GET request to the web app's URL
 export const doGet = (e) => {
@@ -65,10 +65,14 @@ export const doGet = (e) => {
     return HtmlService.createHtmlOutputFromFile('admin-page');
   } else {
     return HtmlService.createHtmlOutputFromFile('booking');
-    //var cookies = e.parameter.cookies || '';
-    //console.log('cookies', cookies);
+    // データを取得
+    //var value = '; ' + document.cookie;
+    //var parts = value.split('; ' + name + '=');
+    //const cookieUserEmail =
+    //  parts.length == 2 ? parts.pop().split(';').shift() : null;
+    //console.log('cookieUserEmail', cookieUserEmail);
     //const service = getOAuthService();
-    //if (!service.hasAccess()) {
+    //if (!cookieUserEmail) {
     //  var authorizationUrl = service.getAuthorizationUrl();
     //  var template = HtmlService.createTemplate(
     //    '<a href="<?= authorizationUrl ?>" target="_blank">Authorize</a>'
@@ -103,6 +107,14 @@ export function authCallback(request) {
     var output = HtmlService.createHtmlOutput('<p>Cookie has been set!</p>');
 
     output.appendCookie('userEmail', userEmail, expireDate);
+    //var date = new Date();
+    //date.setDate(date.getDate() + 1); // 1日後に有効期限を設定
+    //output.append(
+    //  '<script>document.cookie = "userId=12345; expires=' +
+    //    date.toUTCString() +
+    //    '; path=/";</script>'
+    //);
+
     return HtmlService.createHtmlOutputFromFile('booking');
   } else {
     return HtmlService.createHtmlOutput('failue');
