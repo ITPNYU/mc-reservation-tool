@@ -43,7 +43,7 @@ export const MultipleTimegridCalendar = ({
     }
   };
   return (
-    <div key={room.roomId} className={`mx-1 h-[1000px] w-[150px]`}>
+    <div key={room.roomId} className={`mx-1 h-[1000px] w-[200px]`}>
       <h3 className="text-center">
         {room.roomId} {room.name}
       </h3>

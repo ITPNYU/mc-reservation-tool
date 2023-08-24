@@ -56,8 +56,6 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
       mediaServicesDetails: '',
     },
   });
-  const [inputValue, setInputValue] = useState('');
-  const [data, setData] = useState({});
   const [checklist, setChecklist] = useState(false);
   const [agreement, setAgreement] = useState(false);
   const [resetRoom, setResetRoom] = useState(false);
@@ -710,7 +708,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
             onChange={() => setChecklist(!checklist)}
           />
           <label
-            htmlFor="default-checkbox"
+            htmlFor="checklist"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
             I agree
@@ -738,7 +736,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
             onChange={() => setResetRoom(!resetRoom)}
           />
           <label
-            htmlFor="default-checkbox"
+            htmlFor="resetRoom"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
             I agree
@@ -772,7 +770,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           />
           <label
-            htmlFor="default-checkbox"
+            htmlFor="agreement"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
             I agree
@@ -805,7 +803,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
             onChange={() => setBookingPolicy(!bookingPolicy)}
           />
           <label
-            htmlFor="default-checkbox"
+            htmlFor="bookingPolicy"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
             I agree

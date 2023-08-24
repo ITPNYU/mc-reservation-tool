@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import FormInput, { Inputs } from './FormInput';
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
@@ -10,11 +9,14 @@ import { Calendars } from './Calendars';
 import { RoomUsage } from './RoomUsage';
 import { SelectSingleRoom } from './SelectSingleROom';
 import { SelectMotionCapture } from './SelectMotionCapture';
-type RoomSetting = {
+import { Header } from './Header';
+import { MultipleCalendars } from './MultipleCalendars';
+export type RoomSetting = {
   roomId: string;
   name: string;
   capacity: string;
   calendarId: string;
+  calendarRef?: any;
 };
 
 const FIRST_APPROVER = 'rh3555@nyu.edu';
@@ -39,7 +41,7 @@ const SheetEditor = () => {
   const [selectedRoom, setSelectedRoom] = useState([]);
   const [roomSettings, setRoomSettings] = useState([]);
   const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
-  const [section, setSection] = useState('roomUsage');
+  const [section, setSection] = useState('multpleRoom');
   const [selectedPurpose, setSelectedPurpose] = useState('');
   const order: (keyof Inputs)[] = [
     'firstName',
@@ -84,17 +86,6 @@ const SheetEditor = () => {
     const googleApiKey = await serverFunctions.getGoogleCalendarApiKey();
     setApiKey(googleApiKey);
   };
-
-  useEffect(() => {
-    const mappings = roomSettings
-      .map((roomSetting, index) => {
-        if (index !== 0) {
-          return mappingRoomSettingRows(roomSetting);
-        }
-      })
-      .filter((roomSetting) => roomSetting !== undefined);
-    setMappingRoomSettings(mappings);
-  }, [roomSettings]);
 
   // rooms
 
@@ -147,6 +138,7 @@ const SheetEditor = () => {
   };
 
   const handleSubmit = async (data) => {
+    console.log('selectedRoom', selectedRoom);
     if (!bookInfo) return;
     selectedRoom.map(async (room) => {
       const roomCalendarId = findByRoomId(
@@ -218,6 +210,8 @@ const SheetEditor = () => {
       setSection('room');
     } else if (purpose === 'motionCapture') {
       setSection('motionCapture');
+    } else if (purpose === 'multipleRoom') {
+      setSection('multipleRoom');
     }
   };
   const handleSetRoom = (room) => {
@@ -261,7 +255,7 @@ const SheetEditor = () => {
     } else if (section === 'form') {
       return (
         <div>
-          <button onClick={() => setSection('calendar')}>
+          <button onClick={() => setSection('multipleRoom')}>
             Back to Calendar
           </button>
 
@@ -278,9 +272,23 @@ const SheetEditor = () => {
             key="calendars"
             handleSetDate={handleSetDate}
             apiKey={apiKey}
-            rooms={selectedRoom.map((roomId) => {
+            allRooms={mappingRoomSettings}
+            selectedRooms={selectedRoom.map((roomId) => {
               return findByRoomId(mappingRoomSettings, roomId);
             })}
+          />
+        </div>
+      );
+    } else if (section === 'multipleRoom') {
+      return (
+        <div>
+          <MultipleCalendars
+            bookInfo={bookInfo}
+            key="calendars"
+            apiKey={apiKey}
+            allRooms={mappingRoomSettings}
+            setBookInfo={setBookInfo}
+            handleSetDate={handleSetDate}
           />
         </div>
       );
@@ -288,75 +296,8 @@ const SheetEditor = () => {
   };
   return (
     <div className="m-10">
-      <GoogleOAuthProvider clientId="508094483021-9o9u9geflvj1kdl0iionemh71aumr86v.apps.googleusercontent.com">
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            console.log(credentialResponse);
-          }}
-          onError={() => {
-            console.log('Login Failed');
-          }}
-        />
-        ;
-        <div>
-          <h2 className="text-4xl font-extrabold dark:text-white">
-            370🅙 Shared Spaces Reservation Form
-          </h2>
-          <p className="my-4 text-lg text-gray-500">
-            <a
-              href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit"
-              target="_blank"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
-            >
-              Please read our Policy for using the 370 Jay Street Shared Spaces
-            </a>
-          </p>
-          <p className="my-4 text-lg text-gray-500">
-            Booking requests must be made through this form. Verbal requests,
-            email requests, and requests directly from students are not allowed.
-            Booking requests for students must include sign-off by a sponsoring
-            or supervising faculty member who accepts responsibility for their
-            use.
-            <br />
-            <br />
-            <b>Booking Confirmation:</b> You will receive an email response from
-            the 370J Operations team and a calendar invite once your request has
-            been reviewed and processed. Please allow a minimum of 3 days for
-            your request to be approved. If you do not hear back about your
-            request within 48 hours, you can contact Jhanele Green ({' '}
-            <a
-              href="mailto:jg5626@nyu.edu"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
-            >
-              jg5626@nyu.edu
-            </a>
-            ) to follow up. A request does not guarantee a booking.
-            <br />
-            <br />
-            <b>Cancellation Policy:</b> To cancel reservations please email
-            Jhanele Green(
-            <a
-              href="mailto:jg5626@nyu.edu"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
-            >
-              jg5626@nyu.edu
-            </a>
-            ) at least 24 hours before the date of the event. Failure to cancel
-            may result in restricted use of event spaces.
-          </p>
-          <p className="mt-10">Email: {userEmail}</p>
-          <p>
-            Did you take safty training:
-            <span>{isSafetyTrained ? 'Yes' : 'No'}</span>
-            {!isSafetyTrained && (
-              <span className="text-red-500 text-bold  ">
-                You have to take safty training before booking!
-              </span>
-            )}
-          </p>
-        </div>
-        {UserSection()}
-      </GoogleOAuthProvider>
+      <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />
+      {UserSection()}
     </div>
   );
 };

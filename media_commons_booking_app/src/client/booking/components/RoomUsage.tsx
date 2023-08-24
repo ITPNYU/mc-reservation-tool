@@ -25,6 +25,9 @@ export const RoomUsage = ({ selectedPurpose, handleSetSelectedPurpose }) => {
         <option key="single" value="singleRoom">
           Booking single room
         </option>
+        <option key="multipleRoom" value="multipleRoom">
+          Booking multiple room
+        </option>
         <option key="motion" value="motionCapture">
           Booking motion capture
         </option>
