@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 export const RoomUsage = ({ selectedPurpose, handleSetSelectedPurpose }) => {
-  const [purpose, setPurpose] = useState('');
   return (
     <div>
       <label
@@ -14,7 +13,6 @@ export const RoomUsage = ({ selectedPurpose, handleSetSelectedPurpose }) => {
         id="usage"
         onChange={(e) => {
           e.stopPropagation();
-          setPurpose(e.target.value);
           handleSetSelectedPurpose(e.target.value);
         }}
         className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -22,11 +20,8 @@ export const RoomUsage = ({ selectedPurpose, handleSetSelectedPurpose }) => {
         <option value="" selected>
           Select Room Purpose
         </option>
-        <option key="single" value="singleRoom">
-          Booking single room
-        </option>
-        <option key="multipleRoom" value="multipleRoom">
-          Booking multiple room
+        <option key="room" value="multipleRoom">
+          Booking room
         </option>
         <option key="motion" value="motionCapture">
           Booking motion capture

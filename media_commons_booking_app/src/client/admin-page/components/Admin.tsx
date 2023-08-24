@@ -214,6 +214,9 @@ const Admin = () => {
                   Status
                 </th>
                 <th scope="col" className="px-2 py-3">
+                  Room ID
+                </th>
+                <th scope="col" className="px-2 py-3">
                   Name
                 </th>
                 <th scope="col" className="px-2 py-3">
@@ -343,6 +346,7 @@ const Admin = () => {
                       )}
                     </td>
                     <td className="px-2 py-4 w-24">{status}</td>
+                    <td className="px-2 py-4 w-24">{booking.roomId}</td>
                     <td
                       scope="row"
                       className="flex items-center px-2 py-4 text-gray-900 whitespace-nowrap dark:text-white"

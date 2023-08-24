@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendars } from './Calendars';
+import { SelectRooms } from './SelectRooms';
+import { SelectMotionCapture } from './SelectMotionCapture';
 
 export const MultipleCalendars = ({
+  selectedPurpose,
   apiKey,
   allRooms,
   bookInfo,
@@ -28,9 +31,7 @@ export const MultipleCalendars = ({
     );
     setCheckedRooms(checked);
   }, [checkedRoomIds]);
-  const handleDateSelect = (selectInfo) => {
-    setBookInfo(selectInfo);
-  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -38,45 +39,38 @@ export const MultipleCalendars = ({
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
 
+    const valuesArray = value.split(',');
+
     if (checked) {
-      setCheckedRoomIds((prev) => [...prev, value]);
+      setCheckedRoomIds((prev) => [...prev, ...valuesArray]);
     } else {
-      setCheckedRoomIds((prev) => prev.filter((item) => item !== value));
+      setCheckedRoomIds((prev) =>
+        prev.filter((item) => !valuesArray.includes(item))
+      );
     }
+  };
+  const handleSubmit = (bookInfo) => {
+    handleSetDate(bookInfo, checkedRooms);
   };
   return (
     <div className="my-4">
-      <div className="flex space-x-4">
-        {allRooms.map((room, i) => {
-          return (
-            <div
-              key={`${room.roomId}_${i}_checkbox`}
-              className="flex items-center mb-4"
-            >
-              <input
-                id={`checkbox${i}`}
-                type="checkbox"
-                onChange={handleCheckboxChange}
-                value={room.roomId}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label
-                htmlFor={`checkbox${i}`}
-                className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >
-                {room.roomId} {room.name}
-              </label>
-            </div>
-          );
-        })}
-      </div>
+      {selectedPurpose === 'motionCapture' && (
+        <SelectMotionCapture handleCheckboxChange={handleCheckboxChange} />
+      )}
+      {selectedPurpose === 'multipleRoom' && (
+        <SelectRooms
+          allRooms={allRooms}
+          handleCheckboxChange={handleCheckboxChange}
+        />
+      )}
+
       {calendarRefs.length > 0 && (
         <div className="mt-5 ml-20 flex justify-center">
           <Calendars
             allRooms={allRooms}
             selectedRooms={checkedRooms}
             apiKey={apiKey}
-            handleSetDate={handleSetDate}
+            handleSetDate={handleSubmit}
           />
         </div>
       )}

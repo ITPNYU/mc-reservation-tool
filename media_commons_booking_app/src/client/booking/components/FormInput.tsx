@@ -39,7 +39,6 @@ const ErrorMessage = (message) => {
 };
 
 const FormInput = ({ roomNumber, handleParentSubmit }) => {
-  console.log(roomNumber);
   const {
     register,
     handleSubmit,
@@ -683,7 +682,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
 
       <div className="mb-6">
         <label
-          htmlFor="secondaryName"
+          htmlFor="checklist"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           I confirm receipt of the
@@ -717,7 +716,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
       </div>
       <div className="mb-6">
         <label
-          htmlFor="secondaryName"
+          htmlFor="resetRoom"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           I agree to reset any and all requested rooms and common spaces to
@@ -745,7 +744,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
       </div>
       <div className="mb-6">
         <label
-          htmlFor="secondaryName"
+          htmlFor="agreement"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           I agree to the following attestations: <br /> * * I will not leave
@@ -780,7 +779,7 @@ const FormInput = ({ roomNumber, handleParentSubmit }) => {
 
       <div className="mb-6">
         <label
-          htmlFor="secondaryName"
+          htmlFor="bookingPolicy"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           I have read the

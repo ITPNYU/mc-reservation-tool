@@ -3,12 +3,8 @@ import FormInput, { Inputs } from './FormInput';
 
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { set } from 'react-hook-form';
 import { DateSelectArg } from '@fullcalendar/core';
-import { Calendars } from './Calendars';
 import { RoomUsage } from './RoomUsage';
-import { SelectSingleRoom } from './SelectSingleROom';
-import { SelectMotionCapture } from './SelectMotionCapture';
 import { Header } from './Header';
 import { MultipleCalendars } from './MultipleCalendars';
 export type RoomSetting = {
@@ -18,6 +14,8 @@ export type RoomSetting = {
   calendarId: string;
   calendarRef?: any;
 };
+
+export type Purpose = 'multipleRoom' | 'motionCapture';
 
 const FIRST_APPROVER = 'rh3555@nyu.edu';
 const ROOM_SHEET_NAME = 'rooms';
@@ -41,8 +39,9 @@ const SheetEditor = () => {
   const [selectedRoom, setSelectedRoom] = useState([]);
   const [roomSettings, setRoomSettings] = useState([]);
   const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
-  const [section, setSection] = useState('multpleRoom');
-  const [selectedPurpose, setSelectedPurpose] = useState('');
+  const [section, setSection] = useState('roomUsage');
+  const [selectedPurpose, setSelectedPurpose] =
+    useState<Purpose>('multipleRoom');
   const order: (keyof Inputs)[] = [
     'firstName',
     'lastName',
@@ -138,12 +137,12 @@ const SheetEditor = () => {
   };
 
   const handleSubmit = async (data) => {
-    console.log('selectedRoom', selectedRoom);
     if (!bookInfo) return;
     selectedRoom.map(async (room) => {
+      // Add the event to the calendar.
       const roomCalendarId = findByRoomId(
         mappingRoomSettings,
-        room
+        room.roomId
       )?.calendarId;
       const calendarEventId = await serverFunctions.addEventToCalendar(
         roomCalendarId,
@@ -153,19 +152,21 @@ const SheetEditor = () => {
         bookInfo.endStr,
         userEmail
       );
+      // Record the event to the spread sheet.
       const contents = order.map(function (key) {
         return data[key];
       });
       serverFunctions.appendRow(BOOKING_SHEET_NAME, [
         calendarEventId,
-        room,
+        room.roomId,
         userEmail,
         bookInfo.startStr,
         bookInfo.endStr,
         ...contents,
       ]);
       serverFunctions.request(calendarEventId, userEmail).then(() => {
-        if (INSTANT_APPROVAL_ROOMS.includes(room)) {
+        // Rooms 221 to 224 don't need approval
+        if (INSTANT_APPROVAL_ROOMS.includes(room.roomId)) {
           serverFunctions.approveInstantBooking(calendarEventId);
         } else {
           const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
@@ -173,7 +174,7 @@ const SheetEditor = () => {
           Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
             const userEventInputs = {
               calendarEventId: calendarEventId,
-              roomId: room,
+              roomId: room.roomId,
               email: userEmail,
               startDate: bookInfo?.startStr,
               endDate: bookInfo?.endStr,
@@ -182,11 +183,13 @@ const SheetEditor = () => {
               ...data,
             };
             sendApprovalEmail(FIRST_APPROVER, userEventInputs);
-            alert('Your request has been submitted.');
-            setSection('roomUsage');
           });
         }
       });
+      alert(
+        "Your request has been sent.\n Please check the calendar to verify that your submitted event has been registered.\n If you don't see the event, please contact us."
+      );
+      setSection('roomUsage');
     });
   };
 
@@ -203,27 +206,14 @@ const SheetEditor = () => {
   };
 
   const handleSetSelectedPurpose = (purpose) => {
-    console.log('e', purpose);
     setSelectedPurpose(purpose);
-    if (purpose === '') return;
-    if (purpose === 'singleRoom') {
-      setSection('room');
-    } else if (purpose === 'motionCapture') {
-      setSection('motionCapture');
-    } else if (purpose === 'multipleRoom') {
-      setSection('multipleRoom');
-    }
+    setSection('selectRoom');
   };
-  const handleSetRoom = (room) => {
-    if (room.length !== 0) {
-      setSelectedRoom(room);
-      setSection('calendar');
-    }
-  };
-  const handleSetDate = (info) => {
-    console.log('handleSetDate!');
-    setSection('form');
+
+  const handleSetDate = (info, rooms) => {
     setBookInfo(info);
+    setSelectedRoom(rooms);
+    setSection('form');
   };
 
   const UserSection = () => {
@@ -236,50 +226,16 @@ const SheetEditor = () => {
           />
         </div>
       );
-    } else if (section === 'room') {
-      return (
-        <div>
-          <SelectSingleRoom
-            mappingRoomSettings={mappingRoomSettings}
-            handleSetRoom={handleSetRoom}
-          />
-        </div>
-      );
-    } else if (section === 'motionCapture') {
-      return (
-        <SelectMotionCapture
-          selectedRoom={selectedRoom}
-          handleSetRoom={handleSetRoom}
-        />
-      );
     } else if (section === 'form') {
       return (
         <div>
-          <button onClick={() => setSection('multipleRoom')}>
-            Back to Calendar
-          </button>
-
           <FormInput
-            roomNumber={selectedRoom}
+            roomNumber={selectedRoom.map((room) => room.roomId)}
             handleParentSubmit={handleSubmit}
           />
         </div>
       );
-    } else if (section === 'calendar') {
-      return (
-        <div>
-          <Calendars
-            key="calendars"
-            handleSetDate={handleSetDate}
-            apiKey={apiKey}
-            allRooms={mappingRoomSettings}
-            selectedRooms={selectedRoom.map((roomId) => {
-              return findByRoomId(mappingRoomSettings, roomId);
-            })}
-          />
-        </div>
-      );
-    } else if (section === 'multipleRoom') {
+    } else if (section === 'selectRoom') {
       return (
         <div>
           <MultipleCalendars
@@ -289,6 +245,7 @@ const SheetEditor = () => {
             allRooms={mappingRoomSettings}
             setBookInfo={setBookInfo}
             handleSetDate={handleSetDate}
+            selectedPurpose={selectedPurpose}
           />
         </div>
       );
@@ -301,5 +258,4 @@ const SheetEditor = () => {
     </div>
   );
 };
-
 export default SheetEditor;

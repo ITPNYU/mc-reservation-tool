@@ -1,32 +1,53 @@
 import React from 'react';
 
-export const SelectMotionCapture = ({ selectedRoom, handleSetRoom }) => {
-  const [room, setRoom] = React.useState([]);
+export const SelectMotionCapture = ({ handleCheckboxChange }) => {
   return (
-    <div>
-      <label
-        htmlFor="room"
-        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-      >
-        Select Room
-      </label>
-      <select
-        id="motionCaptureRoom"
-        onChange={(e) => {
-          const splitedRoom = e.target.value.split(',');
-          e.stopPropagation();
-          setRoom(splitedRoom);
-          handleSetRoom(splitedRoom);
-        }}
-        className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      >
-        <option value="" selected>
-          Select Room
-        </option>
-        <option value="221,222">Motion capture1(221-222)</option>
-        <option value="223">Motion capture2(223)</option>
-        <option value="224">Motion capture3(224)</option>
-      </select>
+    <div className="flex space-x-4">
+      <div key={`motioncapture_checkbox_1`} className="flex items-center mb-4">
+        <input
+          id={`motioncapture_checkbox_1`}
+          type="checkbox"
+          onChange={handleCheckboxChange}
+          value={['221', '222']}
+          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        />
+        <label
+          htmlFor={`motioncapture_checkbox_1`}
+          className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+        >
+          Motion Capture 1 (Room: 221, 222)
+        </label>
+      </div>
+      <div key={`motioncapture_checkbox_2`} className="flex items-center mb-4">
+        <input
+          id={`motioncapture_checkbox_2`}
+          type="checkbox"
+          onChange={handleCheckboxChange}
+          value={['223']}
+          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        />
+        <label
+          htmlFor={`motioncapture_checkbox_2`}
+          className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+        >
+          Motion Capture 2 (Room: 223)
+        </label>
+      </div>
+      <div key={`motioncapture_checkbox_3`} className="flex items-center mb-4">
+        <input
+          id={`motioncapture_checkbox_3`}
+          type="checkbox"
+          onChange={handleCheckboxChange}
+          value={['224']}
+          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        />
+        <label
+          htmlFor={`motioncapture_checkbox_3`}
+          className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+        >
+          Motion Capture 3 (Room: 224)
+        </label>
+      </div>
     </div>
   );
 };

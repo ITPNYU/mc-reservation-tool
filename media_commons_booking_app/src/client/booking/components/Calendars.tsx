@@ -5,8 +5,8 @@ import timeGridPlugin from '@fullcalendar/timeGrid'; // a plugin!
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { CalendarDatePicker } from './CalendarDatePicker';
-import { RoomSetting } from './SheetEditor';
 import { DateSelectArg } from '@fullcalendar/core';
+import { RoomSetting } from './SheetEditor';
 
 type CalendarProps = {
   apiKey: string;
@@ -28,6 +28,12 @@ export const Calendars = ({
   const validateEvents = (e) => {
     e.stopPropagation;
     const overlap = isOverlap();
+    const past = bookInfo.start < new Date();
+    if (past) {
+      alert("You can't schedule events in the past");
+      return;
+    }
+
     if (overlap) {
       alert('The new event overlaps with an existing event on the same day!');
       return;
@@ -42,13 +48,14 @@ export const Calendars = ({
       if (isConfirmed) handleSetDate(bookInfo);
     }
   };
+
   const isOverlap = () => {
     return selectedRooms.some((room, i) => {
       const calendarApi = room.calendarRef.current.getApi();
 
       const allEvents = calendarApi.getEvents();
       return allEvents.some((event) => {
-        if (event.title === 'Reserve') return false;
+        if (event.title.includes('Reserve')) return false;
         return (
           (event.start >= bookInfo.start && event.start < bookInfo.end) ||
           (event.end > bookInfo.start && event.end <= bookInfo.end) ||
@@ -95,7 +102,7 @@ export const Calendars = ({
         id: Date.now(), // Generate a unique ID for the event
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        title: 'Reserve',
+        title: '[Click to Delete] Reserve',
         groupId: selectInfo.startStr,
       });
     });
@@ -185,14 +192,9 @@ export const Calendars = ({
                 }
               }}
               editable={true}
-              overlap={false}
               initialView={
                 selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridWeek'
               }
-              //@ts-ignore
-              eventAllow={function (dropInfo, draggedEvent) {
-                //return draggedEvent.title.includes('Reserve') ? true : false;
-              }}
               navLinks={true}
               select={function (info) {
                 handleDateSelect(info);
