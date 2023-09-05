@@ -39,9 +39,8 @@ const SheetEditor = () => {
   const [selectedRoom, setSelectedRoom] = useState([]);
   const [roomSettings, setRoomSettings] = useState([]);
   const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
-  const [section, setSection] = useState('roomUsage');
-  const [selectedPurpose, setSelectedPurpose] =
-    useState<Purpose>('multipleRoom');
+  const [section, setSection] = useState('selectRoom');
+  const [loading, setLoading] = useState(true);
   const order: (keyof Inputs)[] = [
     'firstName',
     'lastName',
@@ -102,6 +101,13 @@ const SheetEditor = () => {
       .filter((roomSetting) => roomSetting !== undefined);
     setMappingRoomSettings(mappings);
   }, [roomSettings]);
+
+  useEffect(() => {
+    if (mappingRoomSettingRows.length > 0) {
+      console.log('mappingRoomSettings', mappingRoomSettings);
+      setLoading(false);
+    }
+  }, [mappingRoomSettings]);
 
   function findByRoomId(array, id) {
     return array.find((room) => room.roomId === id);
@@ -189,7 +195,7 @@ const SheetEditor = () => {
       alert(
         "Your request has been sent.\n Please check the calendar to verify that your submitted event has been registered.\n If you don't see the event, please contact us."
       );
-      setSection('roomUsage');
+      setSection('selectRoom');
     });
   };
   const handleSubmit = async (data) => {
@@ -212,11 +218,6 @@ const SheetEditor = () => {
     );
   };
 
-  const handleSetSelectedPurpose = (purpose) => {
-    setSelectedPurpose(purpose);
-    setSection('selectRoom');
-  };
-
   const handleSetDate = (info, rooms) => {
     setBookInfo(info);
     setSelectedRoom(rooms);
@@ -228,18 +229,23 @@ const SheetEditor = () => {
   };
 
   const UserSection = () => {
-    if (section === 'roomUsage') {
-      return (
-        <div className="my-10">
-          <RoomUsage
-            handleSetSelectedPurpose={handleSetSelectedPurpose}
-            selectedPurpose={selectedPurpose}
-          />
-        </div>
-      );
-    } else if (section === 'form') {
+    if (section === 'form') {
       return (
         <div>
+          <button
+            key="backToCalendar"
+            disabled={!bookInfo}
+            onClick={() => {
+              setSection('selectRoom');
+            }}
+            className={`m-10 px-4 py-2 text-white rounded-md focus:outline-none ${
+              bookInfo
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-300 pointer-events-none'
+            }`}
+          >
+            Back to Calendar
+          </button>
           <FormInput
             hasEmail={userEmail ? true : false}
             roomNumber={selectedRoom.map((room) => room.roomId)}
@@ -255,12 +261,16 @@ const SheetEditor = () => {
             apiKey={apiKey}
             allRooms={mappingRoomSettings}
             handleSetDate={handleSetDate}
-            selectedPurpose={selectedPurpose}
           />
         </div>
       );
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="m-10">
       <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />

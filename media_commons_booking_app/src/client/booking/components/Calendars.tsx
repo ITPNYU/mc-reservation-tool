@@ -16,6 +16,8 @@ type CalendarProps = {
   refs?: any[];
 };
 
+const TITLE_TAG = '[Click to Delete]';
+
 export const Calendars = ({
   apiKey,
   allRooms,
@@ -25,6 +27,9 @@ export const Calendars = ({
   const [enrolledThisis, setEnrolledThesis] = useState(false);
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
 
+  const editableEvent = (info) => {
+    return info.title.includes(TITLE_TAG);
+  };
   const validateEvents = (e) => {
     e.stopPropagation;
     const overlap = isOverlap();
@@ -66,6 +71,7 @@ export const Calendars = ({
   };
 
   const handleEventClick = (info) => {
+    if (!editableEvent(info.event)) return;
     const targetGroupId = info.event.groupId;
     const isConfirmed = window.confirm('Do you want to delete this event?');
 
@@ -94,6 +100,10 @@ export const Calendars = ({
   }),
     [selectedRooms];
   const handleDateSelect = (selectInfo) => {
+    if (bookInfo) {
+      alert('You can only book one time slot per reservation');
+      return;
+    }
     allRooms.map((room) => {
       console.log('handle datae select room', room);
       if (!room.calendarRef.current) return;
@@ -102,7 +112,7 @@ export const Calendars = ({
         id: Date.now(), // Generate a unique ID for the event
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        title: '[Click to Delete] Reserve',
+        title: `${TITLE_TAG} Reserve`,
         groupId: selectInfo.startStr,
       });
     });
@@ -200,7 +210,11 @@ export const Calendars = ({
                 handleDateSelect(info);
               }}
               eventClick={function (info) {
+                info.jsEvent.preventDefault();
                 handleEventClick(info);
+              }}
+              eventAllow={(dropLocation, draggedEvent) => {
+                return editableEvent(draggedEvent);
               }}
               selectAllow={function (e) {
                 if (enrolledThisis) {

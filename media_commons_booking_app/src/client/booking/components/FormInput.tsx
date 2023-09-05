@@ -54,7 +54,11 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
       sponsorLastName: '',
       sponsorEmail: '',
       mediaServicesDetails: '',
-      role: 'Student',
+      role: '',
+      catering: '',
+      hireSecurity: '',
+      attendeeAffiliation: '',
+      roomSetup: '',
     },
   });
   const [checklist, setChecklist] = useState(false);
@@ -285,8 +289,14 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         {errors.role && <ErrorMessage errors={errors.role.message} />}
         <select
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('role', { required: true })}
+          {...register('role', {
+            required: true,
+            validate: (value) => value !== '',
+          })}
         >
+          <option value="" disabled>
+            Select option
+          </option>
           <option value="Student">Student</option>
           <option value="Resident/Fellow">Resident / Fellow</option>
           <option value="Faculty">Faculty</option>
@@ -435,8 +445,14 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('attendeeAffiliation', { required: true })}
+            {...register('attendeeAffiliation', {
+              required: true,
+              validate: (value) => value !== '',
+            })}
           >
+            <option value="" disabled>
+              Select option
+            </option>
             <option value="NYU Members">
               NYU Members with an Active NYU ID
             </option>
@@ -470,12 +486,16 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('roomSetup', { required: true })}
+            {...register('roomSetup', {
+              required: true,
+              validate: (value) => value !== '',
+            })}
           >
-            <option value="yes">Yes</option>
-            <option selected value="no">
-              No
+            <option value="" disabled>
+              Select option
             </option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
           </select>
         </div>
       </div>
@@ -609,12 +629,16 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('catering', { required: true })}
+            {...register('catering', {
+              required: true,
+              validate: (value) => value !== '',
+            })}
           >
-            <option value="yes">Yes</option>
-            <option selected value="no">
-              No
+            <option value="" disabled>
+              Select option
             </option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
           </select>
         </div>
       </div>
@@ -635,6 +659,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register('cateringService')}
             >
+              <option value="" disabled>
+                Select option
+              </option>
               <option value="Outside Catering">Outside Catering</option>
               <option selected value="NYU Plated">
                 NYU Plated
@@ -698,10 +725,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register('hireSecurity', { required: true })}
           >
+            <option value="">Select option</option>
             <option value="yes">Yes</option>
-            <option selected value="no">
-              No
-            </option>
+            <option value="no">No</option>
           </select>
         </div>
       </div>

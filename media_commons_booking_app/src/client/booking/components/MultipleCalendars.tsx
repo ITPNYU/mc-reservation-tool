@@ -3,26 +3,21 @@ import { Calendars } from './Calendars';
 import { SelectRooms } from './SelectRooms';
 import { SelectMotionCapture } from './SelectMotionCapture';
 
-export const MultipleCalendars = ({
-  selectedPurpose,
-  apiKey,
-  allRooms,
-  handleSetDate,
-}) => {
+export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
   const [calendarRefs, setCalendarRefs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkedRoomIds, setCheckedRoomIds] = useState([]);
   const [checkedRooms, setCheckedRooms] = useState([]);
 
-  console.log('checkedRoomIds', checkedRoomIds);
   const allRoomWithCalendarRefs = allRooms.map((room, i) => {
     room.calendarRef = React.createRef();
   });
   useEffect(() => {
     const refs = allRoomWithCalendarRefs;
+    console.log('refs', refs);
     setCalendarRefs(refs);
     setLoading(false);
-  }, []);
+  }, [allRooms]);
   useEffect(() => {
     const checked = allRooms.filter((room) =>
       checkedRoomIds.includes(room.roomId)
@@ -52,15 +47,10 @@ export const MultipleCalendars = ({
   };
   return (
     <div className="my-4">
-      {selectedPurpose === 'motionCapture' && (
-        <SelectMotionCapture handleCheckboxChange={handleCheckboxChange} />
-      )}
-      {selectedPurpose === 'multipleRoom' && (
-        <SelectRooms
-          allRooms={allRooms}
-          handleCheckboxChange={handleCheckboxChange}
-        />
-      )}
+      <SelectRooms
+        allRooms={allRooms}
+        handleCheckboxChange={handleCheckboxChange}
+      />
 
       {calendarRefs.length > 0 && (
         <div className="mt-5 ml-20 flex justify-center">
