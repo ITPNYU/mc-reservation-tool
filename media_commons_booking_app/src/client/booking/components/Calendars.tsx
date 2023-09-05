@@ -86,7 +86,7 @@ export const Calendars = ({
   };
 
   useEffect(() => {
-    const view = selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridWeek';
+    const view = selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridDay';
     allRooms.map((room) => {
       const calendarApi = room.calendarRef.current.getApi();
       calendarApi.changeView(view);
@@ -193,7 +193,7 @@ export const Calendars = ({
               }}
               editable={true}
               initialView={
-                selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridWeek'
+                selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridDay'
               }
               navLinks={true}
               select={function (info) {

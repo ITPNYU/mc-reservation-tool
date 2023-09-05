@@ -136,8 +136,8 @@ const SheetEditor = () => {
       });
   };
 
-  const handleSubmit = async (data) => {
-    if (!bookInfo) return;
+  const registerEvent = (data) => {
+    const email = userEmail || data.missingEmail;
     selectedRoom.map(async (room) => {
       // Add the event to the calendar.
       const roomCalendarId = findByRoomId(
@@ -150,7 +150,7 @@ const SheetEditor = () => {
         'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
         bookInfo.startStr,
         bookInfo.endStr,
-        userEmail
+        email
       );
       // Record the event to the spread sheet.
       const contents = order.map(function (key) {
@@ -159,12 +159,12 @@ const SheetEditor = () => {
       serverFunctions.appendRow(BOOKING_SHEET_NAME, [
         calendarEventId,
         room.roomId,
-        userEmail,
+        email,
         bookInfo.startStr,
         bookInfo.endStr,
         ...contents,
       ]);
-      serverFunctions.request(calendarEventId, userEmail).then(() => {
+      serverFunctions.request(calendarEventId, email).then(() => {
         // Rooms 221 to 224 don't need approval
         if (INSTANT_APPROVAL_ROOMS.includes(room.roomId)) {
           serverFunctions.approveInstantBooking(calendarEventId);
@@ -175,7 +175,7 @@ const SheetEditor = () => {
             const userEventInputs = {
               calendarEventId: calendarEventId,
               roomId: room.roomId,
-              email: userEmail,
+              email: email,
               startDate: bookInfo?.startStr,
               endDate: bookInfo?.endStr,
               approvalUrl: values[0],
@@ -191,6 +191,13 @@ const SheetEditor = () => {
       );
       setSection('roomUsage');
     });
+  };
+  const handleSubmit = async (data) => {
+    if (!bookInfo) return;
+    if (!userEmail && data.missingEmail) {
+      setUserEmail(data.missingEmail);
+    }
+    registerEvent(data);
   };
 
   const sendApprovalEmail = (recipient, contents) => {
@@ -213,6 +220,10 @@ const SheetEditor = () => {
   const handleSetDate = (info, rooms) => {
     setBookInfo(info);
     setSelectedRoom(rooms);
+    if (userEmail && !isSafetyTrained) {
+      alert('You have to take safty training before booking!');
+      return;
+    }
     setSection('form');
   };
 
@@ -230,6 +241,7 @@ const SheetEditor = () => {
       return (
         <div>
           <FormInput
+            hasEmail={userEmail ? true : false}
             roomNumber={selectedRoom.map((room) => room.roomId)}
             handleParentSubmit={handleSubmit}
           />
@@ -239,11 +251,9 @@ const SheetEditor = () => {
       return (
         <div>
           <MultipleCalendars
-            bookInfo={bookInfo}
             key="calendars"
             apiKey={apiKey}
             allRooms={mappingRoomSettings}
-            setBookInfo={setBookInfo}
             handleSetDate={handleSetDate}
             selectedPurpose={selectedPurpose}
           />

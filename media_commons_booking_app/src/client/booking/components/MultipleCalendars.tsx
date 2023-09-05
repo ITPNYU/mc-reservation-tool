@@ -7,8 +7,6 @@ export const MultipleCalendars = ({
   selectedPurpose,
   apiKey,
   allRooms,
-  bookInfo,
-  setBookInfo,
   handleSetDate,
 }) => {
   const [calendarRefs, setCalendarRefs] = useState([]);

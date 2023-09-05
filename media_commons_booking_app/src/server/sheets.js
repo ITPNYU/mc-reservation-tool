@@ -70,18 +70,17 @@ export const addEventToCalendar = (
   guestEmail
 ) => {
   const calendar = CalendarApp.getCalendarById(id);
+  console.log('guestEmail', guestEmail);
   const event = calendar.createEvent(
     title,
     new Date(startTime),
     new Date(endTime),
     {
       description: description,
-      guests: guestEmail,
     }
   );
-  console.log('event', event);
   event.setColor(CalendarApp.EventColor.GRAY);
-  console.log('event', event);
+  event.addGuest(guestEmail);
   console.log('event.id', event.getId());
   return event.getId();
 };
