@@ -7,6 +7,8 @@ import { DateSelectArg } from '@fullcalendar/core';
 import { RoomUsage } from './RoomUsage';
 import { Header } from './Header';
 import { MultipleCalendars } from './MultipleCalendars';
+import { Modal } from 'react-bootstrap';
+import { InitialModal } from './InitialModal';
 export type RoomSetting = {
   roomId: string;
   name: string;
@@ -17,8 +19,10 @@ export type RoomSetting = {
 
 export type Purpose = 'multipleRoom' | 'motionCapture';
 
-const FIRST_APPROVER = 'rh3555@nyu.edu';
+const FIRST_APPROVER = ['rh3555@nyu.edu', 'nnp278@nyu.edu'];
 const ROOM_SHEET_NAME = 'rooms';
+const BASE_URL =
+  'https://script.google.com/a/macros/itp.nyu.edu/s/AKfycbwvWl7X9w62iz0QLWOY1F1zTT-cLv9EfzPi77Adkxxwqb_ZG4vQayi3EkT7zz9jekE8/exec';
 
 const BOOKING_SHEET_NAME = 'bookings';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
@@ -32,6 +36,7 @@ const SheetEditor = () => {
     });
   };
   const [apiKey, setApiKey] = useState();
+  const [showModal, setShowModal] = useState(true);
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
@@ -271,10 +276,29 @@ const SheetEditor = () => {
     return <div>Loading...</div>;
   }
 
+  const handleModalClick = () => {
+    setShowModal(false);
+  };
+  console.log('showModal', showModal);
   return (
     <div className="m-10">
-      <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />
-      {UserSection()}
+      {showModal && <InitialModal handleClick={handleModalClick} />}
+      {!showModal && (
+        <>
+          <div className="flex flex-col justify-items-end items-end">
+            <a
+              href={`${BASE_URL}?page=admin`}
+              target="_blank"
+              className="text-blue-600 underline"
+            >
+              Admin page
+            </a>
+
+            <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />
+          </div>
+          {UserSection()}
+        </>
+      )}
     </div>
   );
 };

@@ -5,6 +5,8 @@ import { serverFunctions } from '../../utils/serverFunctions';
 import { Inputs } from '../../booking/components/FormInput';
 import { SafetyTraining } from './SafetyTraining';
 import { Ban } from './Ban';
+import { AdminUsers } from './AdminUsers';
+import { Liaisons } from './Liaisons';
 
 const ACTIVE_SHEET_ID = '1VZ-DY6o0GM5DL-v9AKkpCbF0w-xm-_T-vVUSPZph06Q';
 const BOOKING_SHEET_NAME = 'bookings';
@@ -199,9 +201,35 @@ const Admin = () => {
             Ban
           </a>
         </li>
+        <li className="mr-2">
+          <a
+            onClick={() => setTab('adminUsers')}
+            className={`${
+              tab === 'adminUsers'
+                ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
+                : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+            }`}
+          >
+            Admin users
+          </a>
+        </li>
+        <li className="mr-2">
+          <a
+            onClick={() => setTab('liaesons')}
+            className={`${
+              tab === 'liaesons'
+                ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
+                : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+            }`}
+          >
+            Liaisons
+          </a>
+        </li>
       </ul>
       {tab === 'safety_training' && <SafetyTraining />}
       {tab === 'ban' && <Ban />}
+      {tab === 'adminUsers' && <AdminUsers />}
+      {tab === 'liaesons' && <Liaisons />}
       {tab === 'bookings' && (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">

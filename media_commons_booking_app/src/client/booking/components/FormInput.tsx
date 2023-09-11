@@ -60,6 +60,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
       attendeeAffiliation: '',
       roomSetup: '',
     },
+    mode: 'onBlur',
   });
   const [checklist, setChecklist] = useState(false);
   const [agreement, setAgreement] = useState(false);

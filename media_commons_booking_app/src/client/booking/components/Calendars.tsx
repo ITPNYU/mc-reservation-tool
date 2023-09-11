@@ -32,7 +32,7 @@ export const Calendars = ({
   };
   const validateEvents = (e) => {
     e.stopPropagation;
-    const overlap = isOverlap();
+    const overlap = isOverlap(bookInfo);
     const past = bookInfo.start < new Date();
     if (past) {
       alert("You can't schedule events in the past");
@@ -54,7 +54,7 @@ export const Calendars = ({
     }
   };
 
-  const isOverlap = () => {
+  const isOverlap = (info) => {
     return selectedRooms.some((room, i) => {
       const calendarApi = room.calendarRef.current.getApi();
 
@@ -62,9 +62,9 @@ export const Calendars = ({
       return allEvents.some((event) => {
         if (event.title.includes('Reserve')) return false;
         return (
-          (event.start >= bookInfo.start && event.start < bookInfo.end) ||
-          (event.end > bookInfo.start && event.end <= bookInfo.end) ||
-          (event.start <= bookInfo.start && event.end >= bookInfo.end)
+          (event.start >= info.start && event.start < info.end) ||
+          (event.end > info.start && event.end <= info.end) ||
+          (event.start <= info.start && event.end >= info.end)
         );
       });
     });
@@ -123,6 +123,20 @@ export const Calendars = ({
     allRooms.forEach((room) => {
       room.calendarRef.current.getApi().gotoDate(selectedDate);
     });
+  };
+  const handleSelectAllow = (selectInfo) => {
+    console.log('selectInfo', selectInfo);
+    // only enrolledThesis user can book over 4 hours
+    if (
+      !enrolledThisis &&
+      selectInfo.end.getTime() / 1000 - selectInfo.start.getTime() / 1000 >=
+        60 * 60 * 4
+    ) {
+      return false;
+    }
+
+    console.log('isOverlap', !isOverlap(selectInfo));
+    return !isOverlap(selectInfo);
   };
   return (
     <div className="mt-5 flex flex-col justify-center">
@@ -216,18 +230,7 @@ export const Calendars = ({
               eventAllow={(dropLocation, draggedEvent) => {
                 return editableEvent(draggedEvent);
               }}
-              selectAllow={function (e) {
-                if (enrolledThisis) {
-                  return true;
-                } else {
-                  if (
-                    e.end.getTime() / 1000 - e.start.getTime() / 1000 <=
-                    60 * 60 * 4
-                  ) {
-                    return true;
-                  }
-                }
-              }}
+              selectAllow={(e) => handleSelectAllow(e)}
             />
           </div>
         ))}
