@@ -3,48 +3,50 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
-const SAFETY_TRAINING_SHEET_NAME = 'safety_training_users';
+const SHEET_NAME = 'liaisons';
 
-type SafetyTraining = {
+type LiaisonType = {
   email: string;
+  department: string;
   completedAt: string;
 };
 
-export const SafetyTraining = () => {
-  const [safetyTrainings, setSafetyTrainings] = useState([]);
-  const [trainedEmails, setTrainedEmails] = useState([]);
-  const [mappingTrainings, setMappingTrainings] = useState([]);
+export const Liaisons = () => {
+  const [liaisonUsers, setLiaisonUsers] = useState([]);
+  const [liaisonEmails, setAdminEmails] = useState([]);
+  const [mappingLiaisonUsers, setMappingLiaisonUsers] = useState([]);
   const [email, setEmail] = useState('');
 
   useEffect(() => {
-    fetchSafetyTrainings();
+    fetchLiaisonUsers();
   }, []);
   useEffect(() => {
-    const mappings = safetyTrainings
-      .map((safetyTraining, index) => {
+    const mappings = liaisonUsers
+      .map((liaison, index) => {
         if (index !== 0) {
-          return mappingSafetyTrainingRows(safetyTraining);
+          return mappingSafetyTrainingRows(liaison);
         }
       })
-      .filter((safetyTraining) => safetyTraining !== undefined);
-    //TODO: filter out safetyTrainings that are not in the future
-    setMappingTrainings(mappings);
+      .filter((liaison) => liaison !== undefined);
+    //TODO: filter out liaisonUsers that are not in the future
+    setMappingLiaisonUsers(mappings);
     const emails = mappings.map((mapping) => {
       return mapping.email;
     });
-    setTrainedEmails(emails);
-  }, [safetyTrainings]);
+    setAdminEmails(emails);
+  }, [liaisonUsers]);
 
-  const fetchSafetyTrainings = async () => {
-    serverFunctions.fetchRows(SAFETY_TRAINING_SHEET_NAME).then((rows) => {
-      setSafetyTrainings(rows);
+  const fetchLiaisonUsers = async () => {
+    serverFunctions.fetchRows(SHEET_NAME).then((rows) => {
+      setLiaisonUsers(rows);
     });
   };
 
-  const mappingSafetyTrainingRows = (values: string[]): SafetyTraining => {
+  const mappingSafetyTrainingRows = (values: string[]): LiaisonType => {
     return {
       email: values[0],
-      completedAt: values[1],
+      department: values[1],
+      completedAt: values[2],
     };
   };
 
@@ -60,17 +62,14 @@ export const SafetyTraining = () => {
     return `${year}-${month}-${date} ${hours}:${minutes}`;
   };
 
-  console.log('trainedEmails', trainedEmails);
+  console.log('liaisonEmails', liaisonEmails);
   const addSafetyTrainingUser = () => {
-    if (trainedEmails.includes(email)) {
+    if (liaisonEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(SAFETY_TRAINING_SHEET_NAME, [
-      email,
-      new Date().toString(),
-    ]);
+    serverFunctions.appendRow(SHEET_NAME, [email, new Date().toString()]);
 
     alert('User has been registered successfully!');
   };
@@ -112,21 +111,26 @@ export const SafetyTraining = () => {
                 Email
               </th>
               <th scope="col" className="px-2 py-3">
+                Department
+              </th>
+
+              <th scope="col" className="px-2 py-3">
                 Completed Date
               </th>
             </tr>
           </thead>
           <tbody>
-            {mappingTrainings.map((safetyTraining, index) => {
+            {mappingLiaisonUsers.map((liaison, index) => {
               return (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <td className="px-2 py-4 w-36">{safetyTraining.email}</td>
+                  <td className="px-2 py-4 w-36">{liaison.email}</td>
+                  <td className="px-2 py-4 w-36">{liaison.department}</td>
                   <td className="px-2 py-4 w-36">
                     <div className=" flex items-center flex-col">
-                      <div>{formatDate(safetyTraining.completedAt)}</div>{' '}
+                      <div>{formatDate(liaison.completedAt)}</div>{' '}
                     </div>
                   </td>
                 </tr>

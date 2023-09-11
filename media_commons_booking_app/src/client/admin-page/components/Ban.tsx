@@ -3,48 +3,48 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
-const SAFETY_TRAINING_SHEET_NAME = 'safety_training_users';
+const BAN_SHEET_NAME = 'banned_users';
 
-type SafetyTraining = {
+type Ban = {
   email: string;
-  completedAt: string;
+  bannedAt: string;
 };
 
-export const SafetyTraining = () => {
-  const [safetyTrainings, setSafetyTrainings] = useState([]);
+export const Ban = () => {
+  const [bans, setBans] = useState([]);
   const [trainedEmails, setTrainedEmails] = useState([]);
   const [mappingTrainings, setMappingTrainings] = useState([]);
   const [email, setEmail] = useState('');
 
   useEffect(() => {
-    fetchSafetyTrainings();
+    fetchBans();
   }, []);
   useEffect(() => {
-    const mappings = safetyTrainings
-      .map((safetyTraining, index) => {
+    const mappings = bans
+      .map((ban, index) => {
         if (index !== 0) {
-          return mappingSafetyTrainingRows(safetyTraining);
+          return mappingBanRows(ban);
         }
       })
-      .filter((safetyTraining) => safetyTraining !== undefined);
-    //TODO: filter out safetyTrainings that are not in the future
+      .filter((ban) => ban !== undefined);
+    //TODO: filter out bans that are not in the future
     setMappingTrainings(mappings);
     const emails = mappings.map((mapping) => {
       return mapping.email;
     });
     setTrainedEmails(emails);
-  }, [safetyTrainings]);
+  }, [bans]);
 
-  const fetchSafetyTrainings = async () => {
-    serverFunctions.fetchRows(SAFETY_TRAINING_SHEET_NAME).then((rows) => {
-      setSafetyTrainings(rows);
+  const fetchBans = async () => {
+    serverFunctions.fetchRows(BAN_SHEET_NAME).then((rows) => {
+      setBans(rows);
     });
   };
 
-  const mappingSafetyTrainingRows = (values: string[]): SafetyTraining => {
+  const mappingBanRows = (values: string[]): Ban => {
     return {
       email: values[0],
-      completedAt: values[1],
+      bannedAt: values[1],
     };
   };
 
@@ -61,16 +61,13 @@ export const SafetyTraining = () => {
   };
 
   console.log('trainedEmails', trainedEmails);
-  const addSafetyTrainingUser = () => {
+  const addBanUser = () => {
     if (trainedEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(SAFETY_TRAINING_SHEET_NAME, [
-      email,
-      new Date().toString(),
-    ]);
+    serverFunctions.appendRow(BAN_SHEET_NAME, [email, new Date().toString()]);
 
     alert('User has been registered successfully!');
   };
@@ -97,7 +94,7 @@ export const SafetyTraining = () => {
         </div>
         <button
           type="button"
-          onClick={addSafetyTrainingUser}
+          onClick={addBanUser}
           className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Add User
@@ -112,21 +109,21 @@ export const SafetyTraining = () => {
                 Email
               </th>
               <th scope="col" className="px-2 py-3">
-                Completed Date
+                Ban Date
               </th>
             </tr>
           </thead>
           <tbody>
-            {mappingTrainings.map((safetyTraining, index) => {
+            {mappingTrainings.map((ban, index) => {
               return (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <td className="px-2 py-4 w-36">{safetyTraining.email}</td>
+                  <td className="px-2 py-4 w-36">{ban.email}</td>
                   <td className="px-2 py-4 w-36">
                     <div className=" flex items-center flex-col">
-                      <div>{formatDate(safetyTraining.completedAt)}</div>{' '}
+                      <div>{formatDate(ban.completedAt)}</div>{' '}
                     </div>
                   </td>
                 </tr>

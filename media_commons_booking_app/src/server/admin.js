@@ -105,10 +105,27 @@ export const approveBooking = (id) => {
   }
 };
 
+export const allRoomIds = () => {
+  const rows = fetchRows_('rooms');
+  const ids = rows.map((row) => row[3]);
+  ids.shift();
+  console.log('ids', ids);
+  return ids;
+};
+
 export const updateEventPrefix = (id, newPrefix) => {
-  const event = CalendarApp.getEventById(id);
-  const prefix = /(?<=\[).+?(?=\])/g;
-  event.setTitle(event.getTitle().replace(prefix, newPrefix));
+  const roomIds = allRoomIds();
+  roomIds.map((roomId) => {
+    const calendar = CalendarApp.getCalendarById(roomId);
+    const event = calendar.getEventById(id);
+    const description =
+      ' Cancellation Policy: To cancel reservations please email Jhanele Green(jg5626@nyu.edu) at least 24 hours before the date of the event. Failure to cancel may result in restricted use of event spaces.';
+    if (event) {
+      const prefix = /(?<=\[).+?(?=\])/g;
+      event.setTitle(event.getTitle().replace(prefix, newPrefix));
+      event.setDescription(description);
+    }
+  });
 };
 
 export const reject = (id) => {

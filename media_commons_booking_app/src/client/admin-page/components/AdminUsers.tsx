@@ -3,41 +3,41 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
-const SAFETY_TRAINING_SHEET_NAME = 'safety_training_users';
+const SAFETY_TRAINING_SHEET_NAME = 'admin_users';
 
 type SafetyTraining = {
   email: string;
   completedAt: string;
 };
 
-export const SafetyTraining = () => {
-  const [safetyTrainings, setSafetyTrainings] = useState([]);
-  const [trainedEmails, setTrainedEmails] = useState([]);
-  const [mappingTrainings, setMappingTrainings] = useState([]);
+export const AdminUsers = () => {
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [adminEmails, setAdminEmails] = useState([]);
+  const [mappingAdminUsers, setMappingAdminUsers] = useState([]);
   const [email, setEmail] = useState('');
 
   useEffect(() => {
-    fetchSafetyTrainings();
+    fetchAdminUsers();
   }, []);
   useEffect(() => {
-    const mappings = safetyTrainings
+    const mappings = adminUsers
       .map((safetyTraining, index) => {
         if (index !== 0) {
           return mappingSafetyTrainingRows(safetyTraining);
         }
       })
       .filter((safetyTraining) => safetyTraining !== undefined);
-    //TODO: filter out safetyTrainings that are not in the future
-    setMappingTrainings(mappings);
+    //TODO: filter out adminUsers that are not in the future
+    setMappingAdminUsers(mappings);
     const emails = mappings.map((mapping) => {
       return mapping.email;
     });
-    setTrainedEmails(emails);
-  }, [safetyTrainings]);
+    setAdminEmails(emails);
+  }, [adminUsers]);
 
-  const fetchSafetyTrainings = async () => {
+  const fetchAdminUsers = async () => {
     serverFunctions.fetchRows(SAFETY_TRAINING_SHEET_NAME).then((rows) => {
-      setSafetyTrainings(rows);
+      setAdminUsers(rows);
     });
   };
 
@@ -60,9 +60,9 @@ export const SafetyTraining = () => {
     return `${year}-${month}-${date} ${hours}:${minutes}`;
   };
 
-  console.log('trainedEmails', trainedEmails);
+  console.log('adminEmails', adminEmails);
   const addSafetyTrainingUser = () => {
-    if (trainedEmails.includes(email)) {
+    if (adminEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
@@ -117,7 +117,7 @@ export const SafetyTraining = () => {
             </tr>
           </thead>
           <tbody>
-            {mappingTrainings.map((safetyTraining, index) => {
+            {mappingAdminUsers.map((safetyTraining, index) => {
               return (
                 <tr
                   key={index}

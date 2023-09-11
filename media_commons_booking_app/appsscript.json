@@ -9,7 +9,9 @@
     "https://mail.google.com/",
     "https://www.googleapis.com/auth/calendar",
     "https://www.google.com/calendar/feeds",
-    "https://www.googleapis.com/auth/calendar.readonly"
+    "https://www.googleapis.com/auth/calendar.readonly",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/script.external_request"
   ],
   "runtimeVersion": "V8"
 }

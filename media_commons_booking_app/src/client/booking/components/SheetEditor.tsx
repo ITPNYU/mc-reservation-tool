@@ -3,18 +3,26 @@ import FormInput, { Inputs } from './FormInput';
 
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { set } from 'react-hook-form';
 import { DateSelectArg } from '@fullcalendar/core';
-import { Calendars } from './Calendars';
-type RoomSetting = {
+import { RoomUsage } from './RoomUsage';
+import { Header } from './Header';
+import { MultipleCalendars } from './MultipleCalendars';
+import { Modal } from 'react-bootstrap';
+import { InitialModal } from './InitialModal';
+export type RoomSetting = {
   roomId: string;
   name: string;
   capacity: string;
   calendarId: string;
+  calendarRef?: any;
 };
 
-const FIRST_APPROVER = 'rh3555@nyu.edu';
+export type Purpose = 'multipleRoom' | 'motionCapture';
+
+const FIRST_APPROVER = ['rh3555@nyu.edu', 'nnp278@nyu.edu'];
 const ROOM_SHEET_NAME = 'rooms';
+const BASE_URL =
+  'https://script.google.com/a/macros/itp.nyu.edu/s/AKfycbwvWl7X9w62iz0QLWOY1F1zTT-cLv9EfzPi77Adkxxwqb_ZG4vQayi3EkT7zz9jekE8/exec';
 
 const BOOKING_SHEET_NAME = 'bookings';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
@@ -28,16 +36,16 @@ const SheetEditor = () => {
     });
   };
   const [apiKey, setApiKey] = useState();
+  const [showModal, setShowModal] = useState(true);
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
-  const [enrolledThisis, setEnrolledThesis] = useState(false);
-  const [rooms, setRooms] = useState([]);
+
   const [selectedRoom, setSelectedRoom] = useState([]);
   const [roomSettings, setRoomSettings] = useState([]);
   const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
-  const [section, setSection] = useState('roomUsage');
-  const [selectedPurpose, setSelectedPurpose] = useState('');
+  const [section, setSection] = useState('selectRoom');
+  const [loading, setLoading] = useState(true);
   const order: (keyof Inputs)[] = [
     'firstName',
     'lastName',
@@ -82,17 +90,6 @@ const SheetEditor = () => {
     setApiKey(googleApiKey);
   };
 
-  useEffect(() => {
-    const mappings = roomSettings
-      .map((roomSetting, index) => {
-        if (index !== 0) {
-          return mappingRoomSettingRows(roomSetting);
-        }
-      })
-      .filter((roomSetting) => roomSetting !== undefined);
-    setMappingRoomSettings(mappings);
-  }, [roomSettings]);
-
   // rooms
 
   useEffect(() => {
@@ -109,6 +106,13 @@ const SheetEditor = () => {
       .filter((roomSetting) => roomSetting !== undefined);
     setMappingRoomSettings(mappings);
   }, [roomSettings]);
+
+  useEffect(() => {
+    if (mappingRoomSettingRows.length > 0) {
+      console.log('mappingRoomSettings', mappingRoomSettings);
+      setLoading(false);
+    }
+  }, [mappingRoomSettings]);
 
   function findByRoomId(array, id) {
     return array.find((room) => room.roomId === id);
@@ -143,12 +147,13 @@ const SheetEditor = () => {
       });
   };
 
-  const handleSubmit = async (data) => {
-    if (!bookInfo) return;
-    rooms.map(async (room) => {
+  const registerEvent = (data) => {
+    const email = userEmail || data.missingEmail;
+    selectedRoom.map(async (room) => {
+      // Add the event to the calendar.
       const roomCalendarId = findByRoomId(
         mappingRoomSettings,
-        room
+        room.roomId
       )?.calendarId;
       const calendarEventId = await serverFunctions.addEventToCalendar(
         roomCalendarId,
@@ -156,21 +161,23 @@ const SheetEditor = () => {
         'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
         bookInfo.startStr,
         bookInfo.endStr,
-        userEmail
+        email
       );
+      // Record the event to the spread sheet.
       const contents = order.map(function (key) {
         return data[key];
       });
       serverFunctions.appendRow(BOOKING_SHEET_NAME, [
         calendarEventId,
-        room,
-        userEmail,
+        room.roomId,
+        email,
         bookInfo.startStr,
         bookInfo.endStr,
         ...contents,
       ]);
-      serverFunctions.request(calendarEventId, userEmail).then(() => {
-        if (INSTANT_APPROVAL_ROOMS.includes(room)) {
+      serverFunctions.request(calendarEventId, email).then(() => {
+        // Rooms 221 to 224 don't need approval
+        if (INSTANT_APPROVAL_ROOMS.includes(room.roomId)) {
           serverFunctions.approveInstantBooking(calendarEventId);
         } else {
           const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
@@ -178,8 +185,8 @@ const SheetEditor = () => {
           Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
             const userEventInputs = {
               calendarEventId: calendarEventId,
-              roomId: room,
-              email: userEmail,
+              roomId: room.roomId,
+              email: email,
               startDate: bookInfo?.startStr,
               endDate: bookInfo?.endStr,
               approvalUrl: values[0],
@@ -187,11 +194,21 @@ const SheetEditor = () => {
               ...data,
             };
             sendApprovalEmail(FIRST_APPROVER, userEventInputs);
-            alert('Your request has been submitted.');
           });
         }
       });
+      alert(
+        "Your request has been sent.\n Please check the calendar to verify that your submitted event has been registered.\n If you don't see the event, please contact us."
+      );
+      setSection('selectRoom');
     });
+  };
+  const handleSubmit = async (data) => {
+    if (!bookInfo) return;
+    if (!userEmail && data.missingEmail) {
+      setUserEmail(data.missingEmail);
+    }
+    registerEvent(data);
   };
 
   const sendApprovalEmail = (recipient, contents) => {
@@ -206,268 +223,83 @@ const SheetEditor = () => {
     );
   };
 
+  const handleSetDate = (info, rooms) => {
+    setBookInfo(info);
+    setSelectedRoom(rooms);
+    if (userEmail && !isSafetyTrained) {
+      alert('You have to take safty training before booking!');
+      return;
+    }
+    setSection('form');
+  };
+
   const UserSection = () => {
-    if (section === 'roomUsage') {
+    if (section === 'form') {
       return (
-        <div className="my-10">
-          <label
-            htmlFor="roomUsage"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Select Room Purpose
-          </label>
-          <select
-            id="usage"
-            onChange={(e) => setSelectedPurpose(e.target.value)}
-            className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            <option value="" selected>
-              Select Room Purpose
-            </option>
-            <option value="singleRoom">Booking single room</option>
-            <option value="motionCapture">Booking motion capture</option>
-          </select>
+        <div>
           <button
-            key="1"
-            value={'roomUsageButton'}
-            disabled={!selectedPurpose}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (selectedPurpose === '') return;
-              if (selectedPurpose === 'singleRoom') {
-                setSection('room');
-              } else if (selectedPurpose === 'motionCapture') {
-                setSection('motionCapture');
-              }
+            key="backToCalendar"
+            disabled={!bookInfo}
+            onClick={() => {
+              setSection('selectRoom');
             }}
-            className={`px-4 py-2 text-white rounded-md focus:outline-none ${
-              selectedPurpose
+            className={`m-10 px-4 py-2 text-white rounded-md focus:outline-none ${
+              bookInfo
                 ? 'bg-blue-600 hover:bg-blue-700'
                 : 'bg-gray-300 pointer-events-none'
             }`}
           >
-            Next
-          </button>
-        </div>
-      );
-    } else if (section === 'room') {
-      return (
-        <div>
-          <label
-            htmlFor="room"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Select Room
-          </label>
-          <select
-            id="room"
-            onChange={(e) => {
-              e.stopPropagation();
-              setSelectedRoom([e.target.value]);
-            }}
-            className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            <option value="" selected>
-              Select Room
-            </option>
-            {mappingRoomSettings.map((roomSetting, index) => {
-              return (
-                <option
-                  value={`${roomSetting.roomId}`}
-                >{`${roomSetting.roomId} ${roomSetting.name}`}</option>
-              );
-            })}
-          </select>
-          <button
-            key="2"
-            value={'roomButton'}
-            disabled={!selectedRoom}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (selectedRoom.length !== 0) {
-                setSection('calendar');
-                setRooms(selectedRoom);
-              }
-            }}
-            className={`px-4 py-2 text-white rounded-md focus:outline-none ${
-              selectedRoom
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-gray-300 pointer-events-none'
-            }`}
-          >
-            Choose Date
-          </button>
-        </div>
-      );
-    } else if (section === 'motionCapture') {
-      return (
-        <div>
-          <label
-            htmlFor="room"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Select Room
-          </label>
-          <select
-            id="motionCaptureRoom"
-            onChange={(e) => {
-              e.stopPropagation();
-              setSelectedRoom(e.target.value.split(','));
-            }}
-            className="mr-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            <option value="" selected>
-              Select Room
-            </option>
-            <option value="221,222">Motion capture1(221-222)</option>
-            <option value="223">Motion capture2(223)</option>
-            <option value="224">Motion capture3(224)</option>
-          </select>
-          <button
-            key="3"
-            value={'roomButton'}
-            disabled={!selectedRoom}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (selectedRoom.length === 0) {
-                alert('Please select a room');
-              }
-              setRooms(selectedRoom);
-              setSection('calendar');
-            }}
-            className={`px-4 py-2 text-white rounded-md focus:outline-none ${
-              selectedRoom
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-gray-300 pointer-events-none'
-            }`}
-          >
-            Choose Date
-          </button>
-        </div>
-      );
-    } else if (section === 'form') {
-      return (
-        <div>
-          <button onClick={() => setSection('calendar')}>
             Back to Calendar
           </button>
-
           <FormInput
-            roomNumber={selectedRoom}
+            hasEmail={userEmail ? true : false}
+            roomNumber={selectedRoom.map((room) => room.roomId)}
             handleParentSubmit={handleSubmit}
           />
         </div>
       );
-    } else if (section === 'calendar') {
+    } else if (section === 'selectRoom') {
       return (
         <div>
-          <div className="flex items-center my-4">
-            <input
-              id="default-checkbox"
-              type="checkbox"
-              value=""
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              onChange={(e) => setEnrolledThesis(!enrolledThisis)}
-            />
-            <label
-              htmlFor="default-checkbox"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Enrolled in thesis
-            </label>
-          </div>
-
-          <div className="flex flex-col items-center ">
-            <Calendars
-              enrolledThisis={enrolledThisis}
-              setBookInfo={setBookInfo}
-              apiKey={apiKey}
-              rooms={selectedRoom.map((roomId) => {
-                return findByRoomId(mappingRoomSettings, roomId);
-              })}
-            />
-            <button
-              key="1"
-              value={'roomUsageButton'}
-              disabled={!bookInfo}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSection('form');
-              }}
-              className={`my-10 px-4 py-2 text-white rounded-md focus:outline-none ${
-                bookInfo
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-gray-300 pointer-events-none'
-              }`}
-            >
-              Next
-            </button>
-          </div>
+          <MultipleCalendars
+            key="calendars"
+            apiKey={apiKey}
+            allRooms={mappingRoomSettings}
+            handleSetDate={handleSetDate}
+          />
         </div>
       );
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const handleModalClick = () => {
+    setShowModal(false);
+  };
+  console.log('showModal', showModal);
   return (
     <div className="m-10">
-      <div>
-        <h2 className="text-4xl font-extrabold dark:text-white">
-          370🅙 Shared Spaces Reservation Form
-        </h2>
-        <p className="my-4 text-lg text-gray-500">
-          <a
-            href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit"
-            target="_blank"
-            className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
-          >
-            Please read our Policy for using the 370 Jay Street Shared Spaces
-          </a>
-        </p>
-        <p className="my-4 text-lg text-gray-500">
-          Booking requests must be made through this form. Verbal requests,
-          email requests, and requests directly from students are not allowed.
-          Booking requests for students must include sign-off by a sponsoring or
-          supervising faculty member who accepts responsibility for their use.
-          <br />
-          <br />
-          <b>Booking Confirmation:</b> You will receive an email response from
-          the 370J Operations team and a calendar invite once your request has
-          been reviewed and processed. Please allow a minimum of 3 days for your
-          request to be approved. If you do not hear back about your request
-          within 48 hours, you can contact Jhanele Green ({' '}
-          <a
-            href="mailto:jg5626@nyu.edu"
-            className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
-          >
-            jg5626@nyu.edu
-          </a>
-          ) to follow up. A request does not guarantee a booking.
-          <br />
-          <br />
-          <b>Cancellation Policy:</b> To cancel reservations please email
-          Jhanele Green(
-          <a
-            href="mailto:jg5626@nyu.edu"
-            className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
-          >
-            jg5626@nyu.edu
-          </a>
-          ) at least 24 hours before the date of the event. Failure to cancel
-          may result in restricted use of event spaces.
-        </p>
-        <p className="mt-10">Email: {userEmail}</p>
-        <p>
-          Did you take safty training:
-          <span>{isSafetyTrained ? 'Yes' : 'No'}</span>
-          {!isSafetyTrained && (
-            <span className="text-red-500 text-bold  ">
-              You have to take safty training before booking!
-            </span>
-          )}
-        </p>
-      </div>
-      {UserSection()}
+      {showModal && <InitialModal handleClick={handleModalClick} />}
+      {!showModal && (
+        <>
+          <div className="flex flex-col justify-items-end items-end">
+            <a
+              href={`${BASE_URL}?page=admin`}
+              target="_blank"
+              className="text-blue-600 underline"
+            >
+              Admin page
+            </a>
+
+            <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />
+          </div>
+          {UserSection()}
+        </>
+      )}
     </div>
   );
 };
-
 export default SheetEditor;

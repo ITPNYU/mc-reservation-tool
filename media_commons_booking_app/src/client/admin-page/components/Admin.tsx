@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { serverFunctions } from '../../utils/serverFunctions';
 import { Inputs } from '../../booking/components/FormInput';
 import { SafetyTraining } from './SafetyTraining';
+import { Ban } from './Ban';
+import { AdminUsers } from './AdminUsers';
+import { Liaisons } from './Liaisons';
 
 const ACTIVE_SHEET_ID = '1VZ-DY6o0GM5DL-v9AKkpCbF0w-xm-_T-vVUSPZph06Q';
 const BOOKING_SHEET_NAME = 'bookings';
@@ -15,6 +18,7 @@ type Booking = Inputs & {
   email: string;
   startDate: string;
   endDate: string;
+  roomId: string;
 };
 
 type BookingStatus = {
@@ -81,32 +85,33 @@ const Admin = () => {
   const mappingBookingRows = (values: string[]): Booking => {
     return {
       calendarEventId: values[0],
-      email: values[1],
-      startDate: values[2],
-      endDate: values[3],
-      firstName: values[4],
-      lastName: values[5],
-      secondaryName: values[6],
-      nNumber: values[7],
-      netId: values[8],
-      phoneNumber: values[9],
-      department: values[10],
-      role: values[11],
-      sponsorFirstName: values[12],
-      sponsorLastName: values[13],
-      sponsorEmail: values[14],
-      reservationTitle: values[15],
-      reservationDescription: values[16],
-      expectedAttendance: values[17],
-      attendeeAffiliation: values[18],
-      roomSetup: values[19],
-      setupDetails: values[20],
-      mediaServices: values[21],
-      mediaServicesDetails: values[22],
-      catering: values[23],
-      cateringService: values[24],
-      chartfieldInformation: values[25],
-      hireSecurity: values[26],
+      roomId: values[1],
+      email: values[2],
+      startDate: values[3],
+      endDate: values[4],
+      firstName: values[5],
+      lastName: values[6],
+      secondaryName: values[7],
+      nNumber: values[8],
+      netId: values[9],
+      phoneNumber: values[10],
+      department: values[11],
+      role: values[12],
+      sponsorFirstName: values[13],
+      sponsorLastName: values[14],
+      sponsorEmail: values[15],
+      reservationTitle: values[16],
+      reservationDescription: values[17],
+      expectedAttendance: values[18],
+      attendeeAffiliation: values[19],
+      roomSetup: values[20],
+      setupDetails: values[21],
+      mediaServices: values[22],
+      mediaServicesDetails: values[23],
+      catering: values[24],
+      cateringService: values[25],
+      chartfieldInformation: values[26],
+      hireSecurity: values[27],
     };
   };
 
@@ -184,8 +189,47 @@ const Admin = () => {
             Safety Training
           </a>
         </li>
+        <li className="mr-2">
+          <a
+            onClick={() => setTab('ban')}
+            className={`${
+              tab === 'ban'
+                ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
+                : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+            }`}
+          >
+            Ban
+          </a>
+        </li>
+        <li className="mr-2">
+          <a
+            onClick={() => setTab('adminUsers')}
+            className={`${
+              tab === 'adminUsers'
+                ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
+                : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+            }`}
+          >
+            Admin users
+          </a>
+        </li>
+        <li className="mr-2">
+          <a
+            onClick={() => setTab('liaesons')}
+            className={`${
+              tab === 'liaesons'
+                ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
+                : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+            }`}
+          >
+            Liaisons
+          </a>
+        </li>
       </ul>
       {tab === 'safety_training' && <SafetyTraining />}
+      {tab === 'ban' && <Ban />}
+      {tab === 'adminUsers' && <AdminUsers />}
+      {tab === 'liaesons' && <Liaisons />}
       {tab === 'bookings' && (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">
@@ -196,6 +240,9 @@ const Admin = () => {
                 </th>
                 <th scope="col" className="px-2 py-3">
                   Status
+                </th>
+                <th scope="col" className="px-2 py-3">
+                  Room ID
                 </th>
                 <th scope="col" className="px-2 py-3">
                   Name
@@ -327,6 +374,7 @@ const Admin = () => {
                       )}
                     </td>
                     <td className="px-2 py-4 w-24">{status}</td>
+                    <td className="px-2 py-4 w-24">{booking.roomId}</td>
                     <td
                       scope="row"
                       className="flex items-center px-2 py-4 text-gray-900 whitespace-nowrap dark:text-white"
