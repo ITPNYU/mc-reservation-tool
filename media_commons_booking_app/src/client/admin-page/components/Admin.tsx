@@ -7,6 +7,7 @@ import { SafetyTraining } from './SafetyTraining';
 import { Ban } from './Ban';
 import { AdminUsers } from './AdminUsers';
 import { Liaisons } from './Liaisons';
+import { formatDate } from '../../utils/date';
 
 const ACTIVE_SHEET_ID = '1VZ-DY6o0GM5DL-v9AKkpCbF0w-xm-_T-vVUSPZph06Q';
 const BOOKING_SHEET_NAME = 'bookings';
@@ -31,6 +32,7 @@ type BookingStatus = {
   canceledAt: string;
   checkedInAt: string;
 };
+
 const Admin = () => {
   const [bookings, setBookings] = useState([]);
   const [mappingBookings, setMappingBookings] = useState([]);
@@ -150,17 +152,6 @@ const Admin = () => {
     }
   };
 
-  const formatDate = (oldDate) => {
-    const oldDateObject = new Date(oldDate);
-
-    const year = oldDateObject.getFullYear();
-    const month = String(oldDateObject.getMonth() + 1).padStart(2, '0');
-    const date = String(oldDateObject.getDate()).padStart(2, '0');
-    const hours = String(oldDateObject.getHours()).padStart(2, '0');
-    const minutes = String(oldDateObject.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${date} ${hours}:${minutes}`;
-  };
   return (
     <div className="m-10">
       <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">

@@ -7,6 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import { CalendarDatePicker } from './CalendarDatePicker';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomSetting } from './SheetEditor';
+import { formatDate } from '../../utils/date';
 
 type CalendarProps = {
   apiKey: string;
@@ -48,7 +49,9 @@ export const Calendars = ({
         `You are booking the following rooms: ${selectedRooms.map(
           (room) => `${room.roomId} ${room.name}`
         )}
-      \nYour reserved time slot: ${bookInfo.startStr} ~ ${bookInfo.endStr}`
+      \nYour reserved time slot: ${formatDate(
+        bookInfo.startStr
+      )} ~ ${formatDate(bookInfo.endStr)}`
       );
       if (isConfirmed) handleSetDate(bookInfo);
     }
