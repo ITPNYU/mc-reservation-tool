@@ -236,14 +236,14 @@ const SheetEditor = () => {
   const UserSection = () => {
     if (section === 'form') {
       return (
-        <div>
+        <div className="px-60">
           <button
             key="backToCalendar"
             disabled={!bookInfo}
             onClick={() => {
               setSection('selectRoom');
             }}
-            className={`m-10 px-4 py-2 text-white rounded-md focus:outline-none ${
+            className={`px-4 py-2 text-white rounded-md focus:outline-none ${
               bookInfo
                 ? 'bg-blue-600 hover:bg-blue-700'
                 : 'bg-gray-300 pointer-events-none'
@@ -281,7 +281,7 @@ const SheetEditor = () => {
   };
   console.log('showModal', showModal);
   return (
-    <div className="m-10">
+    <div className="p-10 dark:bg-gray-800">
       {showModal && <InitialModal handleClick={handleModalClick} />}
       {!showModal && (
         <>

@@ -6,7 +6,7 @@ export const Header = ({ isSafetyTrained, userEmail }) => {
   }
   return (
     <div>
-      <p className="mt-10">
+      <p className="mt-10 dark:text-white">
         Email:{' '}
         {userEmail ? `${userEmail}` : `Unable to retrieve the email address.`}
       </p>

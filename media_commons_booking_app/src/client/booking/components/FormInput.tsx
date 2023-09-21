@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm, SubmitHandler } from 'react-hook-form';
 export type Inputs = {
@@ -31,7 +31,7 @@ export type Inputs = {
 const ErrorMessage = (message) => {
   console.log('message', message);
   return (
-    <p className="mt-2 text-xs text-red-600 dark:text-red-500">
+    <p className="mt-2 w-4/5 text-xs text-red-600 dark:text-red-500">
       {message.errors && message.errors !== ''
         ? message.errors
         : 'This field is required'}
@@ -43,6 +43,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
   const {
     register,
     handleSubmit,
+    trigger,
     watch,
     formState: { errors },
   } = useForm<Inputs>({
@@ -58,6 +59,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
       catering: '',
       hireSecurity: '',
       attendeeAffiliation: '',
+      department: '',
       roomSetup: '',
     },
     mode: 'onBlur',
@@ -72,6 +74,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
     resetRoom &&
     bookingPolicy
   );
+  useEffect(() => {
+    trigger();
+  }, [trigger]);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const dumpMediaServices = data.mediaServices || [];
@@ -83,7 +88,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
 
   return (
     <form
-      className="p-10 w-full mx-auto items-center"
+      className="py-10 items-center"
       //onSubmit={(e) => {
       //  e.preventDefault();
       //  const values = Object.values(data);
@@ -109,7 +114,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <input
             type="text"
             id="missingEmail"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder=""
             {...register('missingEmail')}
           />
@@ -127,7 +132,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           type="firstName"
           id="firstName"
           name="firstName"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('firstName', { required: true })}
         />
@@ -144,7 +149,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           type="lastName"
           id="lastName"
           name="lastName"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('lastName', { required: true })}
         />
@@ -167,7 +172,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="secondaryName"
           id="secondaryName"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('secondaryName')}
         />
@@ -186,7 +191,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="nNumber"
           id="nNumber"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('nNumber', {
             required: true,
@@ -213,7 +218,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="netId"
           id="netId"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('netId', {
             required: true,
@@ -237,7 +242,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="phoneNumber"
           id="phoneNumber"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('phoneNumber', {
             required: true,
@@ -260,9 +265,15 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <ErrorMessage errors={errors.department.message} />
         )}
         <select
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('department', { required: true })}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          {...register('department', {
+            required: true,
+            validate: (value) => value !== '',
+          })}
         >
+          <option value="" disabled>
+            Select option
+          </option>
           <option value="ALT">ALT</option>
           <option value="GameCenter">Game Center</option>
           <option value="IDM">IDM</option>
@@ -275,7 +286,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         {watch('department') === 'others' && (
           <input
             type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register('department')}
           />
         )}
@@ -289,7 +300,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         </label>
         {errors.role && <ErrorMessage errors={errors.role.message} />}
         <select
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           {...register('role', {
             required: true,
             validate: (value) => value !== '',
@@ -319,7 +330,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             <input
               type="sponsorFirstName"
               id="sponsorFirstName"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
               {...register('sponsorFirstName')}
             />
@@ -334,7 +345,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             <input
               type="sponsorLastName"
               id="sponsorLastName"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
               {...register('sponsorLastName')}
             />
@@ -353,7 +364,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             <input
               type="sponsorEmail"
               id="sponsorEmail"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
               {...register('sponsorEmail', {
                 pattern: {
@@ -378,7 +389,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="reservationTitle"
           id="reservationTitle"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('reservationTitle', { required: true })}
         />
@@ -396,7 +407,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="reservationDescription"
           id="reservationDescription"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('reservationDescription', { required: true })}
         />
@@ -415,7 +426,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <input
           type="expectedAttendance"
           id="expectedAttendance"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="5"
           {...register('expectedAttendance', { required: true })}
         />
@@ -445,7 +456,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         )}
         <div className="flex items-center mb-4">
           <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register('attendeeAffiliation', {
               required: true,
               validate: (value) => value !== '',
@@ -486,7 +497,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         {errors.roomSetup && <ErrorMessage errors={errors.roomSetup.message} />}
         <div className="flex items-center mb-4">
           <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register('roomSetup', {
               required: true,
               validate: (value) => value !== '',
@@ -514,7 +525,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <input
             type="textarea"
             id="setupDetails"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder=""
             {...register('setupDetails')}
           />
@@ -613,7 +624,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <input
             type="text"
             id="mediaServicesDetails"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder=""
             {...register('mediaServicesDetails')}
           />
@@ -629,7 +640,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         {errors.catering && <ErrorMessage errors={errors.catering.message} />}
         <div className="flex items-center mb-4">
           <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register('catering', {
               required: true,
               validate: (value) => value !== '',
@@ -657,7 +668,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           </p>
           <div className="flex items-center mb-4">
             <select
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register('cateringService')}
             >
               <option value="" disabled>
@@ -689,7 +700,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             <input
               type="textarea"
               id="chartfieldInformation"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
               {...register('chartfieldInformation')}
             />
@@ -723,7 +734,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         )}
         <div className="flex items-center mb-4">
           <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register('hireSecurity', { required: true })}
           >
             <option value="">Select option</option>
@@ -800,18 +811,11 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           htmlFor="agreement"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
-          I agree to the following attestations: <br /> * * I will not leave
-          items behind. <br />* I will reset any furniture that I moved, and
-          clean up after myself. <br /> * I will not secure anything to the
-          pipes and ducting. <br /> * I will run cables along the grid to the
-          edges of the room. <br /> * I will not use zip ties or duct tape on
-          the ceiling grid or on any gear. <br /> * If I mount items to the
-          grid, I will do so securely. I will secure excess cable to the grid so
-          nothing is left dangling. <br /> * I will mount items to the grid
-          using easily removable means e.g. clamps, hooks, carabiners, string
-          with a bow-knot, masking or gaffer tape. <br /> * When I am done, I
-          will remove everything including little bits of string and tape
-          attached to gear.
+          I agree to the following attestations: <br />
+          *I will reset any furniture that I moved, clean up after myself, and
+          not leave anything behind.
+          <br />
+          *If I need to cancel my reservation, I will email the Media Commons.
         </label>
         <div className="flex items-center mb-4">
           <input

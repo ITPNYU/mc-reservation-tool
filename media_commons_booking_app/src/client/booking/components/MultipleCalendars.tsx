@@ -9,6 +9,7 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
   const [checkedRoomIds, setCheckedRoomIds] = useState([]);
   const [checkedRooms, setCheckedRooms] = useState([]);
   const [showMotionCaptureModal, setShowMotionCaptureModal] = useState(false);
+  const [hasModalBeenShown, setHasModalBeenShown] = useState(false);
 
   const allRoomWithCalendarRefs = allRooms.map((room, i) => {
     room.calendarRef = React.createRef();
@@ -24,8 +25,12 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
       checkedRoomIds.includes(room.roomId)
     );
     setCheckedRooms(checked);
-    if (checkedRoomIds.includes('221')) {
+    if (
+      checkedRoomIds.includes('221') ||
+      (checkedRoomIds.includes('222') && !showMotionCaptureModal)
+    ) {
       setShowMotionCaptureModal(true);
+      setHasModalBeenShown(true);
     }
   }, [checkedRoomIds]);
 
@@ -80,7 +85,8 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
                 </svg>
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                   PLEASE NOTE: If you intend to use the motion capture rig in
-                  Room 221 you'll also need to book Room 222 concurrently.
+                  Room 221 or 222, you'll also need to book Room 222
+                  concurrently.
                 </h3>
                 <button
                   data-modal-hide="popup-modal"
