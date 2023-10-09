@@ -132,7 +132,7 @@ export const Calendars = ({
     // only enrolledThesis user can book over 4 hours
     if (
       !enrolledThisis &&
-      selectInfo.end.getTime() / 1000 - selectInfo.start.getTime() / 1000 >=
+      selectInfo.end.getTime() / 1000 - selectInfo.start.getTime() / 1000 >
         60 * 60 * 4
     ) {
       return false;

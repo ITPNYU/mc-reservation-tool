@@ -9,10 +9,7 @@ import { AdminUsers } from './AdminUsers';
 import { Liaisons } from './Liaisons';
 import { formatDate } from '../../utils/date';
 
-const ACTIVE_SHEET_ID = '1VZ-DY6o0GM5DL-v9AKkpCbF0w-xm-_T-vVUSPZph06Q';
 const BOOKING_SHEET_NAME = 'bookings';
-const BOOKING_STATUS_SHEET_NAME = 'bookingStatus';
-const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 
 type Booking = Inputs & {
   calendarEventId: string;
