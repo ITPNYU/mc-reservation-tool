@@ -1,8 +1,4 @@
-const getSheets = () => SpreadsheetApp.getActive().getSheets();
-
-const getActiveSheetName = () => SpreadsheetApp.getActive().getSheetName();
-
-const ACTIVE_SHEET_ID = '1VZ-DY6o0GM5DL-v9AKkpCbF0w-xm-_T-vVUSPZph06Q';
+const ACTIVE_SHEET_ID = '1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68';
 
 export const fetchRows_ = (sheetName) => {
   return SpreadsheetApp.openById(ACTIVE_SHEET_ID)
@@ -22,7 +18,7 @@ export const fetchRows = (sheetName) => {
 
 function fetchById(sheetName, id) {
   const row = fetchRows_(sheetName).find((row) => row[0] === id);
-  if (!row) throw 'Invalid conversation ID: ' + id;
+  if (!row) throw `Invalid conversation ID: ${id}`;
   const messages = fetchRows_(sheetName)
     .filter((row) => row[0] === id)
     .flatMap((row) => {
@@ -76,7 +72,7 @@ export const addEventToCalendar = (
     new Date(startTime),
     new Date(endTime),
     {
-      description: description,
+      description,
     }
   );
   event.setColor(CalendarApp.EventColor.GRAY);
@@ -127,13 +123,13 @@ export const sendHTMLEmail = (
   body
 ) => {
   console.log('contents', contents);
-  var htmlTemplate = HtmlService.createTemplateFromFile(templateName);
-  for (var key in contents) {
+  const htmlTemplate = HtmlService.createTemplateFromFile(templateName);
+  for (const key in contents) {
     htmlTemplate[key] = contents[key] || '';
   }
-  var htmlBody = htmlTemplate.evaluate().getContent();
-  var options = {
-    htmlBody: htmlBody,
+  const htmlBody = htmlTemplate.evaluate().getContent();
+  const options = {
+    htmlBody,
   };
   GmailApp.sendEmail(targetEmail, title, body, options);
 };
