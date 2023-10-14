@@ -25,13 +25,6 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
       checkedRoomIds.includes(room.roomId)
     );
     setCheckedRooms(checked);
-    if (
-      checkedRoomIds.includes('221') ||
-      (checkedRoomIds.includes('222') && !showMotionCaptureModal)
-    ) {
-      setShowMotionCaptureModal(true);
-      setHasModalBeenShown(true);
-    }
   }, [checkedRoomIds]);
 
   if (loading) {
@@ -42,6 +35,15 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
     const { value, checked } = event.target;
 
     const valuesArray = value.split(',');
+    console.log('value', value);
+
+    if (
+      !hasModalBeenShown &&
+      (valuesArray.includes('221') || valuesArray.includes('222'))
+    ) {
+      setShowMotionCaptureModal(true);
+      setHasModalBeenShown(true);
+    }
 
     if (checked) {
       setCheckedRoomIds((prev) => [...prev, ...valuesArray]);
