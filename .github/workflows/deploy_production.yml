@@ -1,8 +1,8 @@
-name: Deploy to Google Apps Script
+name: Deploy to Google Apps Script for production
 
 on: push
   branch:
-    - feature/github_workflow
+    - main
 
 jobs:
   deploy:
@@ -35,4 +35,4 @@ jobs:
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycbxmvvwZQeYuYoP-J-ZFnrqdgyGHdb1COqqHT0ax6On_iO7oWicnk4fV1aig0hX7BMKOAA -d "riho test"
+          clasp deploy --deploymentId AKfycbxmQf1ZncntQwdIaGq372w5gbdiltLGmzo2xbV7efAbZQ7U7zWtMJBw0EQjnXZm4aYimw -d "production"
