@@ -1,8 +1,8 @@
-name: Deploy to Google Apps Script
+name: Deploy to Google Apps Script for noah
 
 on: push
-  branch:
-    - feature/*
+  branches:    
+    - 'noah/**'
 
 jobs:
   deploy:
@@ -35,4 +35,4 @@ jobs:
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycbxmvvwZQeYuYoP-J-ZFnrqdgyGHdb1COqqHT0ax6On_iO7oWicnk4fV1aig0hX7BMKOAA -d "riho test"
+          clasp deploy --deploymentId AKfycby6DWUvOJ-r6Qtq7WR734GWvw_ng5ZquXGacOVRwW-6iQh4OP7V_up8HAClkrsvtYfuWw -d "noah test"

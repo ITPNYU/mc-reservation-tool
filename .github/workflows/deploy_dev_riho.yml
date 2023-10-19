@@ -1,8 +1,8 @@
-name: Deploy to Google Apps Script
+name: Deploy to Google Apps Script for Riho
 
 on: push
-  branch:
-    - feature/*
+  branches:    
+    - 'riho/**'
 
 jobs:
   deploy:
