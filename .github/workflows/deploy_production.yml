@@ -1,8 +1,9 @@
 name: Deploy to Google Apps Script for production
 
-on: push
-  branch:
-    - main
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:

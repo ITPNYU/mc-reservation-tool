@@ -1,8 +1,9 @@
 name: Deploy to Google Apps Script
 
-on: push
-  branch:
-    - feature/*
+on:
+  push:
+    branches:
+      - feature/*
 
 jobs:
   deploy:

@@ -1,8 +1,9 @@
 name: Deploy to Google Apps Script for noah
 
-on: push
-  branches:    
-    - 'noah/**'
+on:
+  push:
+    branches:
+      - "noah/**"
 
 jobs:
   deploy:
