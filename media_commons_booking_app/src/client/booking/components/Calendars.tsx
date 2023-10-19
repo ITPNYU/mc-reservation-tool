@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import FullCalendar from '@fullcalendar/react';
-import timeGridPlugin from '@fullcalendar/timeGrid'; // a plugin!
+import timeGridPlugin from '@fullcalendar/timegrid'; // a plugin!
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { CalendarDatePicker } from './CalendarDatePicker';
