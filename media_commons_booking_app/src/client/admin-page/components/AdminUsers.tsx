@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '@fullcalendar/core';
+import { formatDate } from '../../utils/date';
 
-const SAFETY_TRAINING_SHEET_NAME = 'admin_users';
+const ADMIN_USER_SHEET_NAME = 'admin_users';
 
-type SafetyTraining = {
+type AdminUser = {
   email: string;
-  completedAt: string;
+  createdAt: string;
 };
 
 export const AdminUsers = () => {
@@ -22,12 +22,12 @@ export const AdminUsers = () => {
   }, []);
   useEffect(() => {
     const mappings = adminUsers
-      .map((safetyTraining, index) => {
+      .map((adminUser, index) => {
         if (index !== 0) {
-          return mappingSafetyTrainingRows(safetyTraining);
+          return mappingAdminUserRows(adminUser);
         }
       })
-      .filter((safetyTraining) => safetyTraining !== undefined);
+      .filter((adminUser) => adminUser !== undefined);
     //TODO: filter out adminUsers that are not in the future
     setMappingAdminUsers(mappings);
     const emails = mappings.map((mapping) => {
@@ -37,31 +37,31 @@ export const AdminUsers = () => {
   }, [adminUsers]);
 
   const fetchAdminUsers = async () => {
-    serverFunctions.fetchRows(SAFETY_TRAINING_SHEET_NAME).then((rows) => {
+    serverFunctions.fetchRows(ADMIN_USER_SHEET_NAME).then((rows) => {
       setAdminUsers(rows);
     });
   };
 
-  const mappingSafetyTrainingRows = (values: string[]): SafetyTraining => {
+  const mappingAdminUserRows = (values: string[]): AdminUser => {
     return {
       email: values[0],
-      completedAt: values[1],
+      createdAt: values[1],
     };
   };
 
-  console.log('adminEmails', adminEmails);
-  const addSafetyTrainingUser = () => {
+  const addAdminUser = () => {
     if (adminEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(SAFETY_TRAINING_SHEET_NAME, [
+    serverFunctions.appendRow(ADMIN_USER_SHEET_NAME, [
       email,
       new Date().toString(),
     ]);
 
     alert('User has been registered successfully!');
+    window.location.reload();
   };
   return (
     <div className="m-10">
@@ -86,7 +86,7 @@ export const AdminUsers = () => {
         </div>
         <button
           type="button"
-          onClick={addSafetyTrainingUser}
+          onClick={addAdminUser}
           className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Add User
@@ -101,22 +101,40 @@ export const AdminUsers = () => {
                 Email
               </th>
               <th scope="col" className="px-2 py-3">
-                Completed Date
+                Created Date
+              </th>
+              <th scope="col" className="px-2 py-3">
+                Action
               </th>
             </tr>
           </thead>
           <tbody>
-            {mappingAdminUsers.map((safetyTraining, index) => {
+            {mappingAdminUsers.map((adminUser, index) => {
               return (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <td className="px-2 py-4 w-36">{safetyTraining.email}</td>
+                  <td className="px-2 py-4 w-36">{adminUser.email}</td>
                   <td className="px-2 py-4 w-36">
                     <div className=" flex items-center flex-col">
-                      <div>{formatDate(safetyTraining.completedAt)}</div>{' '}
+                      <div>{formatDate(adminUser.createdAt)}</div>{' '}
                     </div>
+                  </td>
+                  <td className="px-2 py-4 w-36">
+                    <button
+                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      onClick={async () => {
+                        await serverFunctions.removeFromList(
+                          ADMIN_USER_SHEET_NAME,
+                          adminUser.email
+                        );
+                        alert('Successfully removed');
+                        window.location.reload();
+                      }}
+                    >
+                      Remove
+                    </button>
                   </td>
                 </tr>
               );

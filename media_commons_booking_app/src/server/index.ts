@@ -16,9 +16,9 @@ import {
   cancel,
   checkin,
   approveInstantBooking,
-  ACTIVE_SHEET_ID,
   BOOKING_STATUS_SHEET_NAME,
   BOOKING_SHEET_NAME,
+  removeFromList,
 } from './admin';
 
 import {
@@ -31,6 +31,7 @@ import {
   addEventToCalendar,
   getEvents,
   getSheetRows,
+  ACTIVE_SHEET_ID,
   confirmEvent,
   approvedByFirstPerson,
   approvedBySecondPerson,
@@ -73,4 +74,5 @@ export {
   BOOKING_SHEET_NAME,
   getGoogleCalendarApiKey,
   getUserEmail,
+  removeFromList,
 };

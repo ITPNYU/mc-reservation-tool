@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
 
-const SHEET_NAME = 'liaisons';
+const LIAISON_SHEET_NAME = 'liaisons';
 
 type LiaisonType = {
   email: string;
@@ -17,6 +17,7 @@ export const Liaisons = () => {
   const [liaisonEmails, setAdminEmails] = useState([]);
   const [mappingLiaisonUsers, setMappingLiaisonUsers] = useState([]);
   const [email, setEmail] = useState('');
+  const [department, setDepartment] = useState('');
 
   useEffect(() => {
     fetchLiaisonUsers();
@@ -38,7 +39,7 @@ export const Liaisons = () => {
   }, [liaisonUsers]);
 
   const fetchLiaisonUsers = async () => {
-    serverFunctions.fetchRows(SHEET_NAME).then((rows) => {
+    serverFunctions.fetchRows(LIAISON_SHEET_NAME).then((rows) => {
       setLiaisonUsers(rows);
     });
   };
@@ -52,15 +53,25 @@ export const Liaisons = () => {
   };
 
   console.log('liaisonEmails', liaisonEmails);
-  const addSafetyTrainingUser = () => {
+  const addLiaisonUser = () => {
+    if (email === '' || department === '') {
+      alert('Please fill in all the fields');
+      return;
+    }
+
     if (liaisonEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(SHEET_NAME, [email, new Date().toString()]);
+    serverFunctions.appendRow(LIAISON_SHEET_NAME, [
+      email,
+      department,
+      new Date().toString(),
+    ]);
 
     alert('User has been registered successfully!');
+    window.location.reload();
   };
   return (
     <div className="m-10">
@@ -83,9 +94,30 @@ export const Liaisons = () => {
             required
           />
         </div>
+        <div className="mr-6">
+          <select
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[200px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            onChange={(e) => {
+              setDepartment(e.target.value);
+            }}
+            value={department}
+          >
+            <option value="" disabled>
+              Select option
+            </option>
+            <option value="ALT">ALT</option>
+            <option value="GameCenter">Game Center</option>
+            <option value="IDM">IDM</option>
+            <option value="ITP / IMA / Low Res">ITP / IMA / Low Res</option>
+            <option value="MARL">MARL</option>
+            <option value="Music Tech">Music Tech</option>
+            <option value="Recorded Music">Recorded Music</option>
+            <option value="others">Other Group</option>
+          </select>
+        </div>
         <button
           type="button"
-          onClick={addSafetyTrainingUser}
+          onClick={addLiaisonUser}
           className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Add User
@@ -104,7 +136,10 @@ export const Liaisons = () => {
               </th>
 
               <th scope="col" className="px-2 py-3">
-                Completed Date
+                Created Date
+              </th>
+              <th scope="col" className="px-2 py-3">
+                Action
               </th>
             </tr>
           </thead>
@@ -121,6 +156,21 @@ export const Liaisons = () => {
                     <div className=" flex items-center flex-col">
                       <div>{formatDate(liaison.completedAt)}</div>{' '}
                     </div>
+                  </td>
+                  <td className="px-2 py-4 w-36">
+                    <button
+                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      onClick={async () => {
+                        await serverFunctions.removeFromList(
+                          LIAISON_SHEET_NAME,
+                          liaison.email
+                        );
+                        alert('Successfully removed');
+                        window.location.reload();
+                      }}
+                    >
+                      Remove
+                    </button>
                   </td>
                 </tr>
               );
