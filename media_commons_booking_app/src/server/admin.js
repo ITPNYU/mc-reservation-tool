@@ -1,4 +1,3 @@
-export const ACTIVE_SHEET_ID = '1VZ-DY6o0GM5DL-v9AKkpCbF0w-xm-_T-vVUSPZph06Q';
 export const BOOKING_SHEET_NAME = 'bookings';
 export const BOOKING_STATUS_SHEET_NAME = 'bookingStatus';
 const SECOND_APPROVER_EMAIL = 'rh3555@nyu.edu';
@@ -45,8 +44,7 @@ export const bookingContents = (id) => {
     mediaServicesDetails: values[24],
     catering: values[25],
     cateringService: values[26],
-    chartfieldInformation: values[27],
-    hireSecurity: values[28],
+    hireSecurity: values[27],
     approvalUrl: approvalUrl(id),
     rejectedUrl: rejectUrl(id),
   };
@@ -166,4 +164,11 @@ export const checkin = (id) => {
     .getRange(rowIndex + 1, 8)
     .setValue(current);
   updateEventPrefix(id, 'CHECKED IN');
+};
+
+export const removeFromList = (sheet_name, email) => {
+  const rowIndex = fetchRows_(sheet_name).findIndex((row) => row[0] === email);
+  SpreadsheetApp.openById(ACTIVE_SHEET_ID)
+    .getSheetByName(sheet_name)
+    .deleteRow(rowIndex + 1);
 };

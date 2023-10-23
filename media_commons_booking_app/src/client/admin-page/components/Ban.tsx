@@ -58,6 +58,7 @@ export const Ban = () => {
     serverFunctions.appendRow(BAN_SHEET_NAME, [email, new Date().toString()]);
 
     alert('User has been registered successfully!');
+    window.location.reload();
   };
   return (
     <div className="m-10">
@@ -99,6 +100,9 @@ export const Ban = () => {
               <th scope="col" className="px-2 py-3">
                 Ban Date
               </th>
+              <th scope="col" className="px-2 py-3">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -111,8 +115,23 @@ export const Ban = () => {
                   <td className="px-2 py-4 w-36">{ban.email}</td>
                   <td className="px-2 py-4 w-36">
                     <div className=" flex items-center flex-col">
-                      <div>{formatDate(ban.completedAt)}</div>{' '}
+                      <div>{formatDate(ban.bannedAt)}</div>{' '}
                     </div>
+                  </td>
+                  <td className="px-2 py-4 w-36">
+                    <button
+                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      onClick={async () => {
+                        await serverFunctions.removeFromList(
+                          BAN_SHEET_NAME,
+                          ban.email
+                        );
+                        alert('Successfully removed');
+                        window.location.reload();
+                      }}
+                    >
+                      Remove
+                    </button>
                   </td>
                 </tr>
               );

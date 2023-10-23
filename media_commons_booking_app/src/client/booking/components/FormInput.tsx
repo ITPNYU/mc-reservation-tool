@@ -23,7 +23,6 @@ export type Inputs = {
   catering: string;
   hireSecurity: string;
   expectedAttendance: string;
-  chartfieldInformation: string;
   cateringService: string;
   missingEmail?: string;
 };
@@ -50,7 +49,6 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
     defaultValues: {
       setupDetails: '',
       cateringService: '',
-      chartfieldInformation: '',
       sponsorFirstName: '',
       sponsorLastName: '',
       sponsorEmail: '',
@@ -65,15 +63,11 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
     mode: 'onBlur',
   });
   const [checklist, setChecklist] = useState(false);
-  const [agreement, setAgreement] = useState(false);
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
-  const disabledButton = !(
-    checklist &&
-    agreement &&
-    resetRoom &&
-    bookingPolicy
-  );
+  const [showTextbox, setShowTextbox] = useState(false);
+
+  const disabledButton = !(checklist && resetRoom && bookingPolicy);
   useEffect(() => {
     trigger();
   }, [trigger]);
@@ -85,6 +79,14 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
     handleParentSubmit(data);
   };
   console.log('errors', errors);
+
+  const handleSelectChange = (event) => {
+    if (event.target.value === 'others') {
+      setShowTextbox(true);
+    } else {
+      setShowTextbox(false);
+    }
+  };
 
   return (
     <form
@@ -270,6 +272,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             required: true,
             validate: (value) => value !== '',
           })}
+          onChange={(e) => {
+            handleSelectChange(e);
+          }}
         >
           <option value="" disabled>
             Select option
@@ -283,7 +288,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <option value="Recorded Music">Recorded Music</option>
           <option value="others">Other Group</option>
         </select>
-        {watch('department') === 'others' && (
+        {showTextbox && (
           <input
             type="text"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -332,7 +337,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
               id="sponsorFirstName"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
-              {...register('sponsorFirstName')}
+              {...register('sponsorFirstName', {
+                required: watch('role') === 'Student',
+              })}
             />
           </div>
           <div className="mb-6">
@@ -347,7 +354,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
               id="sponsorLastName"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
-              {...register('sponsorLastName')}
+              {...register('sponsorLastName', {
+                required: watch('role') === 'Student',
+              })}
             />
           </div>
           <div className="mb-6">
@@ -367,6 +376,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
               {...register('sponsorEmail', {
+                required: watch('role') === 'Student',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
                   message: 'Invalid email address',
@@ -522,12 +532,17 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             formation.
           </label>
           <p className="text-xs"></p>
+          {errors.setupDetails && (
+            <ErrorMessage errors={errors.setupDetails.message} />
+          )}
           <input
             type="textarea"
             id="setupDetails"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder=""
-            {...register('setupDetails')}
+            {...register('setupDetails', {
+              required: watch('roomSetup') === 'yes',
+            })}
           />
         </div>
       )}
@@ -594,7 +609,19 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
               (For Audio Lab 230) Request an audio technician
             </label>
           )}
-
+          {roomNumber.some((room) =>
+            [220, 221, 222, 223, 224].includes(Number(room))
+          ) && (
+            <label key={'103audioTechnician'}>
+              <input
+                type="checkbox"
+                value="(For Garage 103) Request an audio technician"
+                name="mediaServices"
+                {...register('mediaServices')}
+              />
+              (For 220-224) Using lights in ceiling grid
+            </label>
+          )}
           {roomNumber.includes('202') ||
             (roomNumber.includes('1201') && (
               <label key={'support'}>
@@ -663,8 +690,16 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             Catering Information
           </label>
           <p className="text-xs">
-            Including catering in your event necessitates hiring CBS cleaning
-            services.
+            It is required for the reservation holder to pay and arrange for CBS
+            cleaning services if the event includes catering.
+            <a
+              href=""
+              target="_blank"
+              className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+            >
+              Please see this link for more information
+            </a>
+            .
           </p>
           <div className="flex items-center mb-4">
             <select
@@ -679,31 +714,6 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
                 NYU Plated
               </option>
             </select>
-          </div>
-        </div>
-      )}
-      {watch('catering') === 'yes' && (
-        <div className="mb-6">
-          <label
-            htmlFor="chartfieldInformation"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Chartfield Information
-          </label>
-          <p className="text-xs">
-            It is required for the reservation holder to pay for CBS cleaning
-            services if the event includes catering. The 370J Operations team
-            will arrange for cleaning services with your chartfield information
-            entered below.
-          </p>
-          <div className="flex items-center mb-4">
-            <input
-              type="textarea"
-              id="chartfieldInformation"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder=""
-              {...register('chartfieldInformation')}
-            />
           </div>
         </div>
       )}
@@ -800,33 +810,6 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           />
           <label
             htmlFor="resetRoom"
-            className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >
-            I agree
-          </label>
-        </div>
-      </div>
-      <div className="mb-6">
-        <label
-          htmlFor="agreement"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          I agree to the following attestations: <br />
-          *I will reset any furniture that I moved, clean up after myself, and
-          not leave anything behind.
-          <br />
-          *If I need to cancel my reservation, I will email the Media Commons.
-        </label>
-        <div className="flex items-center mb-4">
-          <input
-            id="agreement"
-            type="checkbox"
-            value=""
-            onChange={() => setAgreement(!agreement)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-          />
-          <label
-            htmlFor="agreement"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
             I agree

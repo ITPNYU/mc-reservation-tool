@@ -68,7 +68,6 @@ const SheetEditor = () => {
     'mediaServicesDetails',
     'catering',
     'cateringService',
-    'chartfieldInformation',
     'hireSecurity',
   ];
 
@@ -261,6 +260,7 @@ const SheetEditor = () => {
     } else if (section === 'selectRoom') {
       return (
         <div>
+          Select room and view calendar
           <MultipleCalendars
             key="calendars"
             apiKey={apiKey}
@@ -286,14 +286,6 @@ const SheetEditor = () => {
       {!showModal && (
         <>
           <div className="flex flex-col justify-items-end items-end">
-            <a
-              href={`${BASE_URL}?page=admin`}
-              target="_blank"
-              className="text-blue-600 underline"
-            >
-              Admin page
-            </a>
-
             <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />
           </div>
           {UserSection()}
