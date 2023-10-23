@@ -46,12 +46,11 @@ export const Calendars = ({
     }
     if (bookInfo) {
       const isConfirmed = window.confirm(
-        `You are booking the following rooms: ${selectedRooms.map(
+        `You are requesting to book the following rooms${selectedRooms.map(
           (room) => `${room.roomId} ${room.name}`
-        )}
-      \nYour reserved time slot: ${formatDate(
-        bookInfo.startStr
-      )} ~ ${formatDate(bookInfo.endStr)}`
+        )}  for the time slot ${formatDate(bookInfo.startStr)} ~ ${formatDate(
+          bookInfo.endStr
+        )}`
       );
       if (isConfirmed) handleSetDate(bookInfo);
     }
@@ -115,7 +114,7 @@ export const Calendars = ({
         id: Date.now(), // Generate a unique ID for the event
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        title: `${TITLE_TAG} Reserve`,
+        title: `${TITLE_TAG}`,
         groupId: selectInfo.startStr,
       });
     });

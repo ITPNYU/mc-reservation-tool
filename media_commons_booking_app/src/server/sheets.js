@@ -1,4 +1,4 @@
-const ACTIVE_SHEET_ID = '1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68';
+export const ACTIVE_SHEET_ID = '1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68';
 
 export const fetchRows_ = (sheetName) => {
   return SpreadsheetApp.openById(ACTIVE_SHEET_ID)
