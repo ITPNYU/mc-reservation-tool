@@ -115,8 +115,7 @@ export const Bookings = () => {
       mediaServicesDetails: values[23],
       catering: values[24],
       cateringService: values[25],
-      chartfieldInformation: values[26],
-      hireSecurity: values[27],
+      hireSecurity: values[26],
     };
   };
 
@@ -370,9 +369,7 @@ export const Bookings = () => {
                   </td>
                   <td className="px-2 py-4 w-18">{booking.catering}</td>
                   <td className="px-2 py-4 w-18">{booking.cateringService}</td>
-                  <td className="px-2 py-4 w-18">
-                    {booking.chartfieldInformation}
-                  </td>
+
                   <td className="px-2 py-4 w-18">{booking.hireSecurity}</td>
                 </tr>
               );

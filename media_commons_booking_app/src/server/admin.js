@@ -44,8 +44,7 @@ export const bookingContents = (id) => {
     mediaServicesDetails: values[24],
     catering: values[25],
     cateringService: values[26],
-    chartfieldInformation: values[27],
-    hireSecurity: values[28],
+    hireSecurity: values[27],
     approvalUrl: approvalUrl(id),
     rejectedUrl: rejectUrl(id),
   };

@@ -62,7 +62,7 @@ export const Calendars = ({
 
       const allEvents = calendarApi.getEvents();
       return allEvents.some((event) => {
-        if (event.title.includes('Reserve')) return false;
+        if (event.title.includes(TITLE_TAG)) return false;
         return (
           (event.start >= info.start && event.start < info.end) ||
           (event.end > info.start && event.end <= info.end) ||

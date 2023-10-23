@@ -23,7 +23,6 @@ export type Inputs = {
   catering: string;
   hireSecurity: string;
   expectedAttendance: string;
-  chartfieldInformation: string;
   cateringService: string;
   missingEmail?: string;
 };
@@ -50,7 +49,6 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
     defaultValues: {
       setupDetails: '',
       cateringService: '',
-      chartfieldInformation: '',
       sponsorFirstName: '',
       sponsorLastName: '',
       sponsorEmail: '',
@@ -65,17 +63,11 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
     mode: 'onBlur',
   });
   const [checklist, setChecklist] = useState(false);
-  const [agreement, setAgreement] = useState(false);
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
   const [showTextbox, setShowTextbox] = useState(false);
 
-  const disabledButton = !(
-    checklist &&
-    agreement &&
-    resetRoom &&
-    bookingPolicy
-  );
+  const disabledButton = !(checklist && resetRoom && bookingPolicy);
   useEffect(() => {
     trigger();
   }, [trigger]);
@@ -617,7 +609,19 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
               (For Audio Lab 230) Request an audio technician
             </label>
           )}
-
+          {roomNumber.some((room) =>
+            [220, 221, 222, 223, 224].includes(Number(room))
+          ) && (
+            <label key={'103audioTechnician'}>
+              <input
+                type="checkbox"
+                value="(For Garage 103) Request an audio technician"
+                name="mediaServices"
+                {...register('mediaServices')}
+              />
+              (For 220-224) Using lights in ceiling grid
+            </label>
+          )}
           {roomNumber.includes('202') ||
             (roomNumber.includes('1201') && (
               <label key={'support'}>

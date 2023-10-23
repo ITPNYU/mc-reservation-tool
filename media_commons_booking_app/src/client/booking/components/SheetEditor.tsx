@@ -68,7 +68,6 @@ const SheetEditor = () => {
     'mediaServicesDetails',
     'catering',
     'cateringService',
-    'chartfieldInformation',
     'hireSecurity',
   ];
 
