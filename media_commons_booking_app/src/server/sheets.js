@@ -16,6 +16,26 @@ export const fetchRows = (sheetName) => {
   return (values || []).map((row) => row.map((cell) => `${cell}`));
 };
 
+export const getFutureDates = (sheetName) => {
+  const values = SpreadsheetApp.openById(ACTIVE_SHEET_ID)
+    .getSheetByName(sheetName)
+    .getDataRange()
+    .getValues();
+
+  var today = new Date();
+  today.setHours(0, 0, 0, 0); // set hours 00:00:00.000
+
+  var filteredData = values.filter(function (row, index) {
+    if (index === 0) return true; // if header row, return true (include in filtered data)
+    var startDate = new Date(row[3]); // 'start date' column
+    console.log('startDate', startDate);
+    return startDate > today; // 'start date' is after today
+  });
+
+  Logger.log('getFutureDates', filteredData);
+  return (filteredData || []).map((row) => row.map((cell) => `${cell}`));
+};
+
 function fetchById(sheetName, id) {
   const row = fetchRows_(sheetName).find((row) => row[0] === id);
   if (!row) throw `Invalid conversation ID: ${id}`;
