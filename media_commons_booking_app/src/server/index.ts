@@ -38,6 +38,7 @@ import {
   sendTextEmail,
   fetchById,
   fetchRows_,
+  getFutureDates,
 } from './sheets';
 
 // Public functions must be exported as named exports
@@ -75,4 +76,5 @@ export {
   getGoogleCalendarApiKey,
   getUserEmail,
   removeFromList,
+  getFutureDates,
 };

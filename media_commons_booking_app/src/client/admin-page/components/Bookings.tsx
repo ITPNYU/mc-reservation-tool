@@ -56,10 +56,7 @@ export const Bookings = () => {
   }, [bookings]);
 
   useEffect(() => {
-    console.log(
-      bookingStatuses,
-      'bookingStatusesbookingStatusesbookingStatusesbookingStatuses'
-    );
+    console.log(bookingStatuses, 'bookingStatus');
     const mappings = bookingStatuses
       .map((bookingStatus, index) => {
         console.log(bookingStatus, 'bookingStatus');
@@ -74,7 +71,7 @@ export const Bookings = () => {
   }, [bookingStatuses]);
 
   const fetchBookings = async () => {
-    serverFunctions.fetchRows(BOOKING_SHEET_NAME).then((rows) => {
+    serverFunctions.getFutureDates(BOOKING_SHEET_NAME).then((rows) => {
       console.log('booking rows', rows);
       setBookings(rows);
     });
