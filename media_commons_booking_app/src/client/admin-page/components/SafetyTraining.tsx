@@ -62,7 +62,7 @@ export const SafetyTraining = () => {
     ]);
 
     alert('User has been registered successfully!');
-    window.location.reload();
+    fetchSafetyTrainings();
   };
   return (
     <div className="m-10">
@@ -131,7 +131,7 @@ export const SafetyTraining = () => {
                           safetyTraining.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchSafetyTrainings();
                       }}
                     >
                       Remove

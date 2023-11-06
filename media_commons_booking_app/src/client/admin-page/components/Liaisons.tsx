@@ -71,7 +71,7 @@ export const Liaisons = () => {
     ]);
 
     alert('User has been registered successfully!');
-    window.location.reload();
+    fetchLiaisonUsers();
   };
   return (
     <div className="m-10">
@@ -166,7 +166,7 @@ export const Liaisons = () => {
                           liaison.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchLiaisonUsers();
                       }}
                     >
                       Remove

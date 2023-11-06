@@ -61,7 +61,7 @@ export const AdminUsers = () => {
     ]);
 
     alert('User has been registered successfully!');
-    window.location.reload();
+    fetchAdminUsers();
   };
   return (
     <div className="m-10">
@@ -130,7 +130,7 @@ export const AdminUsers = () => {
                           adminUser.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchAdminUsers();
                       }}
                     >
                       Remove
