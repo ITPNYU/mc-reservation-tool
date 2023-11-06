@@ -38,11 +38,12 @@ export const Bookings = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedInfo, setSelectedInfo] = useState<Booking>();
   const [tab, setTab] = useState('bookings');
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     fetchBookings();
     fetchBookingStatuses();
-  }, []);
+  }, [reload]);
   useEffect(() => {
     const mappings = bookings
       .map((booking, index) => {
@@ -245,7 +246,7 @@ export const Bookings = () => {
                           await serverFunctions.approveBooking(
                             booking.calendarEventId
                           );
-                          window.location.reload();
+                          setReload(true);
                         }}
                       >
                         Second Approve
@@ -258,7 +259,7 @@ export const Bookings = () => {
                           await serverFunctions.approveBooking(
                             booking.calendarEventId
                           );
-                          window.location.reload();
+                          setReload(true);
                         }}
                       >
                         First Approve
@@ -268,7 +269,7 @@ export const Bookings = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2"
                       onClick={async () => {
                         await serverFunctions.reject(booking.calendarEventId);
-                        window.location.reload();
+                        setReload(true);
                       }}
                     >
                       Reject
@@ -277,7 +278,7 @@ export const Bookings = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2"
                       onClick={async () => {
                         await serverFunctions.cancel(booking.calendarEventId);
-                        window.location.reload();
+                        setReload(true);
                       }}
                     >
                       Cancel
@@ -289,7 +290,7 @@ export const Bookings = () => {
                           await serverFunctions.checkin(
                             booking.calendarEventId
                           );
-                          window.location.reload();
+                          setReload(true);
                         }}
                       >
                         Check In
