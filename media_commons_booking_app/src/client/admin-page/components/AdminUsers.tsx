@@ -61,7 +61,7 @@ export const AdminUsers = () => {
     ]);
 
     alert('User has been registered successfully!');
-    window.location.reload();
+    fetchAdminUsers();
   };
   return (
     <div className="m-10">

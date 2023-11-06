@@ -58,7 +58,7 @@ export const Ban = () => {
     serverFunctions.appendRow(BAN_SHEET_NAME, [email, new Date().toString()]);
 
     alert('User has been registered successfully!');
-    window.location.reload();
+    fetchBans();
   };
   return (
     <div className="m-10">
