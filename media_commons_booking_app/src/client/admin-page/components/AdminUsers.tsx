@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
+import { Loading } from '../../utils/Loading';
 
 const ADMIN_USER_SHEET_NAME = 'admin_users';
 
@@ -50,6 +51,8 @@ export const AdminUsers = () => {
   };
 
   const addAdminUser = async () => {
+    setLoading(true);
+
     if (adminEmails.includes(email)) {
       alert('This user is already registered');
       return;
@@ -61,8 +64,13 @@ export const AdminUsers = () => {
     ]);
 
     alert('User has been registered successfully!');
+    setLoading(false);
     fetchAdminUsers();
   };
+  const [loading, setLoading] = useState(false);
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="m-10">
       <form className="flex items-center">
@@ -125,12 +133,14 @@ export const AdminUsers = () => {
                     <button
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
+                        setLoading(true);
                         await serverFunctions.removeFromList(
                           ADMIN_USER_SHEET_NAME,
                           adminUser.email
                         );
                         alert('Successfully removed');
                         fetchAdminUsers();
+                        setLoading(false);
                       }}
                     >
                       Remove

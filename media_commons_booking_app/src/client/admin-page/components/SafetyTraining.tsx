@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
+import { Loading } from '../../utils/Loading';
 
 const SAFETY_TRAINING_SHEET_NAME = 'safety_training_users';
 
@@ -51,6 +52,7 @@ export const SafetyTraining = () => {
 
   console.log('trainedEmails', trainedEmails);
   const addSafetyTrainingUser = async () => {
+    setLoading(true);
     if (trainedEmails.includes(email)) {
       alert('This user is already registered');
       return;
@@ -62,8 +64,13 @@ export const SafetyTraining = () => {
     ]);
 
     alert('User has been registered successfully!');
+    setLoading(false);
     fetchSafetyTrainings();
   };
+  const [loading, setLoading] = useState(false);
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="m-10">
       <form className="flex items-center">
@@ -126,11 +133,13 @@ export const SafetyTraining = () => {
                     <button
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
+                        setLoading(true);
                         await serverFunctions.removeFromList(
                           SAFETY_TRAINING_SHEET_NAME,
                           safetyTraining.email
                         );
                         alert('Successfully removed');
+                        setLoading(false);
                         fetchSafetyTrainings();
                       }}
                     >

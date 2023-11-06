@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { Loading } from '../../utils/Loading';
 export type Inputs = {
   firstName: string;
   lastName: string;
@@ -541,6 +542,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             placeholder=""
             {...register('setupDetails', {
               required: watch('roomSetup') === 'yes',
+              validate: (value) => value !== '',
             })}
           />
         </div>
