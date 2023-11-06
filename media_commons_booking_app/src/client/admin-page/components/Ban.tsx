@@ -49,13 +49,16 @@ export const Ban = () => {
   };
 
   console.log('trainedEmails', trainedEmails);
-  const addBanUser = () => {
+  const addBanUser = async () => {
     if (trainedEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(BAN_SHEET_NAME, [email, new Date().toString()]);
+    await serverFunctions.appendRow(BAN_SHEET_NAME, [
+      email,
+      new Date().toString(),
+    ]);
 
     alert('User has been registered successfully!');
     fetchBans();

@@ -50,13 +50,13 @@ export const SafetyTraining = () => {
   };
 
   console.log('trainedEmails', trainedEmails);
-  const addSafetyTrainingUser = () => {
+  const addSafetyTrainingUser = async () => {
     if (trainedEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(SAFETY_TRAINING_SHEET_NAME, [
+    await serverFunctions.appendRow(SAFETY_TRAINING_SHEET_NAME, [
       email,
       new Date().toString(),
     ]);
