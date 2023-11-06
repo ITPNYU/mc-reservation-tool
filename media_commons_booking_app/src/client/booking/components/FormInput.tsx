@@ -691,14 +691,6 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <p className="text-xs">
             It is required for the reservation holder to pay and arrange for CBS
             cleaning services if the event includes catering.
-            <a
-              href=""
-              target="_blank"
-              className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
-            >
-              Please see this link for more information
-            </a>
-            .
           </p>
           <div className="flex items-center mb-4">
             <select
