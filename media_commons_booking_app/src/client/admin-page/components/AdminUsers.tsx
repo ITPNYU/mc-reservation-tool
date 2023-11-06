@@ -49,13 +49,13 @@ export const AdminUsers = () => {
     };
   };
 
-  const addAdminUser = () => {
+  const addAdminUser = async () => {
     if (adminEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    serverFunctions.appendRow(ADMIN_USER_SHEET_NAME, [
+    await serverFunctions.appendRow(ADMIN_USER_SHEET_NAME, [
       email,
       new Date().toString(),
     ]);

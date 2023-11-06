@@ -53,7 +53,7 @@ export const Liaisons = () => {
   };
 
   console.log('liaisonEmails', liaisonEmails);
-  const addLiaisonUser = () => {
+  const addLiaisonUser = async () => {
     if (email === '' || department === '') {
       alert('Please fill in all the fields');
       return;
@@ -64,7 +64,7 @@ export const Liaisons = () => {
       return;
     }
 
-    serverFunctions.appendRow(LIAISON_SHEET_NAME, [
+    await serverFunctions.appendRow(LIAISON_SHEET_NAME, [
       email,
       department,
       new Date().toString(),
