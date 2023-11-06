@@ -131,7 +131,7 @@ export const SafetyTraining = () => {
                           safetyTraining.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchSafetyTrainings();
                       }}
                     >
                       Remove

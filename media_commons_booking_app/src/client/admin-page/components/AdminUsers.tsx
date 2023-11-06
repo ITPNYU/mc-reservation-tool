@@ -130,7 +130,7 @@ export const AdminUsers = () => {
                           adminUser.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchAdminUsers();
                       }}
                     >
                       Remove

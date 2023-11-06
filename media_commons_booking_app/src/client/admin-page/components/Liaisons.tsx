@@ -166,7 +166,7 @@ export const Liaisons = () => {
                           liaison.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchLiaisonUsers();
                       }}
                     >
                       Remove

@@ -127,7 +127,7 @@ export const Ban = () => {
                           ban.email
                         );
                         alert('Successfully removed');
-                        window.location.reload();
+                        fetchBans();
                       }}
                     >
                       Remove
