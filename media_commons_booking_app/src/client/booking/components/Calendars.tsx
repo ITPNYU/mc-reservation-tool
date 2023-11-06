@@ -26,15 +26,15 @@ export const Calendars = ({
   handleSetDate,
 }: CalendarProps) => {
   const [enrolledThisis, setEnrolledThesis] = useState(false);
-  const [bookInfo, setBookInfo] = useState<DateSelectArg>();
+  const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
 
   const editableEvent = (info) => {
     return info.title.includes(TITLE_TAG);
   };
   const validateEvents = (e) => {
     e.stopPropagation;
-    const overlap = isOverlap(bookInfo);
-    const past = bookInfo.start < new Date();
+    const overlap = isOverlap(bookingTimeEvent);
+    const past = bookingTimeEvent.start < new Date();
     if (past) {
       alert("You can't schedule events in the past");
       return;
@@ -44,15 +44,15 @@ export const Calendars = ({
       alert('The new event overlaps with an existing event on the same day!');
       return;
     }
-    if (bookInfo) {
+    if (bookingTimeEvent) {
       const isConfirmed = window.confirm(
         `You are requesting to book the following rooms${selectedRooms.map(
           (room) => `${room.roomId} ${room.name}`
-        )}  for the time slot ${formatDate(bookInfo.startStr)} ~ ${formatDate(
-          bookInfo.endStr
-        )}`
+        )}  for the time slot ${formatDate(
+          bookingTimeEvent.startStr
+        )} ~ ${formatDate(bookingTimeEvent.endStr)}`
       );
-      if (isConfirmed) handleSetDate(bookInfo);
+      if (isConfirmed) handleSetDate(bookingTimeEvent);
     }
   };
 
@@ -88,7 +88,7 @@ export const Calendars = ({
           }
         });
       });
-      setBookInfo(null);
+      setBookingTimeEvent(null);
       return;
     }
   };
@@ -102,7 +102,7 @@ export const Calendars = ({
   }),
     [selectedRooms];
   const handleDateSelect = (selectInfo) => {
-    if (bookInfo) {
+    if (bookingTimeEvent) {
       alert('You can only book one time slot per reservation');
       return;
     }
@@ -118,7 +118,7 @@ export const Calendars = ({
         groupId: selectInfo.startStr,
       });
     });
-    setBookInfo(selectInfo);
+    setBookingTimeEvent(selectInfo);
   };
 
   const handleChange = (selectedDate: Date) => {
@@ -140,6 +140,24 @@ export const Calendars = ({
     console.log('isOverlap', !isOverlap(selectInfo));
     return !isOverlap(selectInfo);
   };
+
+  const syncEventLengthAcrossCalendars = (changedEvent) => {
+    allRooms.forEach((room) => {
+      const targetGroupId = changedEvent.groupId;
+      if (room.calendarRef.current) {
+        let calendarApi = room.calendarRef.current.getApi();
+        const events = calendarApi.getEvents();
+        events.map((event) => {
+          //All events are retrieved, so change only for the event retrieved this time.
+          if (event.groupId === targetGroupId) {
+            event.setStart(changedEvent.start);
+            event.setEnd(changedEvent.end);
+          }
+        });
+      }
+    });
+    setBookingTimeEvent(changedEvent);
+  };
   return (
     <div className="mt-5 flex flex-col justify-center">
       <div className="flex justify-center items-center space-x-4 my-8">
@@ -160,12 +178,12 @@ export const Calendars = ({
         <div className="flex flex-col items-center ">
           <button
             key="calendarNextButton"
-            disabled={!bookInfo}
+            disabled={!bookingTimeEvent}
             onClick={(e) => {
               validateEvents(e);
             }}
             className={`px-4 py-2 text-white rounded-md focus:outline-none ${
-              bookInfo
+              bookingTimeEvent
                 ? 'bg-blue-600 hover:bg-blue-700'
                 : 'bg-gray-300 pointer-events-none'
             }`}
@@ -233,6 +251,12 @@ export const Calendars = ({
                 return editableEvent(draggedEvent);
               }}
               selectAllow={(e) => handleSelectAllow(e)}
+              eventResize={(info) => {
+                syncEventLengthAcrossCalendars(info.event);
+              }}
+              eventDrop={(info) => {
+                syncEventLengthAcrossCalendars(info.event);
+              }}
             />
           </div>
         ))}
