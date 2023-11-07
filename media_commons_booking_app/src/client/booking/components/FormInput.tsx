@@ -448,11 +448,10 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           Attendee Affiliation(s)
         </label>
         <p className="text-xs">
-          Due to COVID policies, Non-NYU members will need to gain access
-          clearance through certain NYU processes. For more information about
-          visitor, vendor, and affiliate access,{' '}
+          Non-NYU guests will need to be sponsored through JRNY. For more
+          information about visitor, vendor, and affiliate access,
           <a
-            href="https://www.nyu.edu/life/safety-health-wellness/coronavirus-information/campus-visitors.html"
+            href="https://www.nyu.edu/about/visitor-information/sponsoring-visitors.html"
             className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
             target="_blank"
           >
@@ -490,18 +489,13 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           Room setup needed?
         </label>
         <p className="text-xs">
-          If your event or reservation is in 233 or 1201 and requires a specific
-          room setup that is different from the standard configuration, it is
-          your responsibility to{' '}
-          <a
-            href="https://nyu.service-now.com/csmp?id=sc_cat_item&sys_id=c78a46241bb234901416ea02b24bcb26&referrer=popular_items"
-            target="_blank"
-          >
+          If your reservation is in 233 or 1201 and requires a specific room
+          setup that is different from the standard configuration, it is the
+          <a href="https://nyu.service-now.com/csmp?id=sc_home" target="_blank">
             submit a work order with CBS
           </a>
-          . It is also the reservation holder's responsibility to ensure the
-          room is reset after use. Failure to do either will result in the
-          restriction of reservation privileges.
+          .It is also the reservation holder's responsibility to ensure the room
+          is reset after use.
         </p>
         {errors.roomSetup && <ErrorMessage errors={errors.roomSetup.message} />}
         <div className="flex items-center mb-4">
@@ -618,7 +612,7 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
                 name="mediaServices"
                 {...register('mediaServices')}
               />
-              (For 220-224) Using lights in ceiling grid
+              (For 220-224) Using DMX lights in ceiling grid
             </label>
           )}
           {roomNumber.includes('202') ||
@@ -643,8 +637,26 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
             If you selected any of the Media Services above, please describe
-            your needs in detail. (Ie. what kind of equipment you need to check
-            out or the type of assistance you need from an audio technician)
+            your needs in detail. If you need to check out equipment, you can
+            check our inventory and include your request below. (Ie. 2x Small
+            Mocap Suits)
+            <br />-{' '}
+            <a
+              href="https://docs.google.com/document/d/1oRtvZ0SR52Mq_ykoNXelwqat4JFgdado5JDY6A746VY/edit#heading=h.iv9c7z15bn0t"
+              target="_blank"
+              className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+            >
+              Inventory for Black Box 220 and Ballrooms 221-224
+            </a>
+            <br />-{' '}
+            <a
+              href="https://docs.google.com/spreadsheets/d/1fziyVrzeytQJyZ8585Wtqxer-PBt6L-u-Z0LHVavK5k/edit#gid=870626522"
+              target="_blank"
+              className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+            >
+              Inventory for Garage 103
+            </a>
+            <br />
           </label>
           <p className="text-xs"></p>
           <input
