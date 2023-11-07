@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
+import { Loading } from '../../utils/Loading';
 
 const LIAISON_SHEET_NAME = 'liaisons';
 
@@ -54,6 +55,7 @@ export const Liaisons = () => {
 
   console.log('liaisonEmails', liaisonEmails);
   const addLiaisonUser = async () => {
+    setLoading(true);
     if (email === '' || department === '') {
       alert('Please fill in all the fields');
       return;
@@ -71,8 +73,13 @@ export const Liaisons = () => {
     ]);
 
     alert('User has been registered successfully!');
+    setLoading(false);
     fetchLiaisonUsers();
   };
+  const [loading, setLoading] = useState(false);
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="m-10">
       <form className="flex items-center">
@@ -161,11 +168,13 @@ export const Liaisons = () => {
                     <button
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
+                        setLoading(true);
                         await serverFunctions.removeFromList(
                           LIAISON_SHEET_NAME,
                           liaison.email
                         );
                         alert('Successfully removed');
+                        setLoading(false);
                         fetchLiaisonUsers();
                       }}
                     >

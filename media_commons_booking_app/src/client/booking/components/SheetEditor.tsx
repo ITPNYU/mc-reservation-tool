@@ -9,6 +9,7 @@ import { Header } from './Header';
 import { MultipleCalendars } from './MultipleCalendars';
 import { Modal } from 'react-bootstrap';
 import { InitialModal } from './InitialModal';
+import { Loading } from '../../utils/Loading';
 export type RoomSetting = {
   roomId: string;
   name: string;
@@ -199,10 +200,12 @@ const SheetEditor = () => {
       alert(
         "Your request has been sent.\n Please check the calendar to verify that your submitted event has been registered.\n If you don't see the event, please contact us."
       );
+      setLoading(false);
       setSection('selectRoom');
     });
   };
   const handleSubmit = async (data) => {
+    setLoading(true);
     if (!bookInfo) return;
     if (!userEmail && data.missingEmail) {
       setUserEmail(data.missingEmail);
@@ -273,7 +276,7 @@ const SheetEditor = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   const handleModalClick = () => {

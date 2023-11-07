@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
+import { Loading } from '../../utils/Loading';
 const BAN_SHEET_NAME = 'banned_users';
 
 type Ban = {
@@ -50,6 +51,7 @@ export const Ban = () => {
 
   console.log('trainedEmails', trainedEmails);
   const addBanUser = async () => {
+    setLoading(true);
     if (trainedEmails.includes(email)) {
       alert('This user is already registered');
       return;
@@ -61,8 +63,13 @@ export const Ban = () => {
     ]);
 
     alert('User has been registered successfully!');
+    setLoading(false);
     fetchBans();
   };
+  const [loading, setLoading] = useState(false);
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="m-10">
       <form className="flex items-center">
@@ -125,11 +132,13 @@ export const Ban = () => {
                     <button
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
+                        setLoading(true);
                         await serverFunctions.removeFromList(
                           BAN_SHEET_NAME,
                           ban.email
                         );
                         alert('Successfully removed');
+                        setLoading(false);
                         fetchBans();
                       }}
                     >
