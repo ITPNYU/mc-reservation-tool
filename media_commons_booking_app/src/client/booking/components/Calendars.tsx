@@ -46,11 +46,11 @@ export const Calendars = ({
     }
     if (bookingTimeEvent) {
       const isConfirmed = window.confirm(
-        `You are requesting to book the following rooms${selectedRooms.map(
+        `Confirming that you are requesting to book the following rooms: ${selectedRooms.map(
           (room) => `${room.roomId} ${room.name}`
-        )}  for the time slot ${formatDate(
+        )}  starting at ${formatDate(
           bookingTimeEvent.startStr
-        )} ~ ${formatDate(bookingTimeEvent.endStr)}`
+        )} and ending at ${formatDate(bookingTimeEvent.endStr)}`
       );
       if (isConfirmed) handleSetDate(bookingTimeEvent);
     }
@@ -160,13 +160,14 @@ export const Calendars = ({
   };
   return (
     <div className="mt-5 flex flex-col justify-center">
-      <div className="flex justify-center items-center space-x-4 my-8">
+      <div className="">Select date</div>
+      <div className="flex justify-center items-center space-x-4 ">
         <CalendarDatePicker handleChange={handleChange} />
         <input
           id="default-checkbox"
           type="checkbox"
           value=""
-          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          className="pt-4 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           onChange={(e) => setEnrolledThesis(!enrolledThisis)}
         />
         <label
