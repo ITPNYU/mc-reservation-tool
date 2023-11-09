@@ -279,7 +279,6 @@ const SheetEditor = () => {
   const handleModalClick = () => {
     setShowModal(false);
   };
-  console.log('showModal', showModal);
   return (
     <div className="p-10 dark:bg-gray-800">
       {showModal && <InitialModal handleClick={handleModalClick} />}

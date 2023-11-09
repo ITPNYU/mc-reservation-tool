@@ -14,13 +14,14 @@ export const InitialModal = ({ handleClick }) => {
           <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               370🅙 Media Commons Reservation Form
-              <br />
-              Thank you for your interest in booking with the Media Commons.
-              <br />
-              Please read our Policy for using the 370 Jay Street Shared Spaces
             </h3>
           </div>
           <p className="p-6 space-y-6">
+            Thank you for your interest in booking with the Media Commons.
+            <br />
+            Please read our Policy for using the 370 Jay Street Shared Spaces
+            <br />
+            <br />
             <b>Booking Confirmation:</b> You will receive an email response from
             the 370J Operations team and a calendar invite once your request has
             been reviewed and processed. Please allow a minimum of 3 days for
