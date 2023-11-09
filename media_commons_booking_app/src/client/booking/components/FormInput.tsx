@@ -492,11 +492,18 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
         <p className="text-xs">
           If your reservation is in 233 or 1201 and requires a specific room
           setup that is different from the standard configuration, it is the
-          <a href="https://nyu.service-now.com/csmp?id=sc_home" target="_blank">
-            submit a work order with CBS
+          reservation holder’s responsibility to submit a
+          <a
+            className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+            href="https://nyu.service-now.com/csmp?id=sc_home"
+            target="_blank"
+          >
+            work order with CBS
           </a>
-          .It is also the reservation holder's responsibility to ensure the room
+          . <br />
+          It is also the reservation holder's responsibility to ensure the room
           is reset after use.
+          <br />
         </p>
         {errors.roomSetup && <ErrorMessage errors={errors.roomSetup.message} />}
         <div className="flex items-center mb-4">
@@ -553,15 +560,6 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           <ErrorMessage errors={errors.mediaServices.message} />
         )}
         <div className="flex flex-col mb-4">
-          <label key={'technicalTraining'}>
-            <input
-              type="checkbox"
-              value="Request technical training"
-              name="mediaServices"
-              {...register('mediaServices')}
-            />
-            Request technical training
-          </label>
           <label key={'checkoutEquipment'}>
             <input
               type="checkbox"
