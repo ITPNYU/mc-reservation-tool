@@ -7,6 +7,7 @@ import { Ban } from './Ban';
 import { AdminUsers } from './AdminUsers';
 import { Liaisons } from './Liaisons';
 import { Bookings } from './Bookings';
+import { PAUsers } from './PAUsers';
 
 const Admin = () => {
   const [tab, setTab] = useState('bookings');
@@ -53,6 +54,18 @@ const Admin = () => {
         </li>
         <li className="mr-2">
           <a
+            onClick={() => setTab('paUsers')}
+            className={`${
+              tab === 'paUsers'
+                ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
+                : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+            }`}
+          >
+            PA users
+          </a>
+        </li>
+        <li className="mr-2">
+          <a
             onClick={() => setTab('adminUsers')}
             className={`${
               tab === 'adminUsers'
@@ -79,6 +92,7 @@ const Admin = () => {
       {tab === 'safety_training' && <SafetyTraining />}
       {tab === 'ban' && <Ban />}
       {tab === 'adminUsers' && <AdminUsers />}
+      {tab === 'paUsers' && <PAUsers />}
       {tab === 'liaesons' && <Liaisons />}
       {tab === 'bookings' && <Bookings />}
     </div>

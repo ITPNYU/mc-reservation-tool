@@ -101,30 +101,6 @@ export const addEventToCalendar = (
   return event.getId();
 };
 
-export const approvedByFirstPerson = () => {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const rng = ss.getActiveCell();
-  const flag = rng.getValue();
-  console.log('rng', rng);
-  if (rng.getColumn() == 1 && flag == true) {
-    sendEmail(
-      'rh3555@nyu.edu',
-      'Second Approval',
-      'Please approve the request'
-    );
-  }
-};
-
-export const approvedBySecondPerson = () => {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const rng = ss.getActiveCell();
-  const flag = rng.getValue();
-  if (rng.getColumn() == 2 && flag == true) {
-    console.log('rng', rng);
-    sendEmail('rh3555@nyu.edu', 'Approved!', 'Please approve the request');
-  }
-};
-
 export const confirmEvent = (id) => {
   const event = CalendarApp.getEventById(id);
   event.setTitle(event.getTitle().replace('[HOLD]', '[CONFIRMED]'));
