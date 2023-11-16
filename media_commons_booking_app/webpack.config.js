@@ -61,6 +61,12 @@ const clientEntrypoints = [
     filename: 'admin-page',
     template: './src/client/admin-page/index.html',
   },
+  {
+    name: 'CLIENT - PA',
+    entry: './src/client/admin-page/pa.js',
+    filename: 'pa-page',
+    template: './src/client/admin-page/index.html',
+  },
 ];
 
 // define certificate locations

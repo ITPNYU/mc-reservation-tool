@@ -49,6 +49,8 @@ export const doGet = (e) => {
   }
   if (page === 'admin') {
     return HtmlService.createHtmlOutputFromFile('admin-page');
+  } else if (page === 'pa') {
+    return HtmlService.createHtmlOutputFromFile('pa-page');
   } else {
     return HtmlService.createHtmlOutputFromFile('booking');
   }
