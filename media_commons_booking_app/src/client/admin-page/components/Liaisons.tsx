@@ -55,11 +55,11 @@ export const Liaisons = () => {
 
   console.log('liaisonEmails', liaisonEmails);
   const addLiaisonUser = async () => {
-    setLoading(true);
     if (email === '' || department === '') {
       alert('Please fill in all the fields');
       return;
     }
+    setLoading(true);
 
     if (liaisonEmails.includes(email)) {
       alert('This user is already registered');
