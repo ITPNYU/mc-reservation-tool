@@ -76,7 +76,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const dumpMediaServices = data.mediaServices || [];
     //@ts-ignore
-    data.mediaServices = dumpMediaServices?.join(', ');
+    data.mediaServices = Array.isArray(dumpMediaServices)
+      ? dumpMediaServices.join(', ')
+      : dumpMediaServices;
     handleParentSubmit(data);
   };
   console.log('errors', errors);

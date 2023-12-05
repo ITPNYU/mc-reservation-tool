@@ -20,12 +20,13 @@ export type RoomSetting = {
 
 export type Purpose = 'multipleRoom' | 'motionCapture';
 
-const FIRST_APPROVER = ['rh3555@nyu.edu', 'nnp278@nyu.edu'];
+const FIRST_APPROVER = ['rh3555@nyu.edu'];
 const ROOM_SHEET_NAME = 'rooms';
 const BASE_URL =
   'https://script.google.com/a/macros/itp.nyu.edu/s/AKfycbwvWl7X9w62iz0QLWOY1F1zTT-cLv9EfzPi77Adkxxwqb_ZG4vQayi3EkT7zz9jekE8/exec';
 
 const BOOKING_SHEET_NAME = 'bookings';
+const LIAISON_SHEET_NAME = 'liaisons';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
@@ -36,6 +37,7 @@ const SheetEditor = () => {
       setUserEmail(response);
     });
   };
+
   const [apiKey, setApiKey] = useState();
   const [showModal, setShowModal] = useState(true);
   const [userEmail, setUserEmail] = useState();
@@ -47,6 +49,7 @@ const SheetEditor = () => {
   const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
   const [section, setSection] = useState('selectRoom');
   const [loading, setLoading] = useState(true);
+  const [liaisonUsers, setLiaisonUsers] = useState([]);
   const order: (keyof Inputs)[] = [
     'firstName',
     'lastName',
@@ -94,6 +97,7 @@ const SheetEditor = () => {
 
   useEffect(() => {
     fetchRoomSettings();
+    fetchLiaisonUsers();
   }, []);
 
   useEffect(() => {
@@ -113,6 +117,12 @@ const SheetEditor = () => {
       setLoading(false);
     }
   }, [mappingRoomSettings]);
+
+  const fetchLiaisonUsers = async () => {
+    serverFunctions.fetchRows(LIAISON_SHEET_NAME).then((rows) => {
+      setLiaisonUsers(rows);
+    });
+  };
 
   function findByRoomId(array, id) {
     return array.find((room) => room.roomId === id);
@@ -147,8 +157,19 @@ const SheetEditor = () => {
       });
   };
 
+  const firstApprover = (department) => {
+    console.log('liaisonUsers', liaisonUsers);
+    console.log('department', department);
+    const approvers = liaisonUsers.filter(
+      (liaison) => liaison[1] === department
+    );
+    const emails = approvers.map((approver) => approver[0]);
+    console.log('approvers', emails);
+    approvers.length > 0 ? emails : FIRST_APPROVER;
+  };
   const registerEvent = (data) => {
     const email = userEmail || data.missingEmail;
+    const approver = firstApprover(data.department);
     selectedRoom.map(async (room) => {
       // Add the event to the calendar.
       const roomCalendarId = findByRoomId(
@@ -193,7 +214,7 @@ const SheetEditor = () => {
               rejectedUrl: values[1],
               ...data,
             };
-            sendApprovalEmail(FIRST_APPROVER, userEventInputs);
+            sendApprovalEmail(approver, userEventInputs);
           });
         }
       });
