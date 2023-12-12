@@ -117,7 +117,7 @@ export const updateEventPrefix = (id, newPrefix) => {
     const calendar = CalendarApp.getCalendarById(roomId);
     const event = calendar.getEventById(id);
     const description =
-      ' Cancellation Policy: To cancel reservations please email Jhanele Green(jg5626@nyu.edu) at least 24 hours before the date of the event. Failure to cancel may result in restricted use of event spaces.';
+      ' Cancellation Policy: To cancel reservations please email the Media Commons Team(mediacommons.reservations@nyu.edu) at least 24 hours before the date of the event. Failure to cancel may result in restricted use of event spaces.';
     if (event) {
       const prefix = /(?<=\[).+?(?=\])/g;
       event.setTitle(event.getTitle().replace(prefix, newPrefix));

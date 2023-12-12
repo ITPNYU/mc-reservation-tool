@@ -16,7 +16,6 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
   });
   useEffect(() => {
     const refs = allRoomWithCalendarRefs;
-    console.log('refs', refs);
     setCalendarRefs(refs);
     setLoading(false);
   }, [allRooms]);
@@ -35,7 +34,6 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
     const { value, checked } = event.target;
 
     const valuesArray = value.split(',');
-    console.log('value', value);
 
     if (
       !hasModalBeenShown &&

@@ -26,26 +26,41 @@ export const InitialModal = ({ handleClick }) => {
             the 370J Operations team and a calendar invite once your request has
             been reviewed and processed. Please allow a minimum of 3 days for
             your request to be approved. If you do not hear back about your
-            request within 48 hours, you can contact Jhanele Green (
+            request within 48 hours, you can contact the Media Commons Team (
             <a
-              href="mailto:jg5626@nyu.edu"
+              href="mailto:mediacommons.reservations@nyu.edu"
               className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
             >
-              jg5626@nyu.edu
+              mediacommons.reservations@nyu.edu
             </a>
             ) to follow up. A request does not guarantee a booking.
             <br />
             <br />
-            <b>Cancellation Policy:</b> To cancel reservations please email
-            Jhanele Green(
+            <b>Cancellation Policy:</b> To cancel reservations please email the
+            Media Commons Team(
             <a
-              href="mailto:jg5626@nyu.edu"
+              href="mailto:mediacommons.reservations@nyu.edu"
               className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
             >
-              jg5626@nyu.edu
+              mediacommons.reservations@nyu.edu
             </a>
             ) at least 24 hours before the date of the event. Failure to cancel
             may result in restricted use of event spaces.
+            <br />
+            <a
+              href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit"
+              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
+              target="_blank"
+            >
+              Media Commons Policy
+            </a>
+            <a
+              href="https://docs.google.com/document/d/1TIOl8f8-7o2BdjHxHYIYELSb4oc8QZMj1aSfaENWjR8/edit#heading=h.ns3jisyhutvq"
+              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
+              target="_blank"
+            >
+              Pre-Event Checklist
+            </a>
           </p>
           <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
             <button
