@@ -160,7 +160,7 @@ const SheetEditor = () => {
       )?.calendarId;
       const calendarEventId = await serverFunctions.addEventToCalendar(
         roomCalendarId,
-        `[REQUESTED] Room request from ${userEmail}`,
+        `[REQUESTED] ${room.roomId} ${data.department} ${userEmail}`,
         'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
         bookInfo.startStr,
         bookInfo.endStr,
