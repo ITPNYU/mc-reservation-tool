@@ -75,7 +75,16 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
   const [showTextbox, setShowTextbox] = useState(false);
   const roomNumber = selectedRoom.map((room) => room.roomId);
 
-  const maxCapacity = selectedRoom.map((room) => room.maxCapacity);
+  const maxCapacity = selectedRoom.reduce((sum, room) => {
+    return sum + parseInt(room.capacity);
+  }, 0);
+  const validateExpectedAttendance = (value) => {
+    const attendance = parseInt(value);
+    return (
+      (!isNaN(attendance) && attendance <= maxCapacity) ||
+      `Expected attendance exceeds maximum capacity of ${maxCapacity}`
+    );
+  };
   console.log('maxCapacity', maxCapacity);
   const disabledButton = !(checklist && resetRoom && bookingPolicy);
   useEffect(() => {
@@ -88,7 +97,6 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
     data.mediaServices = dumpMediaServices?.join(', ');
     handleParentSubmit(data);
   };
-  console.log('errors', errors);
 
   const handleSelectChange = (event) => {
     if (event.target.value === 'others') {
@@ -444,10 +452,13 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
           <ErrorMessage errors={errors.expectedAttendance.message} />
         )}
         <input
-          type="expectedAttendance"
           id="expectedAttendance"
+          type="number"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('expectedAttendance', { required: true })}
+          {...register('expectedAttendance', {
+            required: true,
+            validate: validateExpectedAttendance,
+          })}
         />
       </div>
       <div className="mb-6">
