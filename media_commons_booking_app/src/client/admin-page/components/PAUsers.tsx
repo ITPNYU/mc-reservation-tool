@@ -7,7 +7,7 @@ import { Loading } from '../../utils/Loading';
 
 const PA_USER_SHEET_NAME = 'pa_users';
 
-type PaUser = {
+export type PaUser = {
   email: string;
   createdAt: string;
 };
