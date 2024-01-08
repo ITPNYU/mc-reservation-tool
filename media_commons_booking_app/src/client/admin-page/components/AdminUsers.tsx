@@ -5,9 +5,9 @@ import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
 import { Loading } from '../../utils/Loading';
 
-const ADMIN_USER_SHEET_NAME = 'admin_users';
+export const ADMIN_USER_SHEET_NAME = 'admin_users';
 
-type AdminUser = {
+export type AdminUser = {
   email: string;
   createdAt: string;
 };
