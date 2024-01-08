@@ -114,6 +114,9 @@ export const Bookings = () => {
       catering: values[24],
       cateringService: values[25],
       hireSecurity: values[26],
+      chartFieldForCatering: values[27],
+      chartFieldForSecurity: values[28],
+      chartFieldForRoomSetup: values[29],
     };
   };
 
@@ -214,6 +217,9 @@ export const Bookings = () => {
                 Set up
               </th>
               <th scope="col" className="px-2 py-3">
+                Chartfield Information for Room Setup
+              </th>
+              <th scope="col" className="px-2 py-3">
                 Media Service
               </th>
               <th scope="col" className="px-2 py-3">
@@ -223,10 +229,13 @@ export const Bookings = () => {
                 Catering Service
               </th>
               <th scope="col" className="px-2 py-3">
-                Chartfield Information
+                Chartfield Information for catering
               </th>
               <th scope="col" className="px-2 py-3">
                 Hire security
+              </th>
+              <th scope="col" className="px-2 py-3">
+                Chartfield Information for security
               </th>
             </tr>
           </thead>
@@ -355,6 +364,9 @@ export const Bookings = () => {
                     )}
                   </td>
                   <td className="px-2 py-4 w-24">
+                    {booking.chartFieldForRoomSetup}
+                  </td>
+                  <td className="px-2 py-4 w-24">
                     {booking.mediaServices}
                     {booking.mediaServicesDetails && (
                       <>
@@ -367,8 +379,13 @@ export const Bookings = () => {
                   </td>
                   <td className="px-2 py-4 w-18">{booking.catering}</td>
                   <td className="px-2 py-4 w-18">{booking.cateringService}</td>
-
+                  <td className="px-2 py-4 w-24">
+                    {booking.chartFieldForCatering}
+                  </td>
                   <td className="px-2 py-4 w-18">{booking.hireSecurity}</td>
+                  <td className="px-2 py-4 w-24">
+                    {booking.chartFieldForSecurity}
+                  </td>
                 </tr>
               );
             })}

@@ -70,6 +70,9 @@ const SheetEditor = () => {
     'catering',
     'cateringService',
     'hireSecurity',
+    'chartFieldForCatering',
+    'chartFieldForSecurity',
+    'chartFieldForRoomSetup',
   ];
 
   useEffect(() => {
@@ -255,8 +258,8 @@ const SheetEditor = () => {
           </button>
           <FormInput
             hasEmail={userEmail ? true : false}
-            roomNumber={selectedRoom.map((room) => room.roomId)}
             handleParentSubmit={handleSubmit}
+            selectedRoom={selectedRoom}
           />
         </div>
       );

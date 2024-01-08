@@ -26,6 +26,9 @@ export type Inputs = {
   expectedAttendance: string;
   cateringService: string;
   missingEmail?: string;
+  chartFieldForCatering: string;
+  chartFieldForSecurity: string;
+  chartFieldForRoomSetup: string;
 };
 
 const ErrorMessage = (message) => {
@@ -39,7 +42,7 @@ const ErrorMessage = (message) => {
   );
 };
 
-const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
+const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
   const {
     register,
     handleSubmit,
@@ -56,6 +59,9 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
       mediaServicesDetails: '',
       role: '',
       catering: '',
+      chartFieldForCatering: '',
+      chartFieldForSecurity: '',
+      chartFieldForRoomSetup: '',
       hireSecurity: '',
       attendeeAffiliation: '',
       department: '',
@@ -67,7 +73,10 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
   const [showTextbox, setShowTextbox] = useState(false);
+  const roomNumber = selectedRoom.map((room) => room.roomId);
 
+  const maxCapacity = selectedRoom.map((room) => room.maxCapacity);
+  console.log('maxCapacity', maxCapacity);
   const disabledButton = !(checklist && resetRoom && bookingPolicy);
   useEffect(() => {
     trigger();
@@ -548,6 +557,25 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           />
         </div>
       )}
+      {watch('roomSetup') === 'yes' && (
+        <div className="mb-6">
+          <label
+            htmlFor="chartFieldForRoomSetup"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            ChartField for Campus Safety
+          </label>
+          <div className="flex items-center mb-4">
+            <input
+              type="text"
+              id="chartFieldForRoomSetup"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('chartFieldForRoomSetup')}
+            />
+          </div>
+        </div>
+      )}
       <div className="mb-6">
         <label
           htmlFor="mediaServices"
@@ -720,6 +748,25 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           </div>
         </div>
       )}
+      {watch('catering') === 'yes' && (
+        <div className="mb-6">
+          <label
+            htmlFor="chartFieldForCatering"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            ChartField for Event Cleanup
+          </label>
+          <div className="flex items-center mb-4">
+            <input
+              type="text"
+              id="chartFieldForCatering"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('chartFieldForCatering')}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mb-6">
         <label
@@ -756,6 +803,25 @@ const FormInput = ({ hasEmail, roomNumber, handleParentSubmit }) => {
           </select>
         </div>
       </div>
+      {watch('hireSecurity') === 'yes' && (
+        <div className="mb-6">
+          <label
+            htmlFor="chartFieldForSecurity"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            ChartField for Campus Safety
+          </label>
+          <div className="flex items-center mb-4">
+            <input
+              type="text"
+              id="chartFieldForSecurity"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder=""
+              {...register('chartFieldForSecurity')}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mb-6">
         <label
