@@ -147,7 +147,7 @@ const Admin = () => {
           {tab === 'adminUsers' && <AdminUsers />}
           {tab === 'paUsers' && <PAUsers />}
           {tab === 'liaesons' && <Liaisons />}
-          {tab === 'bookings' && <Bookings />}
+          {tab === 'bookings' && <Bookings showNnumber={true} />}
         </div>
       )}
     </div>

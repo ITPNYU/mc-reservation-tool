@@ -30,7 +30,11 @@ type BookingStatus = {
   checkedInAt: string;
 };
 
-export const Bookings = () => {
+interface BookingsProps {
+  showNnumber: boolean;
+}
+
+export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
   const [bookings, setBookings] = useState([]);
   const [mappingBookings, setMappingBookings] = useState([]);
   const [mappingBookingStatuses, setMappingBookingStatuses] = useState([]);
@@ -180,9 +184,11 @@ export const Bookings = () => {
               <th scope="col" className="px-2 py-3">
                 Secondary name
               </th>
-              <th scope="col" className="px-2 py-3">
-                N number
-              </th>
+              {showNnumber && (
+                <th scope="col" className="px-2 py-3">
+                  N number
+                </th>
+              )}
               <th scope="col" className="px-2 py-3">
                 Net Id
               </th>
@@ -331,7 +337,9 @@ export const Bookings = () => {
                   </td>
 
                   <td className="px-2 py-4 w-36">{booking.secondaryName}</td>
-                  <td className="px-2 py-4 w-20">{booking.nNumber}</td>
+                  {showNnumber && (
+                    <td className="px-2 py-4 w-20">{booking.nNumber}</td>
+                  )}
                   <td className="px-2 py-4 w-20">{booking.netId}</td>
                   <td className="px-2 py-4 w-20">{booking.phoneNumber}</td>
                   <td className="px-2 py-4 w-36">{booking.department}</td>
