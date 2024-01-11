@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Header = ({ isSafetyTrained, userEmail }) => {
+export const Header = ({ isBanned, isSafetyTrained, userEmail }) => {
   if (!isSafetyTrained) {
     //alert('You have to take safty training before booking!');
   }
@@ -15,6 +15,9 @@ export const Header = ({ isSafetyTrained, userEmail }) => {
           <span className="text-red-500 text-bold  ">
             You have to take safty training before booking!
           </span>
+        )}
+        {isBanned && (
+          <span className="text-red-500 text-bold  ">You're Banned.</span>
         )}
       </p>
     </div>

@@ -87,12 +87,17 @@ export const addEventToCalendar = (
 ) => {
   const calendar = CalendarApp.getCalendarById(id);
   console.log('guestEmail', guestEmail);
+  const htmlTemplate = HtmlService.createTemplateFromFile(templateName);
+  for (const key in contents) {
+    htmlTemplate[key] = contents[key] || '';
+  }
+  const htmlBody = htmlTemplate.evaluate().getContent();
   const event = calendar.createEvent(
     title,
     new Date(startTime),
     new Date(endTime),
     {
-      description,
+      htmlBody,
     }
   );
   event.setColor(CalendarApp.EventColor.GRAY);

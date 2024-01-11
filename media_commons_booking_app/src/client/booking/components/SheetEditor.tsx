@@ -10,6 +10,7 @@ import { MultipleCalendars } from './MultipleCalendars';
 import { Modal } from 'react-bootstrap';
 import { InitialModal } from './InitialModal';
 import { Loading } from '../../utils/Loading';
+import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
 export type RoomSetting = {
   roomId: string;
   name: string;
@@ -41,6 +42,7 @@ const SheetEditor = () => {
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
+  const [isBanned, setIsBanned] = useState(false);
 
   const [selectedRoom, setSelectedRoom] = useState([]);
   const [roomSettings, setRoomSettings] = useState([]);
@@ -80,6 +82,7 @@ const SheetEditor = () => {
   }, []);
   useEffect(() => {
     getSafetyTrainingStudents();
+    getBannedStudents();
   }, [userEmail]);
 
   // google api key for calendar
@@ -150,6 +153,19 @@ const SheetEditor = () => {
       });
   };
 
+  const getBannedStudents = () => {
+    const students = serverFunctions
+      .getSheetRows(BAN_SHEET_NAME)
+      .then((rows) => {
+        const emails = rows.reduce(
+          (accumulator, value) => accumulator.concat(value),
+          []
+        );
+        const banned = emails.includes(userEmail);
+        setIsBanned(banned);
+      });
+  };
+
   const registerEvent = (data) => {
     const email = userEmail || data.missingEmail;
     selectedRoom.map(async (room) => {
@@ -160,7 +176,7 @@ const SheetEditor = () => {
       )?.calendarId;
       const calendarEventId = await serverFunctions.addEventToCalendar(
         roomCalendarId,
-        `[REQUESTED] ${room.roomId} ${data.department} ${userEmail}`,
+        `[REQUESTED] ${room.roomId} ${data.firstName} ${data.lastName} (${data.netId})`,
         'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
         bookInfo.startStr,
         bookInfo.endStr,
@@ -235,6 +251,10 @@ const SheetEditor = () => {
       alert('You have to take safty training before booking!');
       return;
     }
+    if (userEmail && isBanned) {
+      alert('You are banned');
+      return;
+    }
     setSection('form');
   };
 
@@ -291,7 +311,11 @@ const SheetEditor = () => {
       {!showModal && (
         <>
           <div className="flex flex-col justify-items-end items-end">
-            <Header isSafetyTrained={isSafetyTrained} userEmail={userEmail} />
+            <Header
+              isBanned={isBanned}
+              isSafetyTrained={isSafetyTrained}
+              userEmail={userEmail}
+            />
           </div>
           {UserSection()}
         </>

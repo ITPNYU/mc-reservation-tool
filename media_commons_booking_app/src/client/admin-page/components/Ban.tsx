@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
 import { Loading } from '../../utils/Loading';
-const BAN_SHEET_NAME = 'banned_users';
+export const BAN_SHEET_NAME = 'banned_users';
 
 type Ban = {
   email: string;
