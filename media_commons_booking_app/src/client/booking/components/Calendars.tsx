@@ -221,6 +221,12 @@ export const Calendars = ({
               googleCalendarApiKey={apiKey}
               events={{ googleCalendarId: room.calendarId }}
               eventDidMount={function (info) {
+                // Change the title status only
+                const match = info.event.title.match(/\[(.*?)\]/);
+                if (match) {
+                  info.el.querySelector('.fc-event-title').textContent =
+                    match[1];
+                }
                 // Change the background color of the event depending on its title
                 if (info.event.title.includes('REQUESTED')) {
                   info.el.style.backgroundColor = '#d60000';

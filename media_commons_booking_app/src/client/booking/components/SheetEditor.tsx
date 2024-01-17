@@ -176,7 +176,7 @@ const SheetEditor = () => {
       )?.calendarId;
       const calendarEventId = await serverFunctions.addEventToCalendar(
         roomCalendarId,
-        `[REQUESTED] ${room.roomId} ${data.firstName} ${data.lastName} (${data.netId})`,
+        `[REQUESTED] ${room.roomId} ${data.department} - ${data.firstName} ${data.lastName} (${data.netId})`,
         'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
         bookInfo.startStr,
         bookInfo.endStr,
@@ -216,9 +216,7 @@ const SheetEditor = () => {
           });
         }
       });
-      alert(
-        "Your request has been sent.\n Please check the calendar to verify that your submitted event has been registered.\n If you don't see the event, please contact us."
-      );
+      alert('Your request has been sent.');
       setLoading(false);
       setSection('selectRoom');
     });
