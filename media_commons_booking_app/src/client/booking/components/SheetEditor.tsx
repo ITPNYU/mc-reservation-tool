@@ -16,11 +16,21 @@ export type RoomSetting = {
   name: string;
   capacity: string;
   calendarId: string;
+  calendarIdProd: string;
   calendarRef?: any;
 };
 
 export type Purpose = 'multipleRoom' | 'motionCapture';
 
+const SAFETY_TRAINING_REQUIRED_ROOM = [
+  '103',
+  '220',
+  '221',
+  '222',
+  '223',
+  '224',
+  '230',
+];
 const FIRST_APPROVER = ['rh3555@nyu.edu', 'nnp278@nyu.edu'];
 const ROOM_SHEET_NAME = 'rooms';
 const BASE_URL =
@@ -31,6 +41,22 @@ const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
+  //IN PRODUCTION
+  //const roomCalendarId = (room) => {
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
+  //};
+
+  //IN DEV
+  const roomCalendarId = (room) => {
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  };
+
+  const fetchCalendarEvents = async (calendarId) => {
+    serverFunctions.getCalendarEvents(calendarId).then((rows) => {
+      console.log('calendar events', rows);
+    });
+  };
+
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
@@ -136,6 +162,7 @@ const SheetEditor = () => {
       name: values[1],
       capacity: values[2],
       calendarId: values[3],
+      calendarIdProd: values[4],
     };
   };
 
@@ -170,10 +197,6 @@ const SheetEditor = () => {
     const email = userEmail || data.missingEmail;
     selectedRoom.map(async (room) => {
       // Add the event to the calendar.
-      const roomCalendarId = findByRoomId(
-        mappingRoomSettings,
-        room.roomId
-      )?.calendarId;
       const calendarEventId = await serverFunctions.addEventToCalendar(
         roomCalendarId,
         `[REQUESTED] ${room.roomId} ${data.department} - ${data.firstName} ${data.lastName} (${data.netId})`,
@@ -245,8 +268,11 @@ const SheetEditor = () => {
   const handleSetDate = (info, rooms) => {
     setBookInfo(info);
     setSelectedRoom(rooms);
-    if (userEmail && !isSafetyTrained) {
-      alert('You have to take safty training before booking!');
+    const requiresSafetyTraining = rooms.some((room) =>
+      SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
+    );
+    if (userEmail && !isSafetyTrained && requiresSafetyTraining) {
+      alert('You have to take safety training before booking!');
       return;
     }
     if (userEmail && isBanned) {
