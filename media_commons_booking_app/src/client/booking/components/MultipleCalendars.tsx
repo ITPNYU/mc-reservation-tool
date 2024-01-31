@@ -26,9 +26,9 @@ export const MultipleCalendars = ({ apiKey, allRooms, handleSetDate }) => {
     setCheckedRooms(checked);
   }, [checkedRoomIds]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  //if (loading) {
+  //  return <div>Loading...</div>;
+  //}
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;

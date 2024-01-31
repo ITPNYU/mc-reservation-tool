@@ -316,10 +316,6 @@ const SheetEditor = () => {
     }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
   const handleModalClick = () => {
     setShowModal(false);
   };

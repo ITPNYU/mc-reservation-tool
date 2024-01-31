@@ -24,7 +24,6 @@ export const RoomCalendar = ({
   }, []);
   const fetchCalendarEvents = async (calendarId) => {
     serverFunctions.getCalendarEvents(calendarId).then((rows) => {
-      console.log('rows', rows);
       setEvents(rows);
     });
   };
