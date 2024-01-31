@@ -7,6 +7,7 @@ import {
   request,
   getGoogleCalendarApiKey,
   getUserEmail,
+  getCalendarEvents,
 } from './ui';
 
 import {
@@ -73,4 +74,5 @@ export {
   getUserEmail,
   removeFromList,
   getFutureDates,
+  getCalendarEvents,
 };

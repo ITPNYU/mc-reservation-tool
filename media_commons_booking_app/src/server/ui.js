@@ -7,6 +7,24 @@ export const getGoogleCalendarApiKey = () => {
   return apiKey;
 };
 
+export const getCalendarEvents = (calendarId) => {
+  console.log(calendarId);
+  var calendar = CalendarApp.getCalendarById(calendarId);
+  var now = new Date();
+  var twoHoursFromNow = new Date(now.getTime() + 120 * 60 * 60 * 1000);
+  console.log(twoHoursFromNow);
+  var events = calendar.getEvents(now, twoHoursFromNow);
+
+  const formattedEvents = events.map((e) => {
+    return {
+      title: e.getTitle(),
+      start: e.getStartTime().toISOString(),
+      end: e.getEndTime().toISOString(),
+    };
+  });
+  console.log('formattedEvents', formattedEvents[0]);
+  return formattedEvents;
+};
 export const request = (id, email) => {
   const row = [id, email, new Date()];
   SpreadsheetApp.openById(ACTIVE_SHEET_ID)

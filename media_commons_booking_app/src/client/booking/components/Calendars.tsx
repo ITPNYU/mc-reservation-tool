@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import FullCalendar from '@fullcalendar/react';
-import timeGridPlugin from '@fullcalendar/timegrid'; // a plugin!
-import googleCalendarPlugin from '@fullcalendar/google-calendar';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { CalendarDatePicker } from './CalendarDatePicker';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomSetting } from './SheetEditor';
 import { formatDate } from '../../utils/date';
+import { RoomCalendar } from './RoomCalendar';
 
 type CalendarProps = {
   apiKey: string;
@@ -25,12 +21,25 @@ export const Calendars = ({
   selectedRooms,
   handleSetDate,
 }: CalendarProps) => {
+  console.log('allrooms', allRooms);
   const [enrolledThisis, setEnrolledThesis] = useState(false);
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
+  const isOverlap = (info) => {
+    return selectedRooms.some((room, i) => {
+      const calendarApi = room.calendarRef.current.getApi();
 
-  const editableEvent = (info) => {
-    return info.title.includes(TITLE_TAG);
+      const allEvents = calendarApi.getEvents();
+      return allEvents.some((event) => {
+        if (event.title.includes(TITLE_TAG)) return false;
+        return (
+          (event.start >= info.start && event.start < info.end) ||
+          (event.end > info.start && event.end <= info.end) ||
+          (event.start <= info.start && event.end >= info.end)
+        );
+      });
+    });
   };
+
   const validateEvents = (e) => {
     e.stopPropagation;
     const overlap = isOverlap(bookingTimeEvent);
@@ -56,43 +65,6 @@ export const Calendars = ({
     }
   };
 
-  const isOverlap = (info) => {
-    return selectedRooms.some((room, i) => {
-      const calendarApi = room.calendarRef.current.getApi();
-
-      const allEvents = calendarApi.getEvents();
-      return allEvents.some((event) => {
-        if (event.title.includes(TITLE_TAG)) return false;
-        return (
-          (event.start >= info.start && event.start < info.end) ||
-          (event.end > info.start && event.end <= info.end) ||
-          (event.start <= info.start && event.end >= info.end)
-        );
-      });
-    });
-  };
-
-  const handleEventClick = (info) => {
-    if (!editableEvent(info.event)) return;
-    const targetGroupId = info.event.groupId;
-    const isConfirmed = window.confirm('Do you want to delete this event?');
-
-    if (isConfirmed) {
-      allRooms.map((room) => {
-        if (!room.calendarRef.current) return;
-        let calendarApi = room.calendarRef.current.getApi();
-        const events = calendarApi.getEvents();
-        events.map((event) => {
-          if (event.groupId === targetGroupId) {
-            event.remove();
-          }
-        });
-      });
-      setBookingTimeEvent(null);
-      return;
-    }
-  };
-
   useEffect(() => {
     const view = selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridDay';
     allRooms.map((room) => {
@@ -101,63 +73,13 @@ export const Calendars = ({
     });
   }),
     [selectedRooms];
-  const handleDateSelect = (selectInfo) => {
-    if (bookingTimeEvent) {
-      alert('You can only book one time slot per reservation');
-      return;
-    }
-    allRooms.map((room) => {
-      console.log('handle datae select room', room);
-      if (!room.calendarRef.current) return;
-      let calendarApi = room.calendarRef.current.getApi();
-      calendarApi.addEvent({
-        id: Date.now(), // Generate a unique ID for the event
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        title: `${TITLE_TAG}`,
-        groupId: selectInfo.startStr,
-      });
-    });
-    setBookingTimeEvent(selectInfo);
-  };
 
   const handleChange = (selectedDate: Date) => {
     allRooms.forEach((room) => {
       room.calendarRef.current.getApi().gotoDate(selectedDate);
     });
   };
-  const handleSelectAllow = (selectInfo) => {
-    console.log('selectInfo', selectInfo);
-    // only enrolledThesis user can book over 4 hours
-    if (
-      !enrolledThisis &&
-      selectInfo.end.getTime() / 1000 - selectInfo.start.getTime() / 1000 >
-        60 * 60 * 4
-    ) {
-      return false;
-    }
 
-    console.log('isOverlap', !isOverlap(selectInfo));
-    return !isOverlap(selectInfo);
-  };
-
-  const syncEventLengthAcrossCalendars = (changedEvent) => {
-    allRooms.forEach((room) => {
-      const targetGroupId = changedEvent.groupId;
-      if (room.calendarRef.current) {
-        let calendarApi = room.calendarRef.current.getApi();
-        const events = calendarApi.getEvents();
-        events.map((event) => {
-          //All events are retrieved, so change only for the event retrieved this time.
-          if (event.groupId === targetGroupId) {
-            event.setStart(changedEvent.start);
-            event.setEnd(changedEvent.end);
-          }
-        });
-      }
-    });
-    setBookingTimeEvent(changedEvent);
-  };
   return (
     <div className="mt-5 flex flex-col justify-center">
       <div className="">Select date</div>
@@ -195,77 +117,15 @@ export const Calendars = ({
       </div>
       <div className="flex justify-center">
         {allRooms.map((room, i) => (
-          <div
-            className={`mx-5 h-[1000px] ${
-              selectedRooms.length === 1 && 'w-[1000px]'
-            } ${!selectedRooms.includes(room) && 'hidden'}`}
-          >
-            {selectedRooms.includes(room)}
-            {room.roomId} {room.name}
-            <FullCalendar
-              ref={room.calendarRef}
-              height="100%"
-              selectable={true}
-              plugins={[
-                interactionPlugin,
-                timeGridPlugin,
-                googleCalendarPlugin,
-                dayGridPlugin,
-              ]}
-              headerToolbar={{
-                left: '',
-                center: 'title',
-                right: '',
-              }}
-              themeSystem="bootstrap5"
-              googleCalendarApiKey={apiKey}
-              events={{ googleCalendarId: room.calendarId }}
-              eventDidMount={function (info) {
-                // Change the title status only
-                const match = info.event.title.match(/\[(.*?)\]/);
-                if (match) {
-                  info.el.querySelector('.fc-event-title').textContent =
-                    match[1];
-                }
-                // Change the background color of the event depending on its title
-                if (info.event.title.includes('REQUESTED')) {
-                  info.el.style.backgroundColor = '#d60000';
-                } else if (info.event.title.includes('PRE-APPROVED')) {
-                  info.el.style.backgroundColor = '#f6c026';
-                } else if (info.event.title.includes('APPROVED')) {
-                  info.el.style.backgroundColor = '#33b679';
-                } else if (info.event.title.includes('CONFIRMED')) {
-                  info.el.style.backgroundColor = '#0b8043';
-                } else if (info.event.title.includes('REJECTED')) {
-                  info.el.style.display = 'none';
-                } else if (info.event.title.includes('CANCELLED')) {
-                  info.el.style.display = 'none';
-                }
-              }}
-              editable={true}
-              initialView={
-                selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridDay'
-              }
-              navLinks={true}
-              select={function (info) {
-                handleDateSelect(info);
-              }}
-              eventClick={function (info) {
-                info.jsEvent.preventDefault();
-                handleEventClick(info);
-              }}
-              eventAllow={(dropLocation, draggedEvent) => {
-                return editableEvent(draggedEvent);
-              }}
-              selectAllow={(e) => handleSelectAllow(e)}
-              eventResize={(info) => {
-                syncEventLengthAcrossCalendars(info.event);
-              }}
-              eventDrop={(info) => {
-                syncEventLengthAcrossCalendars(info.event);
-              }}
-            />
-          </div>
+          <RoomCalendar
+            room={room}
+            selectedRooms={selectedRooms}
+            allRooms={allRooms}
+            bookingTimeEvent={bookingTimeEvent}
+            setBookingTimeEvent={setBookingTimeEvent}
+            enrolledThisis={enrolledThisis}
+            isOverlap={isOverlap}
+          />
         ))}
       </div>
     </div>
