@@ -51,12 +51,6 @@ const SheetEditor = () => {
     return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
   };
 
-  const fetchCalendarEvents = async (calendarId) => {
-    serverFunctions.getCalendarEvents(calendarId).then((rows) => {
-      console.log('calendar events', rows);
-    });
-  };
-
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
