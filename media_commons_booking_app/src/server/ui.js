@@ -1,19 +1,12 @@
 import { approveBooking } from './admin';
 
-export const getGoogleCalendarApiKey = () => {
-  const apiKey = PropertiesService.getScriptProperties().getProperty(
-    'GOOGLE_CALENDAR_API_KEY'
-  );
-  return apiKey;
-};
-
 export const getCalendarEvents = (calendarId) => {
   console.log(calendarId);
   var calendar = CalendarApp.getCalendarById(calendarId);
   var now = new Date();
-  var twoHoursFromNow = new Date(now.getTime() + 120 * 60 * 60 * 1000);
-  console.log(twoHoursFromNow);
-  var events = calendar.getEvents(now, twoHoursFromNow);
+  var threeMonthsFromNow = new Date();
+  threeMonthsFromNow.setMonth(now.getMonth() + 3);
+  var events = calendar.getEvents(now, threeMonthsFromNow);
 
   const formattedEvents = events.map((e) => {
     return {

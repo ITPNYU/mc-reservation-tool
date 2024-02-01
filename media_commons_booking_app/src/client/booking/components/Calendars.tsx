@@ -6,7 +6,6 @@ import { formatDate } from '../../utils/date';
 import { RoomCalendar } from './RoomCalendar';
 
 type CalendarProps = {
-  apiKey: string;
   allRooms: any[];
   selectedRooms: RoomSetting[];
   handleSetDate: any;
@@ -16,13 +15,13 @@ type CalendarProps = {
 const TITLE_TAG = '[Click to Delete]';
 
 export const Calendars = ({
-  apiKey,
   allRooms,
   selectedRooms,
   handleSetDate,
 }: CalendarProps) => {
   console.log('allrooms', allRooms);
   const [enrolledThisis, setEnrolledThesis] = useState(false);
+  const [faculty, setFaculty] = useState(false);
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
   const isOverlap = (info) => {
     return selectedRooms.some((room, i) => {
@@ -82,22 +81,44 @@ export const Calendars = ({
 
   return (
     <div className="mt-5 flex flex-col justify-center">
-      <div className="">Select date</div>
       <div className="flex justify-center items-center space-x-4 ">
-        <CalendarDatePicker handleChange={handleChange} />
-        <input
-          id="default-checkbox"
-          type="checkbox"
-          value=""
-          className="pt-4 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-          onChange={(e) => setEnrolledThesis(!enrolledThisis)}
-        />
-        <label
-          htmlFor="default-checkbox"
-          className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-        >
-          Enrolled in thesis
-        </label>
+        <div>
+          <div className="">Select date</div>
+          <CalendarDatePicker handleChange={handleChange} />
+        </div>
+        <div className="flex flex-col justify-center items-center">
+          <div className="">You are </div>
+          <div className="flex ">
+            <input
+              id="default-checkbox"
+              type="checkbox"
+              value=""
+              className="pt-4 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              onChange={(e) => setEnrolledThesis(!enrolledThisis)}
+            />
+            <label
+              htmlFor="default-checkbox"
+              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            >
+              Enrolled in thesis
+            </label>
+          </div>
+          <div className="flex">
+            <input
+              id="default-checkbox"
+              type="checkbox"
+              value=""
+              className="pt-4 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              onChange={(e) => setFaculty(!enrolledThisis)}
+            />
+            <label
+              htmlFor="default-checkbox"
+              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            >
+              Faculty / Advisor
+            </label>
+          </div>
+        </div>
         <div className="flex flex-col items-center ">
           <button
             key="calendarNextButton"
@@ -123,7 +144,7 @@ export const Calendars = ({
             allRooms={allRooms}
             bookingTimeEvent={bookingTimeEvent}
             setBookingTimeEvent={setBookingTimeEvent}
-            enrolledThisis={enrolledThisis}
+            enrolledThisis={enrolledThisis || faculty}
             isOverlap={isOverlap}
           />
         ))}

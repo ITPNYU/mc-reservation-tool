@@ -5,7 +5,6 @@ import {
   approvalUrl,
   rejectUrl,
   request,
-  getGoogleCalendarApiKey,
   getUserEmail,
   getCalendarEvents,
 } from './ui';
@@ -70,7 +69,6 @@ export {
   ACTIVE_SHEET_ID,
   BOOKING_STATUS_SHEET_NAME,
   BOOKING_SHEET_NAME,
-  getGoogleCalendarApiKey,
   getUserEmail,
   removeFromList,
   getFutureDates,

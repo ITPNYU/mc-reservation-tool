@@ -47,17 +47,14 @@ const SheetEditor = () => {
   //};
 
   //IN DEV
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  };
-
+  const roomCalendarId = (room) =>
+    findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
       setUserEmail(response);
     });
   };
-  const [apiKey, setApiKey] = useState();
   const [showModal, setShowModal] = useState(true);
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
@@ -105,19 +102,6 @@ const SheetEditor = () => {
     getBannedStudents();
   }, [userEmail]);
 
-  // google api key for calendar
-
-  useEffect(() => {
-    fetchApiKey();
-  }, []);
-
-  const fetchApiKey = async () => {
-    const googleApiKey = await serverFunctions.getGoogleCalendarApiKey();
-    setApiKey(googleApiKey);
-  };
-
-  // rooms
-
   useEffect(() => {
     fetchRoomSettings();
   }, []);
@@ -140,9 +124,9 @@ const SheetEditor = () => {
     }
   }, [mappingRoomSettings]);
 
-  function findByRoomId(array, id) {
+  const findByRoomId = (array, id) => {
     return array.find((room) => room.roomId === id);
-  }
+  };
 
   const fetchRoomSettings = async () => {
     serverFunctions.fetchRows(ROOM_SHEET_NAME).then((rows) => {
@@ -307,7 +291,6 @@ const SheetEditor = () => {
           Select room and view calendar
           <MultipleCalendars
             key="calendars"
-            apiKey={apiKey}
             allRooms={mappingRoomSettings}
             handleSetDate={handleSetDate}
           />
