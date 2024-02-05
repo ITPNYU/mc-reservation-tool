@@ -41,7 +41,6 @@ export const RoleModal = ({ handleClick }) => {
             <option value="MARL">MARL</option>
             <option value="Music Tech">Music Tech</option>
             <option value="Recorded Music">Recorded Music</option>
-            <option value="others">Other Group</option>
           </select>
 
           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">

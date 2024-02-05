@@ -83,12 +83,10 @@ export const addEventToCalendar = (
   description,
   startTime,
   endTime,
-  guestEmail,
   roomEmails
 ) => {
   const calendar = CalendarApp.getCalendarById(id);
   console.log('calendar', calendar);
-  console.log('guestEmail', guestEmail);
 
   const event = calendar.createEvent(
     title,
@@ -99,7 +97,7 @@ export const addEventToCalendar = (
     }
   );
   event.setColor(CalendarApp.EventColor.GRAY);
-  event.addGuest(guestEmail);
+  //event.addGuest(guestEmail);
   roomEmails.forEach((roomEmail) => {
     event.addGuest(roomEmail);
   });

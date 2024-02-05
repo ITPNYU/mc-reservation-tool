@@ -45,18 +45,18 @@ const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
   //IN PRODUCTION
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  //};
+  const roomCalendarId = (room) => {
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
+  };
 
   //IN DEV
-  const roomCalendarId = (room) => {
-    console.log(
-      'roomCalendarId',
-      findByRoomId(mappingRoomSettings, room.roomId)
-    );
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  };
+  //const roomCalendarId = (room) => {
+  //  console.log(
+  //    'roomCalendarId',
+  //    findByRoomId(mappingRoomSettings, room.roomId)
+  //  );
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  //};
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
@@ -188,18 +188,21 @@ const SheetEditor = () => {
 
   const registerEvent = async (data) => {
     const email = userEmail || data.missingEmail;
-    const [room, ...otherRoomIds] = selectedRoom;
+    const [room, ...otherRooms] = selectedRoom;
+    const otherRoomIds = otherRooms.map((r) => roomCalendarId(r));
     console.log('roomId', roomCalendarId(room));
+
     console.log('otherRoomIds', otherRoomIds);
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
       roomCalendarId(room),
-      `[REQUESTED] ${room.roomId} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
+      `[REQUESTED] ${room.roomId},${otherRooms.map(
+        (r) => room.roomId
+      )} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
       'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
       bookInfo.startStr,
       bookInfo.endStr,
-      email,
-      otherRoomIds.map((r) => roomCalendarId(r))
+      otherRoomIds
     );
     selectedRoom.map(async (room) => {
       // Record the event to the spread sheet.
