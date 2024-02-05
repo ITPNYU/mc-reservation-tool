@@ -83,25 +83,26 @@ export const addEventToCalendar = (
   description,
   startTime,
   endTime,
-  guestEmail
+  guestEmail,
+  roomEmails
 ) => {
   const calendar = CalendarApp.getCalendarById(id);
+  console.log('calendar', calendar);
   console.log('guestEmail', guestEmail);
-  const htmlTemplate = HtmlService.createTemplateFromFile(templateName);
-  for (const key in contents) {
-    htmlTemplate[key] = contents[key] || '';
-  }
-  const htmlBody = htmlTemplate.evaluate().getContent();
+
   const event = calendar.createEvent(
     title,
     new Date(startTime),
     new Date(endTime),
     {
-      htmlBody,
+      description,
     }
   );
   event.setColor(CalendarApp.EventColor.GRAY);
   event.addGuest(guestEmail);
+  roomEmails.forEach((roomEmail) => {
+    event.addGuest(roomEmail);
+  });
   console.log('event.id', event.getId());
   return event.getId();
 };

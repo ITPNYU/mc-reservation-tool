@@ -11,6 +11,7 @@ import { Modal } from 'react-bootstrap';
 import { InitialModal } from './InitialModal';
 import { Loading } from '../../utils/Loading';
 import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
+import { RoleModal } from './RoleModal';
 export type RoomSetting = {
   roomId: string;
   name: string;
@@ -47,8 +48,13 @@ const SheetEditor = () => {
   //};
 
   //IN DEV
-  const roomCalendarId = (room) =>
-    findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  const roomCalendarId = (room) => {
+    console.log(
+      'roomCalendarId',
+      findByRoomId(mappingRoomSettings, room.roomId)
+    );
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  };
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
@@ -56,6 +62,7 @@ const SheetEditor = () => {
     });
   };
   const [showModal, setShowModal] = useState(true);
+  const [roleModal, setRoleModal] = useState(false);
   const [userEmail, setUserEmail] = useState();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
@@ -171,18 +178,22 @@ const SheetEditor = () => {
       });
   };
 
-  const registerEvent = (data) => {
+  const registerEvent = async (data) => {
     const email = userEmail || data.missingEmail;
+    const [room, ...otherRoomIds] = selectedRoom;
+    console.log('roomId', roomCalendarId(room));
+    console.log('otherRoomIds', otherRoomIds);
+    // Add the event to the calendar.
+    const calendarEventId = await serverFunctions.addEventToCalendar(
+      roomCalendarId(room),
+      `[REQUESTED] ${room.roomId} ${data.department} - ${data.firstName} ${data.lastName} (${data.netId})`,
+      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
+      bookInfo.startStr,
+      bookInfo.endStr,
+      email,
+      otherRoomIds.map((r) => roomCalendarId(r))
+    );
     selectedRoom.map(async (room) => {
-      // Add the event to the calendar.
-      const calendarEventId = await serverFunctions.addEventToCalendar(
-        roomCalendarId,
-        `[REQUESTED] ${room.roomId} ${data.department} - ${data.firstName} ${data.lastName} (${data.netId})`,
-        'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
-        bookInfo.startStr,
-        bookInfo.endStr,
-        email
-      );
       // Record the event to the spread sheet.
       const contents = order.map(function (key) {
         return data[key];
@@ -217,10 +228,10 @@ const SheetEditor = () => {
           });
         }
       });
-      alert('Your request has been sent.');
-      setLoading(false);
-      setSection('selectRoom');
     });
+    alert('Your request has been sent.');
+    setLoading(false);
+    setSection('selectRoom');
   };
   const handleSubmit = async (data) => {
     setLoading(true);
@@ -301,10 +312,15 @@ const SheetEditor = () => {
 
   const handleModalClick = () => {
     setShowModal(false);
+    setRoleModal(true);
+  };
+  const handleRoleModalClick = () => {
+    setRoleModal(false);
   };
   return (
     <div className="p-10 dark:bg-gray-800">
       {showModal && <InitialModal handleClick={handleModalClick} />}
+      {roleModal && <RoleModal handleClick={handleRoleModalClick} />}
       {!showModal && (
         <>
           <div className="flex flex-col justify-items-end items-end">
