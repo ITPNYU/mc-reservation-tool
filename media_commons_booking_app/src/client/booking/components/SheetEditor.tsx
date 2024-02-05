@@ -21,6 +21,8 @@ export type RoomSetting = {
   calendarRef?: any;
 };
 
+export type Role = 'Student' | 'Resident/Fellow' | 'Faculty' | 'Admin/Staff';
+
 export type Purpose = 'multipleRoom' | 'motionCapture';
 
 const SAFETY_TRAINING_REQUIRED_ROOM = [
@@ -73,6 +75,12 @@ const SheetEditor = () => {
   const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
   const [section, setSection] = useState('selectRoom');
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState('');
+  const [department, setDepartment] = useState('');
+  const [enrolledThesis, setEnrolledThesis] = useState(false);
+  const canBookFullTime = enrolledThesis || role !== 'Student';
+  console.log('enrolledThesis', enrolledThesis, 'role', role);
+
   const order: (keyof Inputs)[] = [
     'firstName',
     'lastName',
@@ -186,7 +194,7 @@ const SheetEditor = () => {
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
       roomCalendarId(room),
-      `[REQUESTED] ${room.roomId} ${data.department} - ${data.firstName} ${data.lastName} (${data.netId})`,
+      `[REQUESTED] ${room.roomId} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
       'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
       bookInfo.startStr,
       bookInfo.endStr,
@@ -293,6 +301,8 @@ const SheetEditor = () => {
             hasEmail={userEmail ? true : false}
             handleParentSubmit={handleSubmit}
             selectedRoom={selectedRoom}
+            role={role}
+            department={department}
           />
         </div>
       );
@@ -304,6 +314,7 @@ const SheetEditor = () => {
             key="calendars"
             allRooms={mappingRoomSettings}
             handleSetDate={handleSetDate}
+            canBookFullTime={canBookFullTime}
           />
         </div>
       );
@@ -314,7 +325,10 @@ const SheetEditor = () => {
     setShowModal(false);
     setRoleModal(true);
   };
-  const handleRoleModalClick = () => {
+  const handleRoleModalClick = (role, department, enrolledThesis) => {
+    setRole(role);
+    setDepartment(department);
+    setEnrolledThesis(enrolledThesis);
     setRoleModal(false);
   };
   return (

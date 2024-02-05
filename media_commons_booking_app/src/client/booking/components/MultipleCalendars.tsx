@@ -3,7 +3,11 @@ import { Calendars } from './Calendars';
 import { SelectRooms } from './SelectRooms';
 import { SelectMotionCapture } from './SelectMotionCapture';
 
-export const MultipleCalendars = ({ allRooms, handleSetDate }) => {
+export const MultipleCalendars = ({
+  allRooms,
+  handleSetDate,
+  canBookFullTime,
+}) => {
   const [calendarRefs, setCalendarRefs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkedRoomIds, setCheckedRoomIds] = useState([]);
@@ -112,6 +116,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }) => {
             allRooms={allRooms}
             selectedRooms={checkedRooms}
             handleSetDate={handleSubmit}
+            canBookFullTime={canBookFullTime}
           />
         </div>
       )}

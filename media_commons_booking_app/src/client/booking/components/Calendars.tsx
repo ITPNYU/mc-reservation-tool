@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CalendarDatePicker } from './CalendarDatePicker';
 import { DateSelectArg } from '@fullcalendar/core';
-import { RoomSetting } from './SheetEditor';
+import { Role, RoomSetting } from './SheetEditor';
 import { formatDate } from '../../utils/date';
 import { RoomCalendar } from './RoomCalendar';
 
@@ -10,6 +10,7 @@ type CalendarProps = {
   selectedRooms: RoomSetting[];
   handleSetDate: any;
   refs?: any[];
+  canBookFullTime: Boolean;
 };
 
 const TITLE_TAG = '[Click to Delete]';
@@ -18,10 +19,9 @@ export const Calendars = ({
   allRooms,
   selectedRooms,
   handleSetDate,
+  canBookFullTime,
 }: CalendarProps) => {
   console.log('allrooms', allRooms);
-  const [enrolledThisis, setEnrolledThesis] = useState(false);
-  const [faculty, setFaculty] = useState(false);
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
   const isOverlap = (info) => {
     return selectedRooms.some((room, i) => {
@@ -86,23 +86,6 @@ export const Calendars = ({
           <div className="">Select date</div>
           <CalendarDatePicker handleChange={handleChange} />
         </div>
-        <div className="flex flex-col justify-center items-center">
-          <div className="flex ">
-            <input
-              id="default-checkbox"
-              type="checkbox"
-              value=""
-              className="pt-4 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              onChange={(e) => setEnrolledThesis(!enrolledThisis)}
-            />
-            <label
-              htmlFor="default-checkbox"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Enrolled in thesis
-            </label>
-          </div>
-        </div>
         <div className="flex flex-col items-center ">
           <button
             key="calendarNextButton"
@@ -128,7 +111,7 @@ export const Calendars = ({
             allRooms={allRooms}
             bookingTimeEvent={bookingTimeEvent}
             setBookingTimeEvent={setBookingTimeEvent}
-            enrolledThisis={enrolledThisis || faculty}
+            canBookFullTime={canBookFullTime}
             isOverlap={isOverlap}
           />
         ))}

@@ -9,7 +9,7 @@ export type Inputs = {
   nNumber: string;
   netId: string;
   phoneNumber: string;
-  department: String;
+  department: string;
   role: string;
   sponsorFirstName: string;
   sponsorLastName: string;
@@ -42,7 +42,13 @@ const ErrorMessage = (message) => {
   );
 };
 
-const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
+const FormInput = ({
+  hasEmail,
+  handleParentSubmit,
+  selectedRoom,
+  role: initialRole,
+  department: initialDepartment,
+}) => {
   const {
     register,
     handleSubmit,
@@ -57,14 +63,14 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
       sponsorLastName: '',
       sponsorEmail: '',
       mediaServicesDetails: '',
-      role: '',
+      role: initialRole,
       catering: '',
       chartFieldForCatering: '',
       chartFieldForSecurity: '',
       chartFieldForRoomSetup: '',
       hireSecurity: '',
       attendeeAffiliation: '',
-      department: '',
+      department: initialDepartment,
       roomSetup: '',
     },
     mode: 'onBlur',
@@ -276,70 +282,7 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
           })}
         />
       </div>
-      <div className="mb-6">
-        <label
-          htmlFor="department"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Department
-        </label>
-        {errors.department && (
-          <ErrorMessage errors={errors.department.message} />
-        )}
-        <select
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('department', {
-            required: true,
-            validate: (value) => value !== '',
-          })}
-          onChange={(e) => {
-            handleSelectChange(e);
-          }}
-        >
-          <option value="" disabled>
-            Select option
-          </option>
-          <option value="ALT">ALT</option>
-          <option value="GameCenter">Game Center</option>
-          <option value="IDM">IDM</option>
-          <option value="ITP / IMA / Low Res">ITP / IMA / Low Res</option>
-          <option value="MARL">MARL</option>
-          <option value="Music Tech">Music Tech</option>
-          <option value="Recorded Music">Recorded Music</option>
-          <option value="others">Other Group</option>
-        </select>
-        {showTextbox && (
-          <input
-            type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('department')}
-          />
-        )}
-      </div>
-      <div className="mb-6">
-        <label
-          htmlFor="role"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Requestor's Role
-        </label>
-        {errors.role && <ErrorMessage errors={errors.role.message} />}
-        <select
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          {...register('role', {
-            required: true,
-            validate: (value) => value !== '',
-          })}
-        >
-          <option value="" disabled>
-            Select option
-          </option>
-          <option value="Student">Student</option>
-          <option value="Resident/Fellow">Resident / Fellow</option>
-          <option value="Faculty">Faculty</option>
-          <option value="Admin/Staff">Admin / Staff</option>
-        </select>
-      </div>
+
       {watch('role') === 'Student' && (
         <div>
           <div className="mb-6">
@@ -369,6 +312,9 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
             >
               Sponsor Last Name
             </label>
+            {errors.sponsorFirstName && (
+              <ErrorMessage errors={errors.sponsorFirstName.message} />
+            )}
             <input
               type="sponsorLastName"
               id="sponsorLastName"
@@ -396,11 +342,11 @@ const FormInput = ({ hasEmail, handleParentSubmit, selectedRoom }) => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
               {...register('sponsorEmail', {
-                required: watch('role') === 'Student',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
                   message: 'Invalid email address',
                 },
+                required: watch('role') === 'Student',
               })}
             />
           </div>
