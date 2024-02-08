@@ -70,7 +70,7 @@ export const RoleModal = ({ handleClick }) => {
                 htmlFor="default-checkbox"
                 className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
               >
-                Enrolled in thesis
+                This request is related to my thesis or capstone
               </label>
             </>
           )}

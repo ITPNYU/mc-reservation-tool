@@ -7,7 +7,6 @@ import { DateSelectArg } from '@fullcalendar/core';
 import { RoomUsage } from './RoomUsage';
 import { Header } from './Header';
 import { MultipleCalendars } from './MultipleCalendars';
-import { Modal } from 'react-bootstrap';
 import { InitialModal } from './InitialModal';
 import { Loading } from '../../utils/Loading';
 import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
@@ -21,9 +20,17 @@ export type RoomSetting = {
   calendarRef?: any;
 };
 
+export type LiaisonType = {
+  email: string;
+  department: string;
+  completedAt: string;
+};
+
 export type Role = 'Student' | 'Resident/Fellow' | 'Faculty' | 'Admin/Staff';
 
 export type Purpose = 'multipleRoom' | 'motionCapture';
+
+export const LIAISON_SHEET_NAME = 'liaisons';
 
 const SAFETY_TRAINING_REQUIRED_ROOM = [
   '103',
@@ -45,18 +52,15 @@ const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
   //IN PRODUCTION
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  };
+  //const roomCalendarId = (room) => {
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
+  //};
 
   //IN DEV
-  //const roomCalendarId = (room) => {
-  //  console.log(
-  //    'roomCalendarId',
-  //    findByRoomId(mappingRoomSettings, room.roomId)
-  //  );
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  //};
+  const roomCalendarId = (room) => {
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  };
+
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
@@ -79,7 +83,8 @@ const SheetEditor = () => {
   const [department, setDepartment] = useState('');
   const [enrolledThesis, setEnrolledThesis] = useState(false);
   const canBookFullTime = enrolledThesis || role !== 'Student';
-  console.log('enrolledThesis', enrolledThesis, 'role', role);
+
+  const [mappingLiaisonUsers, setMappingLiaisonUsers] = useState([]);
 
   const order: (keyof Inputs)[] = [
     'firstName',
@@ -111,15 +116,34 @@ const SheetEditor = () => {
 
   useEffect(() => {
     getActiveUserEmail();
+    fetchRoomSettings();
+    fetchLiaisonUsers();
   }, []);
   useEffect(() => {
     getSafetyTrainingStudents();
     getBannedStudents();
   }, [userEmail]);
 
-  useEffect(() => {
-    fetchRoomSettings();
-  }, []);
+  const fetchLiaisonUsers = async () => {
+    serverFunctions.fetchRows(LIAISON_SHEET_NAME).then((liaisonUsers) => {
+      const mappingLiaisons = liaisonUsers
+        .map((liaison, index) => {
+          if (index !== 0) {
+            return mappingLiaisonRows(liaison);
+          }
+        })
+        .filter((liaison) => liaison !== undefined);
+      setMappingLiaisonUsers(mappingLiaisons);
+    });
+  };
+
+  const mappingLiaisonRows = (values: string[]): LiaisonType => {
+    return {
+      email: values[0],
+      department: values[1],
+      completedAt: values[2],
+    };
+  };
 
   useEffect(() => {
     const mappings = roomSettings
@@ -186,13 +210,25 @@ const SheetEditor = () => {
       });
   };
 
+  const firstApproverEmailsByDepartment = (
+    liaisons: LiaisonType[],
+    targetDepartment: string
+  ) => {
+    return liaisons
+      .filter((liaison) => liaison.department === targetDepartment)
+      .map((liaison) => liaison.email);
+  };
+
   const registerEvent = async (data) => {
     const email = userEmail || data.missingEmail;
     const [room, ...otherRooms] = selectedRoom;
     const otherRoomIds = otherRooms.map((r) => roomCalendarId(r));
-    console.log('roomId', roomCalendarId(room));
 
-    console.log('otherRoomIds', otherRoomIds);
+    const firstApprovers = firstApproverEmailsByDepartment(
+      mappingLiaisonUsers,
+      department
+    );
+
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
       roomCalendarId(room),

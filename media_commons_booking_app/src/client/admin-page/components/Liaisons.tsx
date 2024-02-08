@@ -4,14 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { serverFunctions } from '../../utils/serverFunctions';
 import { formatDate } from '../../utils/date';
 import { Loading } from '../../utils/Loading';
-
-const LIAISON_SHEET_NAME = 'liaisons';
-
-type LiaisonType = {
-  email: string;
-  department: string;
-  completedAt: string;
-};
+import {
+  LIAISON_SHEET_NAME,
+  LiaisonType,
+} from '../../booking/components/SheetEditor';
 
 export const Liaisons = () => {
   const [liaisonUsers, setLiaisonUsers] = useState([]);
@@ -27,7 +23,7 @@ export const Liaisons = () => {
     const mappings = liaisonUsers
       .map((liaison, index) => {
         if (index !== 0) {
-          return mappingSafetyTrainingRows(liaison);
+          return mappingLiaisonRows(liaison);
         }
       })
       .filter((liaison) => liaison !== undefined);
@@ -45,7 +41,7 @@ export const Liaisons = () => {
     });
   };
 
-  const mappingSafetyTrainingRows = (values: string[]): LiaisonType => {
+  const mappingLiaisonRows = (values: string[]): LiaisonType => {
     return {
       email: values[0],
       department: values[1],
