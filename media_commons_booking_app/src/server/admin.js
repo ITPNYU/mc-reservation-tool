@@ -65,11 +65,7 @@ export const approveInstantBooking = (id) => {
     .getRange(rowIndex + 1, 4)
     .setValue(current);
 
-  SpreadsheetApp.openById(ACTIVE_SHEET_ID)
-    .getSheetByName(BOOKING_STATUS_SHEET_NAME)
-    .getRange(rowIndex + 1, 5)
-    .setValue(current);
-  updateEventPrefix(id, 'APPROVED');
+  approveEvent(rowIndex, id);
 };
 
 export const approveBooking = (id) => {
@@ -83,15 +79,10 @@ export const approveBooking = (id) => {
     .getRange(rowIndex + 1, 4);
   console.log('firstApproveDate', firstApproveDate.getValue());
 
-  //TODO: check email address
+  //COMPLETE ALL APPROVAL
   if (firstApproveDate.getValue() !== '') {
     // second approve
-    SpreadsheetApp.openById(ACTIVE_SHEET_ID)
-      .getSheetByName(BOOKING_STATUS_SHEET_NAME)
-      .getRange(rowIndex + 1, 5)
-      .setValue(current);
-    //TODO: send email to user
-    updateEventPrefix(id, 'APPROVED');
+    approveEvent(rowIndex, id);
   } else {
     // first approve
     SpreadsheetApp.openById(ACTIVE_SHEET_ID)
@@ -111,12 +102,41 @@ export const allRoomIds = () => {
   const rows = fetchRows_('rooms');
   const ids = rows.map((row) => row[3]);
   ids.shift();
-  console.log('ids', ids);
   return ids;
+};
+
+export const approveEvent = (rowIndex, id) => {
+  SpreadsheetApp.openById(ACTIVE_SHEET_ID)
+    .getSheetByName(BOOKING_STATUS_SHEET_NAME)
+    .getRange(rowIndex + 1, 5)
+    .setValue(current);
+  const guestEmail = SpreadsheetApp.openById(ACTIVE_SHEET_ID)
+    .getSheetByName(BOOKING_STATUS_SHEET_NAME)
+    .getRange(rowIndex + 1, 2)
+    .getValue();
+  console.log('guestEmail', guestEmail);
+
+  updateEventPrefix(id, 'APPROVED');
+  inviteUserToCalendarEvent(id, guestEmail);
+};
+
+const inviteUserToCalendarEvent = (eventId, guestEmail) => {
+  console.log(`Invite User:${guestEmail}`);
+  //TODO: getting roomId from booking sheet
+  const roomIds = allRoomIds();
+  roomIds.map((roomId) => {
+    const calendar = CalendarApp.getCalendarById(roomId);
+    const event = calendar.getEventById(eventId);
+    if (event) {
+      event.addGuest(guestEmail);
+      console.log(`Invited ${guestEmail} to room: ${roomId} event: ${eventId}`);
+    }
+  });
 };
 
 export const updateEventPrefix = (id, newPrefix) => {
   const roomIds = allRoomIds();
+  //TODO: getting roomId from booking sheet
   roomIds.map((roomId) => {
     const calendar = CalendarApp.getCalendarById(roomId);
     const event = calendar.getEventById(id);

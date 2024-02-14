@@ -52,14 +52,14 @@ const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
   //IN PRODUCTION
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  //};
+  const roomCalendarId = (room) => {
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
+  };
 
   //IN DEV
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  };
+  //const roomCalendarId = (room) => {
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  //};
 
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
@@ -222,6 +222,7 @@ const SheetEditor = () => {
   const registerEvent = async (data) => {
     const email = userEmail || data.missingEmail;
     const [room, ...otherRooms] = selectedRoom;
+    const selectedRoomIds = selectedRoom.map((r) => r.roomId);
     const otherRoomIds = otherRooms.map((r) => roomCalendarId(r));
 
     const firstApprovers = firstApproverEmailsByDepartment(
@@ -232,49 +233,47 @@ const SheetEditor = () => {
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
       roomCalendarId(room),
-      `[REQUESTED] ${room.roomId},${otherRooms.map(
-        (r) => room.roomId
-      )} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
+      `[REQUESTED] ${selectedRoomIds} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
       'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
       bookInfo.startStr,
       bookInfo.endStr,
       otherRoomIds
     );
-    selectedRoom.map(async (room) => {
-      // Record the event to the spread sheet.
-      const contents = order.map(function (key) {
-        return data[key];
-      });
-      serverFunctions.appendRow(BOOKING_SHEET_NAME, [
-        calendarEventId,
-        room.roomId,
-        email,
-        bookInfo.startStr,
-        bookInfo.endStr,
-        ...contents,
-      ]);
-      serverFunctions.request(calendarEventId, email).then(() => {
-        // Rooms 221 to 224 don't need approval
-        if (INSTANT_APPROVAL_ROOMS.includes(room.roomId)) {
-          serverFunctions.approveInstantBooking(calendarEventId);
-        } else {
-          const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
-          const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
-          Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
-            const userEventInputs = {
-              calendarEventId: calendarEventId,
-              roomId: room.roomId,
-              email: email,
-              startDate: bookInfo?.startStr,
-              endDate: bookInfo?.endStr,
-              approvalUrl: values[0],
-              rejectedUrl: values[1],
-              ...data,
-            };
-            sendApprovalEmail(FIRST_APPROVER, userEventInputs);
-          });
-        }
-      });
+    // Record the event to the spread sheet.
+    const contents = order.map(function (key) {
+      return data[key];
+    });
+    serverFunctions.appendRow(BOOKING_SHEET_NAME, [
+      calendarEventId,
+      selectedRoomIds,
+      email,
+      bookInfo.startStr,
+      bookInfo.endStr,
+      ...contents,
+    ]);
+    serverFunctions.request(calendarEventId, email).then(() => {
+      const isAutoApproval = selectedRoomIds.every((r) =>
+        INSTANT_APPROVAL_ROOMS.includes(r)
+      );
+      if (isAutoApproval) {
+        serverFunctions.approveInstantBooking(calendarEventId);
+      } else {
+        const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
+        const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
+        Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
+          const userEventInputs = {
+            calendarEventId: calendarEventId,
+            roomId: selectedRoomIds,
+            email: email,
+            startDate: bookInfo?.startStr,
+            endDate: bookInfo?.endStr,
+            approvalUrl: values[0],
+            rejectedUrl: values[1],
+            ...data,
+          };
+          sendApprovalEmail(firstApprovers, userEventInputs);
+        });
+      }
     });
     alert('Your request has been sent.');
     setLoading(false);
