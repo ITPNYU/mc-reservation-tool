@@ -37,6 +37,7 @@ import {
   fetchById,
   fetchRows_,
   getFutureDates,
+  getOldSafetyTrainingEmails,
 } from './sheets';
 
 // Public functions must be exported as named exports
@@ -73,4 +74,5 @@ export {
   removeFromList,
   getFutureDates,
   getCalendarEvents,
+  getOldSafetyTrainingEmails,
 };

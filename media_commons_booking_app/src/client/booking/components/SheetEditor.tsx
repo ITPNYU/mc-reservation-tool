@@ -4,7 +4,6 @@ import FormInput, { Inputs } from './FormInput';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 import { DateSelectArg } from '@fullcalendar/core';
-import { RoomUsage } from './RoomUsage';
 import { Header } from './Header';
 import { MultipleCalendars } from './MultipleCalendars';
 import { InitialModal } from './InitialModal';
@@ -185,9 +184,8 @@ const SheetEditor = () => {
 
   // safety training users
   const getSafetyTrainingStudents = () => {
-    const students = serverFunctions
-      .getSheetRows(SAFTY_TRAINING_SHEET_NAME)
-      .then((rows) => {
+    if (!isSafetyTrained) {
+      serverFunctions.getSheetRows(SAFTY_TRAINING_SHEET_NAME).then((rows) => {
         const emails = rows.reduce(
           (accumulator, value) => accumulator.concat(value),
           []
@@ -195,6 +193,16 @@ const SheetEditor = () => {
         const trained = emails.includes(userEmail);
         setIsSafetyTrained(trained);
       });
+      serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
+        console.log('old emails', rows);
+        const emails = rows.reduce(
+          (accumulator, value) => accumulator.concat(value),
+          []
+        );
+        const trained = emails.includes(userEmail);
+        setIsSafetyTrained(trained);
+      });
+    }
   };
 
   const getBannedStudents = () => {

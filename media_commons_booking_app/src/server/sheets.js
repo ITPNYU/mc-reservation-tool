@@ -1,4 +1,6 @@
 export const ACTIVE_SHEET_ID = '1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68';
+export const OLD_SHEET_ID = '1Debe5qF-2qXJhqP0AMy5etEvwAPd3mNFiTswytsbKxQ';
+export const OLD_SHEET_SAFETY_TRAINING_NAME = 'Sheet1';
 
 export const fetchRows_ = (sheetName) => {
   return SpreadsheetApp.openById(ACTIVE_SHEET_ID)
@@ -50,6 +52,20 @@ function fetchById(sheetName, id) {
     });
   return messages;
 }
+
+export const getOldSafetyTrainingEmails = (email) => {
+  const activeSpreadSheet = SpreadsheetApp.openById(OLD_SHEET_ID);
+  const activeSheet = activeSpreadSheet.getSheetByName(
+    OLD_SHEET_SAFETY_TRAINING_NAME
+  );
+  var lastRow = activeSheet.getLastRow();
+
+  // get all row3(email) data
+  var range = activeSheet.getRange(1, 5, lastRow);
+  var values = range.getValues();
+
+  return values;
+};
 
 export const getSheetRows = (sheetName) => {
   const activeSpreadSheet = SpreadsheetApp.openById(ACTIVE_SHEET_ID);
