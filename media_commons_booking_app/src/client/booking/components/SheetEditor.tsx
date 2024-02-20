@@ -47,7 +47,7 @@ const BASE_URL =
 
 const BOOKING_SHEET_NAME = 'bookings';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
-const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
+const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
   //IN PRODUCTION
@@ -190,18 +190,23 @@ const SheetEditor = () => {
           (accumulator, value) => accumulator.concat(value),
           []
         );
+        console.log('emails!!!!!!!!!!!!!!!', emails);
         const trained = emails.includes(userEmail);
+        console.log('trained', trained);
         setIsSafetyTrained(trained);
       });
-      serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
-        console.log('old emails', rows);
-        const emails = rows.reduce(
-          (accumulator, value) => accumulator.concat(value),
-          []
-        );
-        const trained = emails.includes(userEmail);
-        setIsSafetyTrained(trained);
-      });
+      //finding old safety training sheets
+      if (!isSafetyTrained) {
+        serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
+          console.log('old emails', rows);
+          const emails = rows.reduce(
+            (accumulator, value) => accumulator.concat(value),
+            []
+          );
+          const trained = emails.includes(userEmail);
+          setIsSafetyTrained(trained);
+        });
+      }
     }
   };
 
@@ -260,8 +265,9 @@ const SheetEditor = () => {
       ...contents,
     ]);
     serverFunctions.request(calendarEventId, email).then(() => {
-      const isAutoApproval = selectedRoomIds.every((r) =>
-        INSTANT_APPROVAL_ROOMS.includes(r)
+      const isAutoApproval = selectedRoomIds.every(
+        (r) => INSTANT_APPROVAL_ROOMS.includes(r)
+        //TODO: No catering, no media services, no security, no room setup
       );
       if (isAutoApproval) {
         serverFunctions.approveInstantBooking(calendarEventId);
