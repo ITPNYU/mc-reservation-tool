@@ -1,4 +1,4 @@
-name: Deploy to Google Apps Script for production
+name: Deploy to PROD_PROD_CALENDAR to Google Apps Script
 
 on:
   push:
@@ -32,8 +32,8 @@ jobs:
       - name: Push to Google Apps Script
         run: |
           cd media_commons_booking_app
-          echo "Yes" | npm run deploy
+          npm run deploy
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycbxmQf1ZncntQwdIaGq372w5gbdiltLGmzo2xbV7efAbZQ7U7zWtMJBw0EQjnXZm4aYimw -d "production"
+          clasp deploy --deploymentId AKfycbx3bCPVCKcaLXmLf58o98gDnW11MiD0axU45YzAtOyXHjqZNgtKSWR1ljdopSaB189k -d "PROD_PROD_CALENDAR"
