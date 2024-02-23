@@ -1,9 +1,9 @@
-name: Deploy to Google Apps Script for Preview(use production calendar)
+name: Deploy DEV_DEV_CALENDAR_Noah to Google Apps Script
 
 on:
   push:
     branches:
-      - preview
+      - "noah/**"
 
 jobs:
   deploy:
@@ -36,4 +36,4 @@ jobs:
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycbx3bCPVCKcaLXmLf58o98gDnW11MiD0axU45YzAtOyXHjqZNgtKSWR1ljdopSaB189k -d "for preview(use production calendar)"
+          clasp deploy --deploymentId AKfycby6DWUvOJ-r6Qtq7WR734GWvw_ng5ZquXGacOVRwW-6iQh4OP7V_up8HAClkrsvtYfuWw -d "DEV_DEV_CALENDAR_Noah"
