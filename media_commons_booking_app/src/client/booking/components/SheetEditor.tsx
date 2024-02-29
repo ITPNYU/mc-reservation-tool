@@ -50,15 +50,15 @@ const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
 
 const SheetEditor = () => {
-  //IN PRODUCTION
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  };
-
-  //IN DEV
+  //PRODUCTION
   //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
   //};
+
+  //DEV
+  const roomCalendarId = (room) => {
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  };
 
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
@@ -200,7 +200,9 @@ const SheetEditor = () => {
           []
         );
         const trained = emails.includes(userEmail);
-        setIsSafetyTrained(trained);
+        if (trained) {
+          setIsSafetyTrained(trained);
+        }
       });
     }
   };
