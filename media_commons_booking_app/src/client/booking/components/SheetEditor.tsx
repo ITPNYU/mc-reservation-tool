@@ -47,7 +47,7 @@ const BASE_URL =
 
 const BOOKING_SHEET_NAME = 'bookings';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
-const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
+const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
   //PRODUCTION
