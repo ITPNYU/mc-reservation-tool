@@ -118,6 +118,11 @@ export const approveEvent = (rowIndex, id) => {
 
   updateEventPrefix(id, 'APPROVED');
   inviteUserToCalendarEvent(id, guestEmail);
+  sendTextEmail(
+    guestEmail,
+    'Media Commons Reservation Approved',
+    'Your reservation request for Media Commons is approved.'
+  );
 };
 
 const inviteUserToCalendarEvent = (eventId, guestEmail) => {
