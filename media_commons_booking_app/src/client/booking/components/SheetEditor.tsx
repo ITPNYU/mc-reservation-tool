@@ -286,6 +286,12 @@ const SheetEditor = () => {
       }
     });
     alert('Your request has been sent.');
+
+    serverFunctions.sendTextEmail(
+      email,
+      'Your Request Sent to Media Commons',
+      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.'
+    );
     setLoading(false);
     setSection('selectRoom');
   };
@@ -301,7 +307,6 @@ const SheetEditor = () => {
   const sendApprovalEmail = (recipient, contents) => {
     var subject = 'Approval Request';
 
-    //serverFunctions.sendTextEmail(recipient, subject, body);
     serverFunctions.sendHTMLEmail(
       'approval_email',
       contents,
