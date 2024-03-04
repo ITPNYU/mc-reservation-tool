@@ -1,4 +1,4 @@
-name: Deploy DEV_DEV_CALENDAR_Lucia to Google Apps Script
+name: Deploy DEV_Lucia to Google Apps Script
 
 on:
   push:
@@ -36,4 +36,4 @@ jobs:
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycbzSN1K6hAtE8UZQk-L7vQnNyozuy2yGIKbU-WHN8hCmqInf1HFY0Ymp2cYu_ihOn-AELA -d "DEV_DEV_CALENDAR_Lucia"
+          clasp deploy --deploymentId AKfycbzSN1K6hAtE8UZQk-L7vQnNyozuy2yGIKbU-WHN8hCmqInf1HFY0Ymp2cYu_ihOn-AELA -d "DEV_Lucia"

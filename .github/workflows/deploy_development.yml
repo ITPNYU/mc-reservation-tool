@@ -1,9 +1,9 @@
-name: Deploy DEV_DEV_CALENDAR_Noah to Google Apps Script
+name: Deploy DEVELOPMENT to Google Apps Script
 
 on:
   push:
     branches:
-      - "noah/**"
+      - prod_dev
 
 jobs:
   deploy:
@@ -32,8 +32,8 @@ jobs:
       - name: Push to Google Apps Script
         run: |
           cd media_commons_booking_app
-          npm run deploy
+          echo "Yes" | npm run deploy
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycby6DWUvOJ-r6Qtq7WR734GWvw_ng5ZquXGacOVRwW-6iQh4OP7V_up8HAClkrsvtYfuWw -d "DEV_DEV_CALENDAR_Noah"
+          clasp deploy --deploymentId AKfycbxmQf1ZncntQwdIaGq372w5gbdiltLGmzo2xbV7efAbZQ7U7zWtMJBw0EQjnXZm4aYimw -d "DEVELOPMENT"
