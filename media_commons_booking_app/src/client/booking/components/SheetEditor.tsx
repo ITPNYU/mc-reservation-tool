@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
 import FormInput, { Inputs } from './FormInput';
+import React, { useEffect, useState } from 'react';
 
-// This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../utils/serverFunctions';
+import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
 import { DateSelectArg } from '@fullcalendar/core';
 import { Header } from './Header';
-import { MultipleCalendars } from './MultipleCalendars';
 import { InitialModal } from './InitialModal';
 import { Loading } from '../../utils/Loading';
-import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
+import { MultipleCalendars } from './MultipleCalendars';
 import { RoleModal } from './RoleModal';
+// This is a wrapper for google.script.run that lets us use promises.
+import { serverFunctions } from '../../utils/serverFunctions';
+
 export type RoomSetting = {
   roomId: string;
   name: string;
@@ -72,7 +73,7 @@ const SheetEditor = () => {
   };
   const [showModal, setShowModal] = useState(true);
   const [roleModal, setRoleModal] = useState(false);
-  const [userEmail, setUserEmail] = useState();
+  const [userEmail, setUserEmail] = useState<string | undefined>();
   const [bookInfo, setBookInfo] = useState<DateSelectArg>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
   const [isBanned, setIsBanned] = useState(false);
@@ -355,7 +356,7 @@ const SheetEditor = () => {
             Back to Calendar
           </button>
           <FormInput
-            hasEmail={userEmail ? true : false}
+            userEmail={userEmail}
             handleParentSubmit={handleSubmit}
             selectedRoom={selectedRoom}
             role={role}

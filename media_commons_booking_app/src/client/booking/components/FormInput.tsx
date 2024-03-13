@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
 import { Loading } from '../../utils/Loading';
+import PropTypes from 'prop-types';
+
 export type Inputs = {
   firstName: string;
   lastName: string;
@@ -43,7 +45,7 @@ const ErrorMessage = (message) => {
 };
 
 const FormInput = ({
-  hasEmail,
+  userEmail,
   handleParentSubmit,
   selectedRoom,
   role: initialRole,
@@ -92,6 +94,14 @@ const FormInput = ({
     );
   };
   console.log('maxCapacity', maxCapacity);
+
+  const validateSponsorEmail = (value: string) => {
+    if (value === userEmail) {
+      return 'Sponsor email cannot be your own email';
+    }
+    return true;
+  };
+
   const disabledButton = !(checklist && resetRoom && bookingPolicy);
   useEffect(() => {
     trigger();
@@ -124,7 +134,7 @@ const FormInput = ({
       //}}
       onSubmit={handleSubmit(onSubmit)}
     >
-      {!hasEmail && (
+      {userEmail == null && (
         <div className="mb-6">
           <label
             htmlFor="missingEmail"
@@ -343,10 +353,11 @@ const FormInput = ({
               placeholder=""
               {...register('sponsorEmail', {
                 pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  value: /^[A-Z0-9._%+-]+@nyu.edu$/i,
                   message: 'Invalid email address',
                 },
                 required: watch('role') === 'Student',
+                validate: validateSponsorEmail,
               })}
             />
           </div>
