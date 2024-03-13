@@ -3,7 +3,7 @@ name: Deploy DEV_DEV_CALENDAR_Riho to Google Apps Script
 on:
   push:
     branches:
-      - riho/**
+      - local/**
 
 jobs:
   deploy:
