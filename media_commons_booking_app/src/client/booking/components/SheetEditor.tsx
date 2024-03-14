@@ -47,15 +47,15 @@ const BASE_URL =
 
 const BOOKING_SHEET_NAME = 'bookings';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
-const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
+const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
-  //IN PRODUCTION
+  //PRODUCTION
   const roomCalendarId = (room) => {
     return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
   };
 
-  //IN DEV
+  //DEV
   //const roomCalendarId = (room) => {
   //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
   //};
@@ -185,28 +185,25 @@ const SheetEditor = () => {
   // safety training users
   const getSafetyTrainingStudents = () => {
     if (!isSafetyTrained) {
-      const trained = serverFunctions
-        .getSheetRows(SAFTY_TRAINING_SHEET_NAME)
-        .then((rows) => {
-          const emails = rows.reduce(
-            (accumulator, value) => accumulator.concat(value),
-            []
-          );
-          const trained = emails.includes(userEmail);
+      serverFunctions.getSheetRows(SAFTY_TRAINING_SHEET_NAME).then((rows) => {
+        const emails = rows.reduce(
+          (accumulator, value) => accumulator.concat(value),
+          []
+        );
+        const trained = emails.includes(userEmail);
+        setIsSafetyTrained(trained);
+      });
+      serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
+        console.log('old emails', rows);
+        const emails = rows.reduce(
+          (accumulator, value) => accumulator.concat(value),
+          []
+        );
+        const trained = emails.includes(userEmail);
+        if (trained) {
           setIsSafetyTrained(trained);
-          return trained;
-        });
-      if (!trained) {
-        serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
-          console.log('old emails', rows);
-          const emails = rows.reduce(
-            (accumulator, value) => accumulator.concat(value),
-            []
-          );
-          const trained = emails.includes(userEmail);
-          setIsSafetyTrained(trained);
-        });
-      }
+        }
+      });
     }
   };
 
@@ -289,6 +286,12 @@ const SheetEditor = () => {
       }
     });
     alert('Your request has been sent.');
+
+    serverFunctions.sendTextEmail(
+      email,
+      'Your Request Sent to Media Commons',
+      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.'
+    );
     setLoading(false);
     setSection('selectRoom');
   };
@@ -304,7 +307,6 @@ const SheetEditor = () => {
   const sendApprovalEmail = (recipient, contents) => {
     var subject = 'Approval Request';
 
-    //serverFunctions.sendTextEmail(recipient, subject, body);
     serverFunctions.sendHTMLEmail(
       'approval_email',
       contents,
