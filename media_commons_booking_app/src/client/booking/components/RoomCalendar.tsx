@@ -21,9 +21,9 @@ export const RoomCalendar = ({
 
   useEffect(() => {
     //PROD
-    //fetchCalendarEvents(room.calendarIdProd);
+    fetchCalendarEvents(room.calendarIdProd);
     //DEV
-    fetchCalendarEvents(room.calendarId);
+    //fetchCalendarEvents(room.calendarId);
   }, []);
   const fetchCalendarEvents = async (calendarId) => {
     serverFunctions.getCalendarEvents(calendarId).then((rows) => {

@@ -51,14 +51,14 @@ const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
   //PRODUCTION
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  //};
+  const roomCalendarId = (room) => {
+    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
+  };
 
   //DEV
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  };
+  //const roomCalendarId = (room) => {
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  //};
 
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
