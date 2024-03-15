@@ -1,52 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
+import { LiaisonType } from '../../../types';
+import { Loading } from '../../utils/Loading';
+import { TableNames } from '../../../policy';
+import { formatDate } from '../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
-import {
-  LIAISON_SHEET_NAME,
-  LiaisonType,
-} from '../../booking/components/SheetEditor';
 
 export const Liaisons = () => {
-  const [liaisonUsers, setLiaisonUsers] = useState([]);
-  const [liaisonEmails, setAdminEmails] = useState([]);
-  const [mappingLiaisonUsers, setMappingLiaisonUsers] = useState([]);
+  const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
   const [email, setEmail] = useState('');
   const [department, setDepartment] = useState('');
+
+  const liaisonEmails = useMemo<string[]>(
+    () => liaisonUsers.map((user) => user.email),
+    [liaisonUsers]
+  );
 
   useEffect(() => {
     fetchLiaisonUsers();
   }, []);
-  useEffect(() => {
-    const mappings = liaisonUsers
-      .map((liaison, index) => {
-        if (index !== 0) {
-          return mappingLiaisonRows(liaison);
-        }
-      })
-      .filter((liaison) => liaison !== undefined);
-    //TODO: filter out liaisonUsers that are not in the future
-    setMappingLiaisonUsers(mappings);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setAdminEmails(emails);
-  }, [liaisonUsers]);
 
   const fetchLiaisonUsers = async () => {
-    serverFunctions.fetchRows(LIAISON_SHEET_NAME).then((rows) => {
-      setLiaisonUsers(rows);
-    });
-  };
-
-  const mappingLiaisonRows = (values: string[]): LiaisonType => {
-    return {
-      email: values[0],
-      department: values[1],
-      completedAt: values[2],
-    };
+    const liaisons = await serverFunctions
+      .getAllActiveSheetRows(TableNames.LIASONS)
+      .then((rows) =>
+        rows.map((row) => ({
+          email: row[0],
+          department: row[1],
+          completedAt: row[2],
+        }))
+      );
+    setLiaisonUsers(liaisons);
   };
 
   console.log('liaisonEmails', liaisonEmails);
@@ -62,7 +47,7 @@ export const Liaisons = () => {
       return;
     }
 
-    await serverFunctions.appendRow(LIAISON_SHEET_NAME, [
+    await serverFunctions.appendRowActive(TableNames.LIASONS, [
       email,
       department,
       new Date().toString(),
@@ -147,7 +132,7 @@ export const Liaisons = () => {
             </tr>
           </thead>
           <tbody>
-            {mappingLiaisonUsers.map((liaison, index) => {
+            {liaisonUsers.map((liaison, index) => {
               return (
                 <tr
                   key={index}
@@ -165,8 +150,8 @@ export const Liaisons = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
                         setLoading(true);
-                        await serverFunctions.removeFromList(
-                          LIAISON_SHEET_NAME,
+                        await serverFunctions.removeFromListByEmail(
+                          TableNames.LIASONS,
                           liaison.email
                         );
                         alert('Successfully removed');

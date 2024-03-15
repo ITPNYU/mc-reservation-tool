@@ -1,53 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
+import { AdminUser } from '../../../types';
+import { Loading } from '../../utils/Loading';
+import { TableNames } from '../../../policy';
+import { formatDate } from '../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
 
-export const ADMIN_USER_SHEET_NAME = 'admin_users';
-
-export type AdminUser = {
-  email: string;
-  createdAt: string;
-};
-
-export const AdminUsers = () => {
-  const [adminUsers, setAdminUsers] = useState([]);
-  const [adminEmails, setAdminEmails] = useState([]);
-  const [mappingAdminUsers, setMappingAdminUsers] = useState([]);
+const AdminUsers = () => {
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const adminEmails = useMemo<string[]>(
+    () => adminUsers.map((user) => user.email),
+    [adminUsers]
+  );
 
   useEffect(() => {
     fetchAdminUsers();
   }, []);
-  useEffect(() => {
-    const mappings = adminUsers
-      .map((adminUser, index) => {
-        if (index !== 0) {
-          return mappingAdminUserRows(adminUser);
-        }
-      })
-      .filter((adminUser) => adminUser !== undefined);
-    //TODO: filter out adminUsers that are not in the future
-    setMappingAdminUsers(mappings);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setAdminEmails(emails);
-  }, [adminUsers]);
 
   const fetchAdminUsers = async () => {
-    serverFunctions.fetchRows(ADMIN_USER_SHEET_NAME).then((rows) => {
-      setAdminUsers(rows);
-    });
-  };
-
-  const mappingAdminUserRows = (values: string[]): AdminUser => {
-    return {
-      email: values[0],
-      createdAt: values[1],
-    };
+    const users = await serverFunctions
+      .getAllActiveSheetRows(TableNames.ADMINS)
+      .then((rows) =>
+        rows.map((row) => ({
+          email: row[0],
+          createdAt: row[1],
+        }))
+      );
+    setAdminUsers(users);
   };
 
   const addAdminUser = async () => {
@@ -58,7 +41,7 @@ export const AdminUsers = () => {
       return;
     }
 
-    await serverFunctions.appendRow(ADMIN_USER_SHEET_NAME, [
+    await serverFunctions.appendRowActive(TableNames.ADMINS, [
       email,
       new Date().toString(),
     ]);
@@ -67,7 +50,7 @@ export const AdminUsers = () => {
     setLoading(false);
     fetchAdminUsers();
   };
-  const [loading, setLoading] = useState(false);
+
   if (loading) {
     return <Loading />;
   }
@@ -117,7 +100,7 @@ export const AdminUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {mappingAdminUsers.map((adminUser, index) => {
+            {adminUsers.map((adminUser, index) => {
               return (
                 <tr
                   key={index}
@@ -134,8 +117,8 @@ export const AdminUsers = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
                         setLoading(true);
-                        await serverFunctions.removeFromList(
-                          ADMIN_USER_SHEET_NAME,
+                        await serverFunctions.removeFromListByEmail(
+                          TableNames.ADMINS,
                           adminUser.email
                         );
                         alert('Successfully removed');
@@ -155,3 +138,5 @@ export const AdminUsers = () => {
     </div>
   );
 };
+
+export default AdminUsers;

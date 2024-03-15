@@ -1,61 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { AdminUser } from '../../../types';
+import AdminUsers from './AdminUsers';
+import { Ban } from './Ban';
+import { Bookings } from './Bookings';
+import { Liaisons } from './Liaisons';
+import { Loading } from '../../utils/Loading';
+import { PAUsers } from './PAUsers';
+import { SafetyTraining } from './SafetyTraining';
+import { TableNames } from '../../../policy';
+import { serverFunctions } from '../../utils/serverFunctions';
 
 // This is a wrapper for google.script.run that lets us use promises.
-
-import { SafetyTraining } from './SafetyTraining';
-import { Ban } from './Ban';
-import { ADMIN_USER_SHEET_NAME, AdminUser, AdminUsers } from './AdminUsers';
-import { Liaisons } from './Liaisons';
-import { Bookings } from './Bookings';
-import { PAUsers } from './PAUsers';
-import { serverFunctions } from '../../utils/serverFunctions';
-import { Loading } from '../../utils/Loading';
 
 const Admin = () => {
   const [tab, setTab] = useState('bookings');
 
-  const [adminUsers, setAdminUsers] = useState([]);
-  const [adminEmails, setAdminEmails] = useState([]);
-  const [userEmail, setUserEmail] = useState();
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [userEmail, setUserEmail] = useState<string | undefined>();
+
+  const adminEmails = useMemo<string[]>(
+    () => adminUsers.map((user) => user.email),
+    [adminUsers]
+  );
+  const userHasPermission = adminEmails.includes(userEmail);
 
   useEffect(() => {
     fetchAdminUsers();
     getActiveUserEmail();
   }, []);
+
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
       console.log('userEmail response', response);
       setUserEmail(response);
     });
   };
-  useEffect(() => {
-    const mappings = adminUsers
-      .map((adminUser, index) => {
-        if (index !== 0) {
-          return mappingAdminUserRows(adminUser);
-        }
-      })
-      .filter((adminUser) => adminUser !== undefined);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setAdminEmails(emails);
-  }, [adminUsers]);
 
   const fetchAdminUsers = async () => {
-    serverFunctions.fetchRows(ADMIN_USER_SHEET_NAME).then((rows) => {
-      setAdminUsers(rows);
-    });
+    const admins = await serverFunctions
+      .getAllActiveSheetRows(TableNames.ADMINS)
+      .then((rows) =>
+        rows.map((row) => ({
+          email: row[0],
+          createdAt: row[1],
+        }))
+      );
+
+    setAdminUsers(admins);
   };
 
-  const mappingAdminUserRows = (values: string[]): AdminUser => {
-    return {
-      email: values[0],
-      createdAt: values[1],
-    };
-  };
-  const userHasPermission = adminEmails.includes(userEmail);
-  if (adminEmails.length === 0 || userEmail === null) {
+  if (adminEmails.length === 0 || userEmail == null) {
     return <Loading />;
   }
 

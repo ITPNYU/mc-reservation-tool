@@ -1,34 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { Booking, BookingStatus } from '../../../types';
+import React, { useEffect, useState } from 'react';
 
+import { formatDate } from '../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { Inputs } from '../../booking/components/FormInput';
-import { SafetyTraining } from './SafetyTraining';
-import { Ban } from './Ban';
-import { AdminUsers } from './AdminUsers';
-import { Liaisons } from './Liaisons';
-import { formatDate } from '../../utils/date';
-
-const BOOKING_SHEET_NAME = 'bookings';
-
-type Booking = Inputs & {
-  calendarEventId: string;
-  email: string;
-  startDate: string;
-  endDate: string;
-  roomId: string;
-};
-
-type BookingStatus = {
-  calendarEventId: string;
-  email: string;
-  requestedAt: string;
-  firstApprovedAt: string;
-  secondApprovedAt: string;
-  rejectedAt: string;
-  canceledAt: string;
-  checkedInAt: string;
-};
 
 interface BookingsProps {
   showNnumber: boolean;
@@ -40,8 +15,6 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
   const [mappingBookingStatuses, setMappingBookingStatuses] = useState([]);
   const [bookingStatuses, setBookingStatuses] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedInfo, setSelectedInfo] = useState<Booking>();
-  const [tab, setTab] = useState('bookings');
   const [reload, setReload] = useState(false);
 
   useEffect(() => {
@@ -76,7 +49,7 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
   }, [bookingStatuses]);
 
   const fetchBookings = async () => {
-    serverFunctions.getFutureDates(BOOKING_SHEET_NAME).then((rows) => {
+    serverFunctions.getActiveBookingsFutureDates().then((rows) => {
       console.log('booking rows', rows);
       setBookings(rows);
     });

@@ -1,53 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
+import { Loading } from '../../utils/Loading';
+import { PaUser } from '../../../types';
+import { TableNames } from '../../../policy';
+import { formatDate } from '../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
-
-const PA_USER_SHEET_NAME = 'pa_users';
-
-export type PaUser = {
-  email: string;
-  createdAt: string;
-};
 
 export const PAUsers = () => {
-  const [paUsers, setPaUsers] = useState([]);
-  const [paEmails, setPaEmails] = useState([]);
-  const [mappingPaUsers, setMappingPaUsers] = useState([]);
+  const [paUsers, setPaUsers] = useState<PaUser[]>([]);
   const [email, setEmail] = useState('');
+
+  const paEmails = useMemo<string[]>(
+    () => paUsers.map((user) => user.email),
+    [paUsers]
+  );
 
   useEffect(() => {
     fetchPaUsers();
   }, []);
-  useEffect(() => {
-    const mappings = paUsers
-      .map((paUser, index) => {
-        if (index !== 0) {
-          return mappingPaUserRows(paUser);
-        }
-      })
-      .filter((paUser) => paUser !== undefined);
-    //TODO: filter out paUsers that are not in the future
-    setMappingPaUsers(mappings);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setPaEmails(emails);
-  }, [paUsers]);
 
   const fetchPaUsers = async () => {
-    serverFunctions.fetchRows(PA_USER_SHEET_NAME).then((rows) => {
-      setPaUsers(rows);
-    });
-  };
-
-  const mappingPaUserRows = (values: string[]): PaUser => {
-    return {
-      email: values[0],
-      createdAt: values[1],
-    };
+    const pas = await serverFunctions
+      .getAllActiveSheetRows(TableNames.PAS)
+      .then((rows) =>
+        rows.map((row) => ({
+          email: row[0],
+          createdAt: row[1],
+        }))
+      );
+    setPaUsers(pas);
   };
 
   const addPaUser = async () => {
@@ -58,7 +40,7 @@ export const PAUsers = () => {
       return;
     }
 
-    await serverFunctions.appendRow(PA_USER_SHEET_NAME, [
+    await serverFunctions.appendRowActive(TableNames.PAS, [
       email,
       new Date().toString(),
     ]);
@@ -117,7 +99,7 @@ export const PAUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {mappingPaUsers.map((paUser, index) => {
+            {paUsers.map((paUser, index) => {
               return (
                 <tr
                   key={index}
@@ -134,8 +116,8 @@ export const PAUsers = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
                         setLoading(true);
-                        await serverFunctions.removeFromList(
-                          PA_USER_SHEET_NAME,
+                        await serverFunctions.removeFromListByEmail(
+                          TableNames.PAS,
                           paUser.email
                         );
                         alert('Successfully removed');

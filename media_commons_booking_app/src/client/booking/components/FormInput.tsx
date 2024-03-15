@@ -1,37 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { Inputs } from '../../../types';
 import { Loading } from '../../utils/Loading';
 import PropTypes from 'prop-types';
-
-export type Inputs = {
-  firstName: string;
-  lastName: string;
-  secondaryName: string;
-  nNumber: string;
-  netId: string;
-  phoneNumber: string;
-  department: string;
-  role: string;
-  sponsorFirstName: string;
-  sponsorLastName: string;
-  sponsorEmail: string;
-  reservationTitle: string;
-  reservationDescription: string;
-  attendeeAffiliation: string;
-  roomSetup: string;
-  setupDetails: string;
-  mediaServices: string;
-  mediaServicesDetails: string;
-  catering: string;
-  hireSecurity: string;
-  expectedAttendance: string;
-  cateringService: string;
-  missingEmail?: string;
-  chartFieldForCatering: string;
-  chartFieldForSecurity: string;
-  chartFieldForRoomSetup: string;
-};
 
 const ErrorMessage = (message) => {
   console.log('message', message);

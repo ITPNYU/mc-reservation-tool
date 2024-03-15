@@ -1,8 +1,13 @@
-import FormInput, { Inputs } from './FormInput';
-import React, { useEffect, useState } from 'react';
+import {
+  INSTANT_APPROVAL_ROOMS,
+  SAFETY_TRAINING_REQUIRED_ROOM,
+  TableNames,
+} from '../../../policy';
+import { Inputs, LiaisonType, RoomSetting } from '../../../types';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
 import { DateSelectArg } from '@fullcalendar/core';
+import FormInput from './FormInput';
 import { Header } from './Header';
 import { InitialModal } from './InitialModal';
 import { Loading } from '../../utils/Loading';
@@ -11,80 +16,28 @@ import { RoleModal } from './RoleModal';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
-export type RoomSetting = {
-  roomId: string;
-  name: string;
-  capacity: string;
-  calendarId: string;
-  calendarIdProd: string;
-  calendarRef?: any;
-};
-
-export type LiaisonType = {
-  email: string;
-  department: string;
-  completedAt: string;
-};
-
-export type Role = 'Student' | 'Resident/Fellow' | 'Faculty' | 'Admin/Staff';
-
-export type Purpose = 'multipleRoom' | 'motionCapture';
-
-export const LIAISON_SHEET_NAME = 'liaisons';
-
-const SAFETY_TRAINING_REQUIRED_ROOM = [
-  '103',
-  '220',
-  '221',
-  '222',
-  '223',
-  '224',
-  '230',
-];
-const FIRST_APPROVER = ['rh3555@nyu.edu', 'nnp278@nyu.edu'];
-const ROOM_SHEET_NAME = 'rooms';
-const BASE_URL =
-  'https://script.google.com/a/macros/itp.nyu.edu/s/AKfycbwvWl7X9w62iz0QLWOY1F1zTT-cLv9EfzPi77Adkxxwqb_ZG4vQayi3EkT7zz9jekE8/exec';
-
-const BOOKING_SHEET_NAME = 'bookings';
-const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
-const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
+// const BASE_URL =
+//   'https://script.google.com/a/macros/itp.nyu.edu/s/AKfycbwvWl7X9w62iz0QLWOY1F1zTT-cLv9EfzPi77Adkxxwqb_ZG4vQayi3EkT7zz9jekE8/exec';
 
 const SheetEditor = () => {
-  //IN PRODUCTION
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  };
-
-  //IN DEV
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  //};
-
-  const getActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail response', response);
-      setUserEmail(response);
-    });
-  };
-  const [showModal, setShowModal] = useState(true);
-  const [roleModal, setRoleModal] = useState(false);
   const [userEmail, setUserEmail] = useState<string | undefined>();
-  const [bookInfo, setBookInfo] = useState<DateSelectArg>();
+  const [liaisons, setLiaisons] = useState<LiaisonType[]>([]);
+  const [roomSettings, setRoomSettings] = useState<RoomSetting[]>([]);
+
   const [isSafetyTrained, setIsSafetyTrained] = useState(false);
   const [isBanned, setIsBanned] = useState(false);
 
+  const [showModal, setShowModal] = useState(true);
+  const [roleModal, setRoleModal] = useState(false);
+  const [bookInfo, setBookInfo] = useState<DateSelectArg>();
+
   const [selectedRoom, setSelectedRoom] = useState([]);
-  const [roomSettings, setRoomSettings] = useState([]);
-  const [mappingRoomSettings, setMappingRoomSettings] = useState([]);
   const [section, setSection] = useState('selectRoom');
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState('');
   const [department, setDepartment] = useState('');
   const [enrolledThesis, setEnrolledThesis] = useState(false);
   const canBookFullTime = enrolledThesis || role !== 'Student';
-
-  const [mappingLiaisonUsers, setMappingLiaisonUsers] = useState([]);
 
   const order: (keyof Inputs)[] = [
     'firstName',
@@ -114,119 +67,104 @@ const SheetEditor = () => {
     'chartFieldForRoomSetup',
   ];
 
+  const getActiveUserEmail = () => {
+    serverFunctions.getActiveUserEmail().then((response) => {
+      console.log('userEmail response', response);
+      setUserEmail(response);
+    });
+  };
+
+  // TODO big refactor into useMediaCommonsData
   useEffect(() => {
     getActiveUserEmail();
     fetchRoomSettings();
     fetchLiaisonUsers();
   }, []);
+
   useEffect(() => {
     getSafetyTrainingStudents();
     getBannedStudents();
   }, [userEmail]);
 
   const fetchLiaisonUsers = async () => {
-    serverFunctions.fetchRows(LIAISON_SHEET_NAME).then((liaisonUsers) => {
-      const mappingLiaisons = liaisonUsers
-        .map((liaison, index) => {
-          if (index !== 0) {
-            return mappingLiaisonRows(liaison);
-          }
-        })
-        .filter((liaison) => liaison !== undefined);
-      setMappingLiaisonUsers(mappingLiaisons);
-    });
-  };
-
-  const mappingLiaisonRows = (values: string[]): LiaisonType => {
-    return {
-      email: values[0],
-      department: values[1],
-      completedAt: values[2],
-    };
-  };
-
-  useEffect(() => {
-    const mappings = roomSettings
-      .map((roomSetting, index) => {
-        if (index !== 0) {
-          return mappingRoomSettingRows(roomSetting);
-        }
-      })
-      .filter((roomSetting) => roomSetting !== undefined);
-    setMappingRoomSettings(mappings);
-  }, [roomSettings]);
-
-  useEffect(() => {
-    if (mappingRoomSettingRows.length > 0) {
-      console.log('mappingRoomSettings', mappingRoomSettings);
-      setLoading(false);
-    }
-  }, [mappingRoomSettings]);
-
-  const findByRoomId = (array, id) => {
-    return array.find((room) => room.roomId === id);
+    serverFunctions
+      .getAllActiveSheetRows(TableNames.LIASONS)
+      .then((liaisonUsers) => {
+        const mappedLiaisonUsers: LiaisonType[] = liaisonUsers.map(
+          (liaisonRow) => ({
+            email: liaisonRow[0],
+            department: liaisonRow[1],
+            completedAt: liaisonRow[2],
+          })
+        );
+        setLiaisons(mappedLiaisonUsers);
+      });
   };
 
   const fetchRoomSettings = async () => {
-    serverFunctions.fetchRows(ROOM_SHEET_NAME).then((rows) => {
-      setRoomSettings(rows);
-    });
+    const mappedRooms = await serverFunctions
+      .getAllActiveSheetRows(TableNames.ROOMS)
+      .then((rooms) =>
+        rooms.map((roomRow) => ({
+          roomId: roomRow[0],
+          name: roomRow[1],
+          capacity: roomRow[2],
+          calendarId: roomRow[3],
+          calendarIdProd: roomRow[4],
+        }))
+      );
+    setRoomSettings(mappedRooms);
+    setLoading(mappedRooms.length === 0);
   };
 
-  const mappingRoomSettingRows = (values: string[]): RoomSetting => {
-    return {
-      roomId: values[0],
-      name: values[1],
-      capacity: values[2],
-      calendarId: values[3],
-      calendarIdProd: values[4],
-    };
-  };
+  const checkIncludesEmail = useCallback(
+    (rows: string[][]) => rows.map((row) => row[0]).includes(userEmail),
+    [userEmail]
+  );
 
   // safety training users
-  const getSafetyTrainingStudents = () => {
+  const getSafetyTrainingStudents = async () => {
     if (!isSafetyTrained) {
-      serverFunctions.getSheetRows(SAFTY_TRAINING_SHEET_NAME).then((rows) => {
-        const emails = rows.reduce(
-          (accumulator, value) => accumulator.concat(value),
-          []
-        );
-        const trained = emails.includes(userEmail);
-        setIsSafetyTrained(trained);
-      });
-      serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
-        console.log('old emails', rows);
-        const emails = rows.reduce(
-          (accumulator, value) => accumulator.concat(value),
-          []
-        );
-        const trained = emails.includes(userEmail);
-        setIsSafetyTrained(trained);
-      });
+      let isTrained = await serverFunctions
+        .getAllActiveSheetRows(TableNames.SAFETY_TRAINING)
+        .then(checkIncludesEmail);
+
+      // if not on active list, check old list
+      if (!isTrained) {
+        isTrained = await serverFunctions
+          .getOldSafetyTrainingEmails()
+          .then(checkIncludesEmail);
+      }
+      setIsSafetyTrained(isTrained);
     }
   };
 
-  const getBannedStudents = () => {
-    const students = serverFunctions
-      .getSheetRows(BAN_SHEET_NAME)
-      .then((rows) => {
-        const emails = rows.reduce(
-          (accumulator, value) => accumulator.concat(value),
-          []
-        );
-        const banned = emails.includes(userEmail);
-        setIsBanned(banned);
-      });
+  const getBannedStudents = async () => {
+    let banned = await serverFunctions
+      .getAllActiveSheetRows(TableNames.BANNED)
+      .then(checkIncludesEmail);
+    setIsBanned(banned);
   };
 
-  const firstApproverEmailsByDepartment = (
-    liaisons: LiaisonType[],
-    targetDepartment: string
-  ) => {
+  const firstApproverEmailsByDepartment = (targetDepartment: string) => {
     return liaisons
       .filter((liaison) => liaison.department === targetDepartment)
       .map((liaison) => liaison.email);
   };
+
+  const findByRoomId = (array, id: string) => {
+    return array.find((room) => room.roomId === id);
+  };
+
+  //IN PRODUCTION
+  const roomCalendarId = (room) => {
+    return findByRoomId(roomSettings, room.roomId)?.calendarIdProd;
+  };
+
+  //IN DEV
+  //const roomCalendarId = (room) => {
+  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
+  //};
 
   const registerEvent = async (data) => {
     const email = userEmail || data.missingEmail;
@@ -234,10 +172,7 @@ const SheetEditor = () => {
     const selectedRoomIds = selectedRoom.map((r) => r.roomId);
     const otherRoomIds = otherRooms.map((r) => roomCalendarId(r));
 
-    const firstApprovers = firstApproverEmailsByDepartment(
-      mappingLiaisonUsers,
-      department
-    );
+    const firstApprovers = firstApproverEmailsByDepartment(department);
 
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
@@ -252,7 +187,7 @@ const SheetEditor = () => {
     const contents = order.map(function (key) {
       return data[key];
     });
-    serverFunctions.appendRow(BOOKING_SHEET_NAME, [
+    serverFunctions.appendRowActive(TableNames.BOOKING, [
       calendarEventId,
       selectedRoomIds,
       email,
@@ -260,30 +195,36 @@ const SheetEditor = () => {
       bookInfo.endStr,
       ...contents,
     ]);
-    serverFunctions.request(calendarEventId, email).then(() => {
-      const isAutoApproval = selectedRoomIds.every((r) =>
-        INSTANT_APPROVAL_ROOMS.includes(r)
-      );
-      if (isAutoApproval) {
-        serverFunctions.approveInstantBooking(calendarEventId);
-      } else {
-        const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
-        const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
-        Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
-          const userEventInputs = {
-            calendarEventId: calendarEventId,
-            roomId: selectedRoomIds,
-            email: email,
-            startDate: bookInfo?.startStr,
-            endDate: bookInfo?.endStr,
-            approvalUrl: values[0],
-            rejectedUrl: values[1],
-            ...data,
-          };
-          sendApprovalEmail(firstApprovers, userEventInputs);
-        });
-      }
-    });
+    await serverFunctions.appendRowActive(TableNames.BOOKING_STATUS, [
+      calendarEventId,
+      email,
+      new Date(),
+    ]);
+
+    // TODO full auto approval logic
+    const isAutoApproval = selectedRoomIds.every((r) =>
+      INSTANT_APPROVAL_ROOMS.includes(r)
+    );
+    if (isAutoApproval) {
+      serverFunctions.approveInstantBooking(calendarEventId);
+    } else {
+      const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
+      const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
+      Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
+        const userEventInputs = {
+          calendarEventId: calendarEventId,
+          roomId: selectedRoomIds,
+          email: email,
+          startDate: bookInfo?.startStr,
+          endDate: bookInfo?.endStr,
+          approvalUrl: values[0],
+          rejectedUrl: values[1],
+          ...data,
+        };
+        sendApprovalEmail(firstApprovers, userEventInputs);
+      });
+    }
+
     alert('Your request has been sent.');
     setLoading(false);
     setSection('selectRoom');
@@ -305,11 +246,13 @@ const SheetEditor = () => {
       'approval_email',
       contents,
       recipient,
-      subject
+      subject,
+      ''
     );
   };
 
   const handleSetDate = (info, rooms) => {
+    console.log('handle set date', info, rooms, selectedRoom);
     setBookInfo(info);
     setSelectedRoom(rooms);
     const requiresSafetyTraining = rooms.some((room) =>
@@ -359,7 +302,7 @@ const SheetEditor = () => {
           Select room and view calendar
           <MultipleCalendars
             key="calendars"
-            allRooms={mappingRoomSettings}
+            allRooms={roomSettings}
             handleSetDate={handleSetDate}
             canBookFullTime={canBookFullTime}
           />

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { Calendars } from './Calendars';
-import { SelectRooms } from './SelectRooms';
 import { SelectMotionCapture } from './SelectMotionCapture';
+import { SelectRooms } from './SelectRooms';
 
 export const MultipleCalendars = ({
   allRooms,

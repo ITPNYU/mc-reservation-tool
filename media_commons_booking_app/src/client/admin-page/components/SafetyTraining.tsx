@@ -1,53 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
+import { Loading } from '../../utils/Loading';
+import { TableNames } from '../../../policy';
+import { formatDate } from '../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
-
-const SAFETY_TRAINING_SHEET_NAME = 'safety_training_users';
-
-type SafetyTraining = {
-  email: string;
-  completedAt: string;
-};
 
 export const SafetyTraining = () => {
   const [safetyTrainings, setSafetyTrainings] = useState([]);
-  const [trainedEmails, setTrainedEmails] = useState([]);
-  const [mappingTrainings, setMappingTrainings] = useState([]);
   const [email, setEmail] = useState('');
+
+  const trainedEmails = useMemo<string[]>(
+    () => safetyTrainings.map((user) => user.email),
+    [safetyTrainings]
+  );
 
   useEffect(() => {
     fetchSafetyTrainings();
   }, []);
-  useEffect(() => {
-    const mappings = safetyTrainings
-      .map((safetyTraining, index) => {
-        if (index !== 0) {
-          return mappingSafetyTrainingRows(safetyTraining);
-        }
-      })
-      .filter((safetyTraining) => safetyTraining !== undefined);
-    //TODO: filter out safetyTrainings that are not in the future
-    setMappingTrainings(mappings);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setTrainedEmails(emails);
-  }, [safetyTrainings]);
 
   const fetchSafetyTrainings = async () => {
-    serverFunctions.fetchRows(SAFETY_TRAINING_SHEET_NAME).then((rows) => {
-      setSafetyTrainings(rows);
-    });
-  };
-
-  const mappingSafetyTrainingRows = (values: string[]): SafetyTraining => {
-    return {
-      email: values[0],
-      completedAt: values[1],
-    };
+    const rows = await serverFunctions
+      .getAllActiveSheetRows(TableNames.SAFETY_TRAINING)
+      .then((rows) =>
+        rows.map((row) => ({
+          email: row[0],
+          completedAt: row[1],
+        }))
+      );
+    setSafetyTrainings(rows);
   };
 
   console.log('trainedEmails', trainedEmails);
@@ -58,7 +39,7 @@ export const SafetyTraining = () => {
       return;
     }
 
-    await serverFunctions.appendRow(SAFETY_TRAINING_SHEET_NAME, [
+    await serverFunctions.appendRowActive(TableNames.SAFETY_TRAINING, [
       email,
       new Date().toString(),
     ]);
@@ -117,7 +98,7 @@ export const SafetyTraining = () => {
             </tr>
           </thead>
           <tbody>
-            {mappingTrainings.map((safetyTraining, index) => {
+            {safetyTrainings.map((safetyTraining, index) => {
               return (
                 <tr
                   key={index}
@@ -134,8 +115,8 @@ export const SafetyTraining = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
                         setLoading(true);
-                        await serverFunctions.removeFromList(
-                          SAFETY_TRAINING_SHEET_NAME,
+                        await serverFunctions.removeFromListByEmail(
+                          TableNames.SAFETY_TRAINING,
                           safetyTraining.email
                         );
                         alert('Successfully removed');

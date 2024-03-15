@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { Loading } from '../../utils/Loading';
+import { TableNames } from '../../../policy';
+import { formatDate } from '../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
-export const BAN_SHEET_NAME = 'banned_users';
 
 type Ban = {
   email: string;
@@ -37,7 +37,7 @@ export const Ban = () => {
   }, [bans]);
 
   const fetchBans = async () => {
-    serverFunctions.fetchRows(BAN_SHEET_NAME).then((rows) => {
+    serverFunctions.getAllActiveSheetRows(TableNames.BANNED).then((rows) => {
       setBans(rows);
     });
   };
@@ -57,7 +57,7 @@ export const Ban = () => {
       return;
     }
 
-    await serverFunctions.appendRow(BAN_SHEET_NAME, [
+    await serverFunctions.appendRowActive(TableNames.BANNED, [
       email,
       new Date().toString(),
     ]);
@@ -133,8 +133,8 @@ export const Ban = () => {
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       onClick={async () => {
                         setLoading(true);
-                        await serverFunctions.removeFromList(
-                          BAN_SHEET_NAME,
+                        await serverFunctions.removeFromListByEmail(
+                          TableNames.BANNED,
                           ban.email
                         );
                         alert('Successfully removed');

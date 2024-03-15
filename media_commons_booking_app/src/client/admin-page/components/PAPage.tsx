@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { Bookings } from './Bookings';
+import { Loading } from '../../utils/Loading';
+import { PaUser } from '../../../types';
+import { SafetyTraining } from './SafetyTraining';
+import { TableNames } from '../../../policy';
+import { serverFunctions } from '../../utils/serverFunctions';
 
 // This is a wrapper for google.script.run that lets us use promises.
 
-import { SafetyTraining } from './SafetyTraining';
-import { Bookings } from './Bookings';
-import { serverFunctions } from '../../utils/serverFunctions';
-import { PaUser } from './PAUsers';
-import { Loading } from '../../utils/Loading';
-
 const PAPage = () => {
-  const PA_USER_SHEET_NAME = 'pa_users';
-
   const [tab, setTab] = useState('bookings');
   const [paUsers, setPaUsers] = useState([]);
   const [paEmails, setPaEmails] = useState([]);
-  const [userEmail, setUserEmail] = useState();
+  const [userEmail, setUserEmail] = useState<string | undefined>();
 
   useEffect(() => {
     fetchPaUsers();
@@ -42,7 +41,7 @@ const PAPage = () => {
   };
 
   const fetchPaUsers = async () => {
-    serverFunctions.fetchRows(PA_USER_SHEET_NAME).then((rows) => {
+    serverFunctions.getAllActiveSheetRows(TableNames.PAS).then((rows) => {
       setPaUsers(rows);
     });
   };
