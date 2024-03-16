@@ -70,6 +70,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@types/expect-puppeteer": "^5.0.0",
     "@types/jest-environment-puppeteer": "^5.0.2",
+    "@types/node": "^20.11.28",
     "@types/puppeteer": "^5.4.6",
     "@types/react": "^18.0.14",
     "autoprefixer": "10.4.5",

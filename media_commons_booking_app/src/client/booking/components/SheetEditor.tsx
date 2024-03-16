@@ -50,15 +50,17 @@ const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
-  //PRODUCTION
   const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
+    const roomById = findByRoomId(mappingRoomSettings, room.roomId);
+    if (roomById) {
+      console.log('ENVIRONMENT:', process.env.REACT_APP_ENVIRONMENT);
+      if (process.env.REACT_APP_ENVIRONMENT === 'production') {
+        return roomById.calendarIdProd;
+      } else {
+        return roomById.calendarId;
+      }
+    }
   };
-
-  //DEV
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  //};
 
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
