@@ -50,6 +50,8 @@ const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
+  console.log('DEPLOY ENVIRONMENT:', process.env.REACT_APP_ENVIRONMENT);
+
   const roomCalendarId = (room) => {
     const roomById = findByRoomId(mappingRoomSettings, room.roomId);
     if (roomById) {
