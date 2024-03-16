@@ -4,11 +4,18 @@ on:
   push:
     branches:
       - prod
+env:
+  REACT_APP_ENVIRONMENT: production
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug env variable
+        run: |
+          echo "Environment variable: $REACT_APP_ENVIRONMENT"
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -29,8 +36,6 @@ jobs:
       - name: Install clasp
         run: npm install -g @google/clasp
       - name: Push to Google Apps Script
-        env:
-          REACT_APP_ENVIRONMENT: production
         run: |
           cd media_commons_booking_app
           npm run deploy
