@@ -4,18 +4,12 @@ on:
   push:
     branches:
       - prod
-env:
-  REACT_APP_ENVIRONMENT: production
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug env variable
-        run: |
-          echo "Environment variable: $REACT_APP_ENVIRONMENT"
-
       - name: Checkout code
         uses: actions/checkout@v2
 
