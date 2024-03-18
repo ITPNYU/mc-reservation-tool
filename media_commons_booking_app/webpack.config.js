@@ -22,10 +22,10 @@ const parsed = dotenv.error ? {} : dotenv.parsed;
 const envVars = parsed || {};
 const PORT = envVars.PORT || 3000;
 envVars.NODE_ENV = process.env.NODE_ENV;
+envVars.CALENDAR_ENV = process.env.CALENDAR_ENV;
 envVars.PORT = PORT;
 
-const isProd =
-  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+const isProd = process.env.NODE_ENV === 'production';
 const isWebpackServe = process.env.WEBPACK_SERVE === 'true';
 
 const publicPath = process.env.ASSET_PATH || '/';

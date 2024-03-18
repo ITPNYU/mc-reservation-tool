@@ -50,13 +50,13 @@ const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
 const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
-  console.log('DEPLOY MODE ENVIRONMENT:', process.env.NODE_ENV);
+  console.log('DEPLOY MODE ENVIRONMENT:', process.env.CALENDAR_ENV);
 
   const roomCalendarId = (room) => {
     const roomById = findByRoomId(mappingRoomSettings, room.roomId);
     if (roomById) {
-      console.log('ENVIRONMENT:', process.env.NODE_ENV);
-      if (process.env.NODE_ENV === 'production') {
+      console.log('ENVIRONMENT:', process.env.CALENDAR_ENV);
+      if (process.env.CALENDAR_ENV === 'production') {
         return roomById.calendarIdProd;
       } else {
         return roomById.calendarId;
