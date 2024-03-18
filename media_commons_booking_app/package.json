@@ -14,8 +14,10 @@
     "open": "clasp open --addon",
     "setup:https": "mkdirp certs && mkcert -key-file ./certs/key.pem -cert-file ./certs/cert.pem localhost 127.0.0.1",
     "build:dev": "cross-env NODE_ENV=development webpack",
+    "build:staging": "cross-env NODE_ENV=staging webpack",
     "build": "cross-env NODE_ENV=production webpack",
     "deploy:dev": "rimraf dist && npm run build:dev && npx clasp push",
+    "deploy:staging": "rimraf dist && npm run build:staging && npx clasp push",
     "deploy": "rimraf dist && npm run build && npx clasp push",
     "serve": "cross-env NODE_ENV=development webpack serve",
     "start": "npm run deploy:dev && npm run serve"

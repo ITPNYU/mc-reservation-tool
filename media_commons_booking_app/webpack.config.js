@@ -24,7 +24,8 @@ const PORT = envVars.PORT || 3000;
 envVars.NODE_ENV = process.env.NODE_ENV;
 envVars.PORT = PORT;
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd =
+  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
 const isWebpackServe = process.env.WEBPACK_SERVE === 'true';
 
 const publicPath = process.env.ASSET_PATH || '/';
