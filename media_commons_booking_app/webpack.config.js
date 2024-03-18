@@ -22,6 +22,7 @@ const parsed = dotenv.error ? {} : dotenv.parsed;
 const envVars = parsed || {};
 const PORT = envVars.PORT || 3000;
 envVars.NODE_ENV = process.env.NODE_ENV;
+envVars.CALENDAR_ENV = process.env.CALENDAR_ENV;
 envVars.PORT = PORT;
 
 const isProd = process.env.NODE_ENV === 'production';

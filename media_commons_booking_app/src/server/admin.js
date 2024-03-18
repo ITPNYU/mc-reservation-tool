@@ -1,6 +1,6 @@
 export const BOOKING_SHEET_NAME = 'bookings';
 export const BOOKING_STATUS_SHEET_NAME = 'bookingStatus';
-const SECOND_APPROVER_EMAIL = 'ss12430@nyu.edu';
+const SECOND_APPROVER_EMAIL = 'mediacommons.reservations@nyu.edu';
 
 const current = new Date();
 
@@ -118,6 +118,11 @@ export const approveEvent = (rowIndex, id) => {
 
   updateEventPrefix(id, 'APPROVED');
   inviteUserToCalendarEvent(id, guestEmail);
+  sendTextEmail(
+    guestEmail,
+    'Media Commons Reservation Approved',
+    'Your reservation request for Media Commons is approved.'
+  );
 };
 
 const inviteUserToCalendarEvent = (eventId, guestEmail) => {

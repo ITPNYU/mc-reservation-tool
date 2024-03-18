@@ -1,9 +1,9 @@
-name: Deploy to PROD_PROD_CALENDAR to Google Apps Script
+name: Deploy DEV_Riho to Google Apps Script
 
 on:
   push:
     branches:
-      - main
+      - riho/**
 
 jobs:
   deploy:
@@ -36,4 +36,4 @@ jobs:
       - name: Create new version and push
         run: |
           cd media_commons_booking_app
-          clasp deploy --deploymentId AKfycbx3bCPVCKcaLXmLf58o98gDnW11MiD0axU45YzAtOyXHjqZNgtKSWR1ljdopSaB189k -d "PROD_PROD_CALENDAR"
+          clasp deploy --deploymentId AKfycbxmvvwZQeYuYoP-J-ZFnrqdgyGHdb1COqqHT0ax6On_iO7oWicnk4fV1aig0hX7BMKOAA -d "DEV_Riho"

@@ -44,7 +44,7 @@ When developing locally, please follow the flow below.
 5. **Create a New Version of Google App Script**:
    Deploy using clasp, targeting your `deploymentId`:
    ```bash
-   clasp deploy --deploymentId ${deploymentID} -d for DEV_DEV_YOURNAME
+   clasp deploy --deploymentId ${deploymentID} -d DEV_YOURNAME
    ```
 6. **Access the Application**:
    You can now access the app at `https://script.google.com/a/macros/nyu.edu/s/${deploymentId}/exec`.

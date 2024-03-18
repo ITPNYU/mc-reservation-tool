@@ -48,18 +48,22 @@ const BASE_URL =
 
 const BOOKING_SHEET_NAME = 'bookings';
 const SAFTY_TRAINING_SHEET_NAME = 'safety_training_users';
-const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
+const INSTANT_APPROVAL_ROOMS = ['220', '221', '222', '223', '224', '233'];
 
 const SheetEditor = () => {
-  //IN PRODUCTION
-  const roomCalendarId = (room) => {
-    return findByRoomId(mappingRoomSettings, room.roomId)?.calendarIdProd;
-  };
+  console.log('DEPLOY MODE ENVIRONMENT:', process.env.CALENDAR_ENV);
 
-  //IN DEV
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  //};
+  const roomCalendarId = (room) => {
+    const roomById = findByRoomId(mappingRoomSettings, room.roomId);
+    if (roomById) {
+      console.log('ENVIRONMENT:', process.env.CALENDAR_ENV);
+      if (process.env.CALENDAR_ENV === 'production') {
+        return roomById.calendarIdProd;
+      } else {
+        return roomById.calendarId;
+      }
+    }
+  };
 
   const getActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
@@ -201,7 +205,9 @@ const SheetEditor = () => {
           []
         );
         const trained = emails.includes(userEmail);
-        setIsSafetyTrained(trained);
+        if (trained) {
+          setIsSafetyTrained(trained);
+        }
       });
     }
   };
@@ -285,6 +291,12 @@ const SheetEditor = () => {
       }
     });
     alert('Your request has been sent.');
+
+    serverFunctions.sendTextEmail(
+      email,
+      'Your Request Sent to Media Commons',
+      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.'
+    );
     setLoading(false);
     setSection('selectRoom');
   };
@@ -300,7 +312,6 @@ const SheetEditor = () => {
   const sendApprovalEmail = (recipient, contents) => {
     var subject = 'Approval Request';
 
-    //serverFunctions.sendTextEmail(recipient, subject, body);
     serverFunctions.sendHTMLEmail(
       'approval_email',
       contents,
