@@ -1,76 +1,71 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { Loading } from '../../../utils/Loading';
+import { formatDate } from '../../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
-import {
-  LIAISON_SHEET_NAME,
-  LiaisonType,
-} from '../../booking/components/SheetEditor';
+import { serverFunctions } from '../../../utils/serverFunctions';
 
-export const Liaisons = () => {
-  const [liaisonUsers, setLiaisonUsers] = useState([]);
-  const [liaisonEmails, setAdminEmails] = useState([]);
-  const [mappingLiaisonUsers, setMappingLiaisonUsers] = useState([]);
+const PA_USER_SHEET_NAME = 'pa_users';
+
+export type PaUser = {
+  email: string;
+  createdAt: string;
+};
+
+export const PAUsers = () => {
+  const [paUsers, setPaUsers] = useState([]);
+  const [paEmails, setPaEmails] = useState([]);
+  const [mappingPaUsers, setMappingPaUsers] = useState([]);
   const [email, setEmail] = useState('');
-  const [department, setDepartment] = useState('');
 
   useEffect(() => {
-    fetchLiaisonUsers();
+    fetchPaUsers();
   }, []);
   useEffect(() => {
-    const mappings = liaisonUsers
-      .map((liaison, index) => {
+    const mappings = paUsers
+      .map((paUser, index) => {
         if (index !== 0) {
-          return mappingLiaisonRows(liaison);
+          return mappingPaUserRows(paUser);
         }
       })
-      .filter((liaison) => liaison !== undefined);
-    //TODO: filter out liaisonUsers that are not in the future
-    setMappingLiaisonUsers(mappings);
+      .filter((paUser) => paUser !== undefined);
+    //TODO: filter out paUsers that are not in the future
+    setMappingPaUsers(mappings);
     const emails = mappings.map((mapping) => {
       return mapping.email;
     });
-    setAdminEmails(emails);
-  }, [liaisonUsers]);
+    setPaEmails(emails);
+  }, [paUsers]);
 
-  const fetchLiaisonUsers = async () => {
-    serverFunctions.fetchRows(LIAISON_SHEET_NAME).then((rows) => {
-      setLiaisonUsers(rows);
+  const fetchPaUsers = async () => {
+    serverFunctions.fetchRows(PA_USER_SHEET_NAME).then((rows) => {
+      setPaUsers(rows);
     });
   };
 
-  const mappingLiaisonRows = (values: string[]): LiaisonType => {
+  const mappingPaUserRows = (values: string[]): PaUser => {
     return {
       email: values[0],
-      department: values[1],
-      completedAt: values[2],
+      createdAt: values[1],
     };
   };
 
-  console.log('liaisonEmails', liaisonEmails);
-  const addLiaisonUser = async () => {
-    if (email === '' || department === '') {
-      alert('Please fill in all the fields');
-      return;
-    }
+  const addPaUser = async () => {
     setLoading(true);
 
-    if (liaisonEmails.includes(email)) {
+    if (paEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    await serverFunctions.appendRow(LIAISON_SHEET_NAME, [
+    await serverFunctions.appendRow(PA_USER_SHEET_NAME, [
       email,
-      department,
       new Date().toString(),
     ]);
 
     alert('User has been registered successfully!');
     setLoading(false);
-    fetchLiaisonUsers();
+    fetchPaUsers();
   };
   const [loading, setLoading] = useState(false);
   if (loading) {
@@ -97,30 +92,9 @@ export const Liaisons = () => {
             required
           />
         </div>
-        <div className="mr-6">
-          <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[200px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            onChange={(e) => {
-              setDepartment(e.target.value);
-            }}
-            value={department}
-          >
-            <option value="" disabled>
-              Select option
-            </option>
-            <option value="ALT">ALT</option>
-            <option value="GameCenter">Game Center</option>
-            <option value="IDM">IDM</option>
-            <option value="ITP / IMA / Low Res">ITP / IMA / Low Res</option>
-            <option value="MARL">MARL</option>
-            <option value="Music Tech">Music Tech</option>
-            <option value="Recorded Music">Recorded Music</option>
-            <option value="others">Other Group</option>
-          </select>
-        </div>
         <button
           type="button"
-          onClick={addLiaisonUser}
+          onClick={addPaUser}
           className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Add User
@@ -135,10 +109,6 @@ export const Liaisons = () => {
                 Email
               </th>
               <th scope="col" className="px-2 py-3">
-                Department
-              </th>
-
-              <th scope="col" className="px-2 py-3">
                 Created Date
               </th>
               <th scope="col" className="px-2 py-3">
@@ -147,17 +117,16 @@ export const Liaisons = () => {
             </tr>
           </thead>
           <tbody>
-            {mappingLiaisonUsers.map((liaison, index) => {
+            {mappingPaUsers.map((paUser, index) => {
               return (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <td className="px-2 py-4 w-36">{liaison.email}</td>
-                  <td className="px-2 py-4 w-36">{liaison.department}</td>
+                  <td className="px-2 py-4 w-36">{paUser.email}</td>
                   <td className="px-2 py-4 w-36">
                     <div className=" flex items-center flex-col">
-                      <div>{formatDate(liaison.completedAt)}</div>{' '}
+                      <div>{formatDate(paUser.createdAt)}</div>{' '}
                     </div>
                   </td>
                   <td className="px-2 py-4 w-36">
@@ -166,12 +135,12 @@ export const Liaisons = () => {
                       onClick={async () => {
                         setLoading(true);
                         await serverFunctions.removeFromList(
-                          LIAISON_SHEET_NAME,
-                          liaison.email
+                          PA_USER_SHEET_NAME,
+                          paUser.email
                         );
                         alert('Successfully removed');
+                        fetchPaUsers();
                         setLoading(false);
-                        fetchLiaisonUsers();
                       }}
                     >
                       Remove

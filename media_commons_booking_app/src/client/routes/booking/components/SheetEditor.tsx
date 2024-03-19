@@ -1,15 +1,15 @@
 import FormInput, { Inputs } from './FormInput';
 import React, { useEffect, useState } from 'react';
 
-import { BAN_SHEET_NAME } from '../../admin-page/components/Ban';
+import { BAN_SHEET_NAME } from '../../admin/components/Ban';
 import { DateSelectArg } from '@fullcalendar/core';
 import { Header } from './Header';
 import { InitialModal } from './InitialModal';
-import { Loading } from '../../utils/Loading';
+import { Loading } from '../../../utils/Loading';
 import { MultipleCalendars } from './MultipleCalendars';
 import { RoleModal } from './RoleModal';
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../utils/serverFunctions';
+import { serverFunctions } from '../../../utils/serverFunctions';
 
 export type RoomSetting = {
   roomId: string;
@@ -385,7 +385,7 @@ const SheetEditor = () => {
     setRoleModal(false);
   };
   return (
-    <div className="p-10 dark:bg-gray-800">
+    <div className="dark:bg-gray-800">
       {showModal && <InitialModal handleClick={handleModalClick} />}
       {roleModal && <RoleModal handleClick={handleRoleModalClick} />}
       {!showModal && (

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../utils/serverFunctions';
+import { serverFunctions } from '../../../utils/serverFunctions';
+
 const BOOKING_SHEET_NAME = 'bookings';
 
 type AdminSetting = {
