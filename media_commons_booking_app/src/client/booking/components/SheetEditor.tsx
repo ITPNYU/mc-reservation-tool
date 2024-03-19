@@ -188,27 +188,22 @@ const SheetEditor = () => {
   };
 
   // safety training users
-  const getSafetyTrainingStudents = () => {
+  const getSafetyTrainingStudents = async () => {
     if (!isSafetyTrained) {
-      serverFunctions.getSheetRows(SAFTY_TRAINING_SHEET_NAME).then((rows) => {
-        const emails = rows.reduce(
-          (accumulator, value) => accumulator.concat(value),
-          []
+      const newSafetyTrainingRows = await serverFunctions.getSheetRows(
+        SAFTY_TRAINING_SHEET_NAME
+      );
+      const newSafetyTrainedEmails = newSafetyTrainingRows.map((row) => row[0]);
+      let trained = newSafetyTrainedEmails.includes(userEmail);
+      if (!trained) {
+        const oldSafetyTrainingRows =
+          await serverFunctions.getOldSafetyTrainingEmails();
+        const oldSafetyTrainedEmails = oldSafetyTrainingRows.map(
+          (row) => row[0]
         );
-        const trained = emails.includes(userEmail);
-        setIsSafetyTrained(trained);
-      });
-      serverFunctions.getOldSafetyTrainingEmails().then((rows) => {
-        console.log('old emails', rows);
-        const emails = rows.reduce(
-          (accumulator, value) => accumulator.concat(value),
-          []
-        );
-        const trained = emails.includes(userEmail);
-        if (trained) {
-          setIsSafetyTrained(trained);
-        }
-      });
+        trained = oldSafetyTrainedEmails.includes(userEmail);
+      }
+      setIsSafetyTrained(trained);
     }
   };
 
