@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { Loading } from '../../utils/Loading';
+import { Loading } from '../../../utils/Loading';
 import PropTypes from 'prop-types';
 
 export type Inputs = {

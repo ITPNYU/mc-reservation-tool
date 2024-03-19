@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-// This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../utils/serverFunctions';
 import { Inputs } from '../../booking/components/FormInput';
-import { SafetyTraining } from './SafetyTraining';
-import { Ban } from './Ban';
-import { AdminUsers } from './AdminUsers';
-import { Liaisons } from './Liaisons';
-import { formatDate } from '../../utils/date';
+import { formatDate } from '../../../utils/date';
+// This is a wrapper for google.script.run that lets us use promises.
+import { serverFunctions } from '../../../utils/serverFunctions';
 
 const BOOKING_SHEET_NAME = 'bookings';
 
@@ -48,6 +44,7 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
     fetchBookings();
     fetchBookingStatuses();
   }, [reload]);
+
   useEffect(() => {
     const mappings = bookings
       .map((booking, index) => {
@@ -57,34 +54,29 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
       })
       .filter((booking) => booking !== undefined);
     //TODO: filter out bookings that are not in the future
+    console.log('BOOKINGS', mappings);
     setMappingBookings(mappings);
   }, [bookings]);
 
   useEffect(() => {
-    console.log(bookingStatuses, 'bookingStatus');
     const mappings = bookingStatuses
       .map((bookingStatus, index) => {
-        console.log(bookingStatus, 'bookingStatus');
-        console.log(index, 'index');
         if (index !== 0) {
           return mappingBookingStatusRow(bookingStatus);
         }
       })
       .filter((booking) => booking !== undefined);
-    console.log('mapping status', mappings);
     setMappingBookingStatuses(mappings);
   }, [bookingStatuses]);
 
   const fetchBookings = async () => {
     serverFunctions.getFutureDates(BOOKING_SHEET_NAME).then((rows) => {
-      console.log('booking rows', rows);
       setBookings(rows);
     });
   };
 
   const fetchBookingStatuses = async () => {
     serverFunctions.fetchRows('bookingStatus').then((statusRows) => {
-      console.log('bookingStatuses rows', statusRows);
       setBookingStatuses(statusRows);
     });
   };
@@ -125,7 +117,6 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
   };
 
   const mappingBookingStatusRow = (values: string[]): BookingStatus => {
-    console.log(values, 'values');
     return {
       calendarEventId: values[0],
       email: values[1],

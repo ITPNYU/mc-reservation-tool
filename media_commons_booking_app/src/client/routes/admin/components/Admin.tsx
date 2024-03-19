@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { ADMIN_USER_SHEET_NAME, AdminUser, AdminUsers } from './AdminUsers';
+import React, { useEffect, useState } from 'react';
+
+import { Ban } from './Ban';
+import { Bookings } from './Bookings';
+import { Liaisons } from './Liaisons';
+import { Loading } from '../../../utils/Loading';
+import { PAUsers } from '../../pa/components/PAUsers';
+import { SafetyTraining } from './SafetyTraining';
+import { serverFunctions } from '../../../utils/serverFunctions';
 
 // This is a wrapper for google.script.run that lets us use promises.
-
-import { SafetyTraining } from './SafetyTraining';
-import { Ban } from './Ban';
-import { ADMIN_USER_SHEET_NAME, AdminUser, AdminUsers } from './AdminUsers';
-import { Liaisons } from './Liaisons';
-import { Bookings } from './Bookings';
-import { PAUsers } from './PAUsers';
-import { serverFunctions } from '../../utils/serverFunctions';
-import { Loading } from '../../utils/Loading';
 
 const Admin = () => {
   const [tab, setTab] = useState('bookings');

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { Bookings } from '../admin/components/Bookings';
+import { Loading } from '../../utils/Loading';
+import { PaUser } from './components/PAUsers';
+import { SafetyTraining } from '../admin/components/SafetyTraining';
+import { serverFunctions } from '../../utils/serverFunctions';
 
 // This is a wrapper for google.script.run that lets us use promises.
-
-import { SafetyTraining } from './SafetyTraining';
-import { Bookings } from './Bookings';
-import { serverFunctions } from '../../utils/serverFunctions';
-import { PaUser } from './PAUsers';
-import { Loading } from '../../utils/Loading';
 
 const PAPage = () => {
   const PA_USER_SHEET_NAME = 'pa_users';
