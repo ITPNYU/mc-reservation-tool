@@ -20,11 +20,18 @@ export const RoomCalendar = ({
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    //PROD
-    fetchCalendarEvents(room.calendarIdProd);
-    //DEV
-    //fetchCalendarEvents(room.calendarId);
+    console.log(
+      'Fetching calendar events from:',
+      process.env.CALENDAR_ENV,
+      'calendars'
+    );
+    fetchCalendarEvents(
+      process.env.CALENDAR_ENV === 'production'
+        ? room.calendarIdProd
+        : room.calendarId
+    );
   }, []);
+
   const fetchCalendarEvents = async (calendarId) => {
     serverFunctions.getCalendarEvents(calendarId).then((rows) => {
       setEvents(rows);
