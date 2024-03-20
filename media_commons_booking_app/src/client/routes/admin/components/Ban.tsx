@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { Loading } from '../../../utils/Loading';
+import { formatDate } from '../../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../utils/serverFunctions';
-import { formatDate } from '../../utils/date';
-import { Loading } from '../../utils/Loading';
+import { serverFunctions } from '../../../utils/serverFunctions';
+
 export const BAN_SHEET_NAME = 'banned_users';
 
 type Ban = {
