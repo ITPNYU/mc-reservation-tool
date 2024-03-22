@@ -32,7 +32,7 @@ export const getActiveUserEmail = () => {
 
 // client calls by sending a HTTP GET request to the web app's URL
 export const doGet = (e) => {
-  var page = e.parameter['page'];
+  console.log('DO GET', JSON.stringify(e));
   var action = e.parameter['action'];
   var calendarId = e.parameter['calendarId'];
 
@@ -43,11 +43,6 @@ export const doGet = (e) => {
     reject(calendarId);
     return HtmlService.createHtmlOutputFromFile('reject');
   }
-  if (page === 'admin') {
-    return HtmlService.createHtmlOutputFromFile('admin-page');
-  } else if (page === 'pa') {
-    return HtmlService.createHtmlOutputFromFile('pa-page');
-  } else {
-    return HtmlService.createHtmlOutputFromFile('booking');
-  }
+
+  return HtmlService.createHtmlOutputFromFile('index');
 };

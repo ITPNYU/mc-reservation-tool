@@ -12,8 +12,12 @@ This application is designed for reserving rooms at the 370J Media Commons Room.
 
 ## Deployment
 
-We employ GitHub workflows for our deployment process.
-Any merges into the main branch automatically trigger a deployment to the production Google App Script.
+We employ GitHub workflows for our deployment process. Pushing or merging to different branches will automatically trigger different Google App Script deploys:
+- `main` branch: triggers the DEVELOPMENT deploy, which serves from localhost and reads/writes the development calendars
+- `staging` branch: triggers the STAGING deploy, which serves from the GAS project and reads/writes the development calendars
+- `prod` branch: triggers the PRODUCTION deploy, which serves from the GAS project and reads/writes the **production** calendars
+
+The `NODE_ENV` environment variable controls where we serve from, and the `CALENDAR_ENV` environment variable controls which calendars we use. These values are specified in the `package.json` commands triggered by the workflows
 
 ## Preparation
 
@@ -44,7 +48,7 @@ When developing locally, please follow the flow below.
 5. **Create a New Version of Google App Script**:
    Deploy using clasp, targeting your `deploymentId`:
    ```bash
-   clasp deploy --deploymentId ${deploymentID} -d for DEV_DEV_YOURNAME
+   clasp deploy --deploymentId ${deploymentID} -d DEV_YOURNAME
    ```
 6. **Access the Application**:
    You can now access the app at `https://script.google.com/a/macros/nyu.edu/s/${deploymentId}/exec`.

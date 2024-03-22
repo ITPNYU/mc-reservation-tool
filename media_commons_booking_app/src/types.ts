@@ -3,6 +3,11 @@ export type AdminUser = {
   createdAt: string;
 };
 
+export type Ban = {
+  email: string;
+  bannedAt: string;
+};
+
 export type Booking = Inputs & {
   calendarEventId: string;
   email: string;
