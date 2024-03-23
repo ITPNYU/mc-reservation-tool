@@ -59,13 +59,19 @@ export type Inputs = {
 export type LiaisonType = {
   email: string;
   department: string;
-  completedAt: string;
+  createdAt: string;
 };
 
 export type PaUser = {
   email: string;
   createdAt: string;
 };
+
+export enum PagePermission {
+  ADMIN,
+  BOOKING,
+  PA,
+}
 
 export type Role = 'Student' | 'Resident/Fellow' | 'Faculty' | 'Admin/Staff';
 

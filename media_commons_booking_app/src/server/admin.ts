@@ -156,5 +156,6 @@ export const removeFromListByEmail = (
   column: number = 0
 ) => {
   const rowIndex = fetchIndexByUniqueValue(sheetName, column, email);
+  console.log('rowIndex to remove:', rowIndex);
   removeRowActive(sheetName, rowIndex);
 };

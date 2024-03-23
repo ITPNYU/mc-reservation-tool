@@ -8,7 +8,7 @@ export enum TableNames {
   BANNED = 'banned_users',
   BOOKING = 'bookings',
   BOOKING_STATUS = 'bookingStatus',
-  LIASONS = 'liaisons',
+  LIAISONS = 'liaisons',
   PAS = 'pa_users',
   ROOMS = 'rooms',
   SAFETY_TRAINING = 'safety_training_users',

@@ -1,54 +1,26 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
-import { AdminUser } from '../../../../types';
-import AdminUsers from './AdminUsers';
+import { AdminUsers } from './AdminUsers';
 import { BannedUsers } from './Ban';
 import { Bookings } from './Bookings';
+import { DatabaseContext } from '../../../components/provider';
 import { Liaisons } from './Liaisons';
 import Loading from '../../../utils/Loading';
-import { PAUsers } from '../../pa/components/PAUsers';
-import { SafetyTrainedUsers } from './SafetyTraining';
-import { TableNames } from '../../../../policy';
-import { serverFunctions } from '../../../utils/serverFunctions';
+import { PAUsers } from './PAUsers';
+import { PagePermission } from '../../../../types';
+import SafetyTrainedUsers from './SafetyTraining';
 
 // This is a wrapper for google.script.run that lets us use promises.
 
 export default function Admin() {
   const [tab, setTab] = useState('bookings');
-
-  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
-  const [userEmail, setUserEmail] = useState<string | undefined>();
+  const { adminUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
   const adminEmails = useMemo<string[]>(
     () => adminUsers.map((user) => user.email),
     [adminUsers]
   );
-  const userHasPermission = userEmail ? adminEmails.includes(userEmail) : false;
-
-  useEffect(() => {
-    fetchAdminUsers();
-    getActiveUserEmail();
-  }, []);
-
-  const getActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail response', response);
-      setUserEmail(response);
-    });
-  };
-
-  const fetchAdminUsers = async () => {
-    const admins = await serverFunctions
-      .getAllActiveSheetRows(TableNames.ADMINS)
-      .then((rows) =>
-        rows.map((row) => ({
-          email: row[0],
-          createdAt: row[1],
-        }))
-      );
-
-    setAdminUsers(admins);
-  };
+  const userHasPermission = pagePermission === PagePermission.ADMIN;
 
   if (adminEmails.length === 0 || userEmail == null) {
     return <Loading />;

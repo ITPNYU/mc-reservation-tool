@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Bookings } from '../admin/components/Bookings';
 import Loading from '../../utils/Loading';
 import { PaUser } from '../../../types';
-import { SafetyTrainedUsers } from '../admin/components/SafetyTraining';
+import SafetyTrainedUsers from '../admin/components/SafetyTraining';
 import { TableNames } from '../../../policy';
 import { serverFunctions } from '../../utils/serverFunctions';
 

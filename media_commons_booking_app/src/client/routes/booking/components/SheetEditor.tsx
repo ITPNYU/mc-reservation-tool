@@ -88,13 +88,13 @@ const SheetEditor = () => {
 
   const fetchLiaisonUsers = async () => {
     serverFunctions
-      .getAllActiveSheetRows(TableNames.LIASONS)
+      .getAllActiveSheetRows(TableNames.LIAISONS)
       .then((liaisonUsers) => {
         const mappedLiaisonUsers: LiaisonType[] = liaisonUsers.map(
           (liaisonRow) => ({
             email: liaisonRow[0],
             department: liaisonRow[1],
-            completedAt: liaisonRow[2],
+            createdAt: liaisonRow[2],
           })
         );
         setLiaisons(mappedLiaisonUsers);

@@ -1,5 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
+import { DatabaseContext } from '../../../components/provider';
+import EmailListTable from '../../../components/emailListTable';
 import { LiaisonType } from '../../../../types';
 import Loading from '../../../utils/Loading';
 import { TableNames } from '../../../../policy';
@@ -7,34 +9,11 @@ import { formatDate } from '../../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../../utils/serverFunctions';
 
-export const Liaisons = () => {
-  const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
+const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
   const [email, setEmail] = useState('');
   const [department, setDepartment] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const liaisonEmails = useMemo<string[]>(
-    () => liaisonUsers.map((user) => user.email),
-    [liaisonUsers]
-  );
-
-  useEffect(() => {
-    fetchLiaisonUsers();
-  }, []);
-
-  const fetchLiaisonUsers = async () => {
-    const liaisons = await serverFunctions
-      .getAllActiveSheetRows(TableNames.LIASONS)
-      .then((rows) =>
-        rows.map((row) => ({
-          email: row[0],
-          department: row[1],
-          completedAt: row[2],
-        }))
-      );
-    setLiaisonUsers(liaisons);
-  };
-
-  console.log('liaisonEmails', liaisonEmails);
   const addLiaisonUser = async () => {
     if (email === '' || department === '') {
       alert('Please fill in all the fields');
@@ -47,7 +26,7 @@ export const Liaisons = () => {
       return;
     }
 
-    await serverFunctions.appendRowActive(TableNames.LIASONS, [
+    await serverFunctions.appendRowActive(TableNames.LIAISONS, [
       email,
       department,
       new Date().toString(),
@@ -55,21 +34,22 @@ export const Liaisons = () => {
 
     alert('User has been registered successfully!');
     setLoading(false);
-    fetchLiaisonUsers();
+    reloadLiaisonEmails();
   };
-  const [loading, setLoading] = useState(false);
+
   if (loading) {
     return <Loading />;
   }
+
   return (
-    <div className="m-10">
+    <div className="mt-10 mr-10 ml-10">
       <form className="flex items-center">
         <div className="mb-6 mr-6">
           <label
             htmlFor="email"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
-            email
+            Email
           </label>
           <input
             type="email"
@@ -111,63 +91,30 @@ export const Liaisons = () => {
           Add User
         </button>
       </form>
-
-      <div className="w-[500px relative sm:rounded-lg">
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" className="px-2 py-3">
-                Email
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Department
-              </th>
-
-              <th scope="col" className="px-2 py-3">
-                Created Date
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {liaisonUsers.map((liaison, index) => {
-              return (
-                <tr
-                  key={index}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                >
-                  <td className="px-2 py-4 w-36">{liaison.email}</td>
-                  <td className="px-2 py-4 w-36">{liaison.department}</td>
-                  <td className="px-2 py-4 w-36">
-                    <div className=" flex items-center flex-col">
-                      <div>{formatDate(liaison.completedAt)}</div>{' '}
-                    </div>
-                  </td>
-                  <td className="px-2 py-4 w-36">
-                    <button
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      onClick={async () => {
-                        setLoading(true);
-                        await serverFunctions.removeFromListByEmail(
-                          TableNames.LIASONS,
-                          liaison.email
-                        );
-                        alert('Successfully removed');
-                        setLoading(false);
-                        fetchLiaisonUsers();
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
     </div>
+  );
+};
+
+export const Liaisons = () => {
+  const { liaisonUsers, reloadLiaisonUsers } = useContext(DatabaseContext);
+
+  const liaisonEmails = useMemo<string[]>(
+    () => liaisonUsers.map((user) => user.email),
+    [liaisonUsers]
+  );
+
+  return (
+    <>
+      <AddLiaisonForm
+        liaisonEmails={liaisonEmails}
+        reloadLiaisonEmails={reloadLiaisonUsers}
+      />
+      <EmailListTable
+        tableName={TableNames.LIAISONS}
+        userList={liaisonUsers}
+        userListRefresh={reloadLiaisonUsers}
+        columnFormatters={{ createdAt: formatDate }}
+      />
+    </>
   );
 };

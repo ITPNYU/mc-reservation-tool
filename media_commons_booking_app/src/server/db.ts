@@ -9,12 +9,16 @@ import {
 const sheetToStrings = (rows: any[][] | undefined) =>
   (rows || []).map((row) => row.map((cell) => `${cell}`));
 
-const fetchRows_ = (sheetId: string, sheetName: string) => {
+const fetchRows_ = (
+  sheetId: string,
+  sheetName: string,
+  includeHeaders: boolean = false
+) => {
   const values = SpreadsheetApp.openById(sheetId)
     .getSheetByName(sheetName)
     .getDataRange()
     .getValues()
-    .slice(1); // ignore the header row
+    .slice(includeHeaders ? 0 : 1); // potentially ignore the header row
   console.log('fetchRows_', values);
   return sheetToStrings(values);
 };
@@ -59,7 +63,7 @@ export const fetchIndexByUniqueValue = (
   column: number,
   value: string
 ) => {
-  const rowIndex = fetchRows_(ACTIVE_SHEET_ID, sheetName).findIndex(
+  const rowIndex = fetchRows_(ACTIVE_SHEET_ID, sheetName, true).findIndex(
     (row) => row[column] === value
   );
   if (rowIndex === -1) throw 'Invalid unique value: ' + value;
