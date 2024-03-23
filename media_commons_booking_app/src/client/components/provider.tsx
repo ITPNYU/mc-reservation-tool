@@ -30,6 +30,7 @@ export interface DatabaseContextType {
   reloadLiaisonUsers: () => void;
   reloadPaUsers: () => void;
   reloadSafetyTrainedUsers: () => void;
+  setUserEmail: (x: string) => void;
 }
 
 export const DatabaseContext = createContext<DatabaseContextType>({
@@ -49,6 +50,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   reloadLiaisonUsers: () => {},
   reloadPaUsers: () => {},
   reloadSafetyTrainedUsers: () => {},
+  setUserEmail: (x: string) => {},
 });
 
 export const DatabaseProvider = ({ children }) => {
@@ -94,7 +96,7 @@ export const DatabaseProvider = ({ children }) => {
 
   const fetchBookings = async () => {
     const bookingRows = await serverFunctions
-      .getAllActiveSheetRows(TableNames.BOOKING)
+      .getActiveBookingsFutureDates()
       .then((rows) => rows.map((row) => mappingBookingRows(row)));
     setBookings(bookingRows);
   };
@@ -186,6 +188,7 @@ export const DatabaseProvider = ({ children }) => {
         reloadLiaisonUsers: fetchLiaisonUsers,
         reloadPaUsers: fetchPaUsers,
         reloadSafetyTrainedUsers: fetchSafetyTrainedUsers,
+        setUserEmail,
       }}
     >
       {children}

@@ -6,7 +6,6 @@ import Loading from '../../../utils/Loading';
 import PropTypes from 'prop-types';
 
 const ErrorMessage = (message) => {
-  console.log('message', message);
   return (
     <p className="mt-2 w-4/5 text-xs text-red-600 dark:text-red-500">
       {message.errors && message.errors !== ''
@@ -65,7 +64,6 @@ const FormInput = ({
       `Expected attendance exceeds maximum capacity of ${maxCapacity}`
     );
   };
-  console.log('maxCapacity', maxCapacity);
 
   const validateSponsorEmail = (value: string) => {
     if (value === userEmail) {

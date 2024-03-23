@@ -1,54 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
 import { Bookings } from '../admin/components/Bookings';
+import { DatabaseContext } from '../../components/provider';
 import Loading from '../../utils/Loading';
-import { PaUser } from '../../../types';
+import { PagePermission } from '../../../types';
 import SafetyTrainedUsers from '../admin/components/SafetyTraining';
-import { TableNames } from '../../../policy';
-import { serverFunctions } from '../../utils/serverFunctions';
-
-// This is a wrapper for google.script.run that lets us use promises.
 
 const PAPage = () => {
   const [tab, setTab] = useState('bookings');
-  const [paUsers, setPaUsers] = useState<PaUser[]>([]);
-  const [userEmail, setUserEmail] = useState<string | undefined>();
+  const { paUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
   const paEmails = useMemo<string[]>(
     () => paUsers.map((user) => user.email),
     [paUsers]
   );
 
-  useEffect(() => {
-    fetchPaUsers();
-    getActiveUserEmail();
-  }, []);
+  const userHasPermission =
+    pagePermission === PagePermission.ADMIN ||
+    pagePermission === PagePermission.PA;
 
-  const getActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail response', response);
-      setUserEmail(response);
-    });
-  };
-
-  const fetchPaUsers = async () => {
-    const paRows = await serverFunctions
-      .getAllActiveSheetRows(TableNames.PAS)
-      .then((rows) =>
-        rows.map((row) => ({
-          email: row[0],
-          createdAt: row[1],
-        }))
-      );
-    setPaUsers(paRows);
-  };
-
-  const userHasPermission = userEmail ? paEmails.includes(userEmail) : false;
-  console.log('paEmails', paEmails);
-  console.log('userHasPermission', userHasPermission);
   if (paEmails.length === 0 || userEmail === null) {
     return <Loading />;
   }
+
   return (
     <div className="m-10">
       {!userHasPermission ? (

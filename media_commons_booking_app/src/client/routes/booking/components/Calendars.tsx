@@ -115,6 +115,7 @@ export const Calendars = ({
             setBookingTimeEvent={setBookingTimeEvent}
             canBookFullTime={canBookFullTime}
             isOverlap={isOverlap}
+            key={i}
           />
         ))}
       </div>

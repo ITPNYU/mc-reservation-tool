@@ -3,14 +3,20 @@ import {
   SAFETY_TRAINING_REQUIRED_ROOM,
   TableNames,
 } from '../../../../policy';
-import { Inputs, LiaisonType, RoomSetting } from '../../../../types';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Inputs, RoomSetting } from '../../../../types';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
+import { DatabaseContext } from '../../../components/provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import FormInput from './FormInput';
 import { Header } from './Header';
 import { InitialModal } from './InitialModal';
-import Loading from '../../../utils/Loading';
 import { MultipleCalendars } from './MultipleCalendars';
 import { RoleModal } from './RoleModal';
 // This is a wrapper for google.script.run that lets us use promises.
@@ -20,12 +26,22 @@ import { serverFunctions } from '../../../utils/serverFunctions';
 //   'https://script.google.com/a/macros/itp.nyu.edu/s/AKfycbwvWl7X9w62iz0QLWOY1F1zTT-cLv9EfzPi77Adkxxwqb_ZG4vQayi3EkT7zz9jekE8/exec';
 
 const SheetEditor = () => {
-  const [userEmail, setUserEmail] = useState<string | undefined>();
-  const [liaisons, setLiaisons] = useState<LiaisonType[]>([]);
+  const {
+    bannedUsers,
+    liaisonUsers,
+    safetyTrainedUsers,
+    setUserEmail,
+    userEmail,
+  } = useContext(DatabaseContext);
   const [roomSettings, setRoomSettings] = useState<RoomSetting[]>([]);
 
-  const [isSafetyTrained, setIsSafetyTrained] = useState(false);
-  const [isBanned, setIsBanned] = useState(false);
+  const isBanned = useMemo<boolean>(() => {
+    if (!userEmail) return false;
+    return bannedUsers
+      .map((bannedUser) => bannedUser.email)
+      .includes(userEmail);
+  }, [userEmail, bannedUsers]);
+  const [isSafetyTrained, setIsSafetyTrained] = useState<boolean>(false);
 
   const [showModal, setShowModal] = useState(true);
   const [roleModal, setRoleModal] = useState(false);
@@ -67,39 +83,14 @@ const SheetEditor = () => {
     'chartFieldForRoomSetup',
   ];
 
-  const getActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail response', response);
-      setUserEmail(response);
-    });
-  };
-
-  // TODO big refactor into useMediaCommonsData
   useEffect(() => {
-    getActiveUserEmail();
+    console.log('DEPLOY MODE ENVIRONMENT:', process.env.CALENDAR_ENV);
     fetchRoomSettings();
-    fetchLiaisonUsers();
   }, []);
 
   useEffect(() => {
     getSafetyTrainingStudents();
-    getBannedStudents();
-  }, [userEmail]);
-
-  const fetchLiaisonUsers = async () => {
-    serverFunctions
-      .getAllActiveSheetRows(TableNames.LIAISONS)
-      .then((liaisonUsers) => {
-        const mappedLiaisonUsers: LiaisonType[] = liaisonUsers.map(
-          (liaisonRow) => ({
-            email: liaisonRow[0],
-            department: liaisonRow[1],
-            createdAt: liaisonRow[2],
-          })
-        );
-        setLiaisons(mappedLiaisonUsers);
-      });
-  };
+  }, [userEmail, safetyTrainedUsers]);
 
   const fetchRoomSettings = async () => {
     const mappedRooms = await serverFunctions
@@ -117,61 +108,47 @@ const SheetEditor = () => {
     setLoading(mappedRooms.length === 0);
   };
 
-  const checkIncludesEmail = useCallback(
-    (rows: string[][]) =>
-      userEmail ? rows.map((row) => row[0]).includes(userEmail) : false,
-    [userEmail]
-  );
-
   // safety training users
-  const getSafetyTrainingStudents = async () => {
+  const getSafetyTrainingStudents = useCallback(async () => {
     if (!isSafetyTrained) {
-      let isTrained = await serverFunctions
-        .getAllActiveSheetRows(TableNames.SAFETY_TRAINING)
-        .then(checkIncludesEmail);
-
+      if (!userEmail) return;
+      let isTrained = safetyTrainedUsers
+        .map((user) => user.email)
+        .includes(userEmail);
       // if not on active list, check old list
       if (!isTrained) {
         isTrained = await serverFunctions
           .getOldSafetyTrainingEmails()
-          .then(checkIncludesEmail);
+          .then((rows) => rows.map((row) => row[0]).includes(userEmail));
       }
       setIsSafetyTrained(isTrained);
     }
-  };
-
-  const getBannedStudents = async () => {
-    let banned = await serverFunctions
-      .getAllActiveSheetRows(TableNames.BANNED)
-      .then(checkIncludesEmail);
-    setIsBanned(banned);
-  };
+  }, [userEmail, safetyTrainedUsers]);
 
   const firstApproverEmailsByDepartment = (targetDepartment: string) => {
-    return liaisons
+    return liaisonUsers
       .filter((liaison) => liaison.department === targetDepartment)
       .map((liaison) => liaison.email);
   };
 
-  const findByRoomId = (array, id: string) => {
-    return array.find((room) => room.roomId === id);
+  const roomCalendarId = (room: RoomSetting) => {
+    console.log('ENVIRONMENT:', process.env.CALENDAR_ENV);
+    if (process.env.CALENDAR_ENV === 'production') {
+      return room.calendarIdProd;
+    } else {
+      return room.calendarId;
+    }
   };
-
-  //IN PRODUCTION
-  const roomCalendarId = (room) => {
-    return findByRoomId(roomSettings, room.roomId)?.calendarIdProd;
-  };
-
-  //IN DEV
-  //const roomCalendarId = (room) => {
-  //  return findByRoomId(mappingRoomSettings, room.roomId)?.calendarId;
-  //};
 
   const registerEvent = async (data) => {
     const email = userEmail || data.missingEmail;
     const [room, ...otherRooms] = selectedRoom;
     const selectedRoomIds = selectedRoom.map((r) => r.roomId);
-    const otherRoomIds = otherRooms.map((r) => roomCalendarId(r));
+    const otherRoomIds = otherRooms
+      .map((r) => roomCalendarId(r))
+      .filter((x) => x != null) as string[];
+
+    console.log(selectedRoom, room, otherRooms);
 
     const firstApprovers = firstApproverEmailsByDepartment(department);
 
@@ -183,32 +160,53 @@ const SheetEditor = () => {
       return;
     }
 
+    console.log('adding to calendar');
+
+    let calendarId = roomCalendarId(room);
+    if (calendarId == null) {
+      console.error('ROOM CALENDAR ID NOT FOUND');
+      return;
+    }
+
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
-      roomCalendarId(room),
-      `[REQUESTED] ${selectedRoomIds} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
+      calendarId,
+      `[REQUESTED] ${selectedRoomIds.join(', ')} ${department} - ${
+        data.firstName
+      } ${data.lastName} (${data.netId})`,
       'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
       bookInfo.startStr,
       bookInfo.endStr,
       otherRoomIds
     );
+
+    console.log('added to calendar');
+
     // Record the event to the spread sheet.
     const contents = order.map(function (key) {
       return data[key];
     });
+
+    console.log('adding to booking table');
     serverFunctions.appendRowActive(TableNames.BOOKING, [
       calendarEventId,
-      selectedRoomIds,
+      selectedRoomIds.join(', '),
       email,
       bookInfo.startStr,
       bookInfo.endStr,
       ...contents,
     ]);
+
+    console.log('added to booking table');
+    console.log('adding to booking status table');
+
     await serverFunctions.appendRowActive(TableNames.BOOKING_STATUS, [
       calendarEventId,
       email,
-      new Date(),
+      new Date().toString(),
     ]);
+
+    console.log('added to booking status table');
 
     // TODO full auto approval logic
     const isAutoApproval = selectedRoomIds.every((r) =>
@@ -244,6 +242,7 @@ const SheetEditor = () => {
     setLoading(false);
     setSection('selectRoom');
   };
+
   const handleSubmit = async (data) => {
     setLoading(true);
     if (!bookInfo) return;

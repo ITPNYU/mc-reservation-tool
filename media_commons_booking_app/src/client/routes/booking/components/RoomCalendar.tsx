@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import { CalendarEvent } from '../../../../types';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
@@ -18,7 +19,7 @@ export const RoomCalendar = ({
   canBookFullTime,
   isOverlap,
 }) => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
     console.log(
@@ -142,7 +143,10 @@ export const RoomCalendar = ({
           // Change the title status only
           const match = info.event.title.match(/\[(.*?)\]/);
           if (match) {
-            info.el.querySelector('.fc-event-title').textContent = match[1];
+            let el = info.el.querySelector('.fc-event-title');
+            if (el != null) {
+              el.textContent = match[1];
+            }
           }
           // Change the background color of the event depending on its title
           if (info.event.title.includes('REQUESTED')) {

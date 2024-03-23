@@ -27,6 +27,12 @@ export type BookingStatus = {
   checkedInAt: string;
 };
 
+export type CalendarEvent = {
+  title: string;
+  start: string;
+  end: string;
+};
+
 export type Inputs = {
   firstName: string;
   lastName: string;
