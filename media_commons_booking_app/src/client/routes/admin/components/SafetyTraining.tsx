@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 
-import AddEmail from '../../../components/addEmail';
+import AddEmail from '../../../components/AddEmail';
 import { DatabaseContext } from '../../../components/provider';
-import EmailListTable from '../../../components/emailListTable';
+import EmailListTable from '../../../components/EmailListTable';
 import { TableNames } from '../../../../policy';
 import { formatDate } from '../../../utils/date';
 
@@ -14,8 +14,8 @@ export default function SafetyTrainedUsers() {
     <>
       <AddEmail
         tableName={TableNames.SAFETY_TRAINING}
-        userList="safetyTrainedUsers"
-        userListRefresh="reloadSafetyTrainedUsers"
+        userList={safetyTrainedUsers}
+        userListRefresh={reloadSafetyTrainedUsers}
       />
       <EmailListTable
         columnFormatters={{ completedAt: formatDate }}

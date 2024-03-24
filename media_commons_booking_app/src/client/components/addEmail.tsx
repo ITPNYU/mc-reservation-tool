@@ -1,48 +1,33 @@
-import { DatabaseContext, DatabaseContextType } from './provider';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Loading from '../utils/Loading';
 import { TableNames } from '../../policy';
 import { serverFunctions } from '../utils/serverFunctions';
 
-type KeysWithArrayValues = {
-  [K in keyof DatabaseContextType]: DatabaseContextType[K] extends Array<any>
-    ? K
-    : never;
-}[keyof DatabaseContextType];
-
-type VoidFunction = () => void;
-type EmailListRefreshFunctionContextKeys = {
-  [K in keyof DatabaseContextType]: DatabaseContextType[K] extends VoidFunction
-    ? K
-    : never;
-}[keyof DatabaseContextType];
-
-interface Props {
-  tableName: TableNames;
-  userList: KeysWithArrayValues;
-  userListRefresh: EmailListRefreshFunctionContextKeys;
+interface EmailField {
+  email: string;
 }
 
-export default function AddEmail({
+interface Props<T extends EmailField> {
+  tableName: TableNames;
+  userList: T[];
+  userListRefresh: () => Promise<void>;
+}
+
+export default function AddEmail<T extends EmailField>({
   tableName,
   userList,
   userListRefresh,
-}: Props) {
-  const context = useContext(DatabaseContext);
+}: Props<T>) {
   const [emailToAdd, setEmailToAdd] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
-  const users = context[userList];
-  const refresh = context[userListRefresh];
-
   const userEmails = useMemo<string[]>(
-    () => users.map((user) => user.email),
-    [users]
+    () => userList.map((user) => user.email),
+    [userList]
   );
 
   const addUser = async () => {
-    setLoading(true);
     if (!emailToAdd) return;
 
     if (userEmails.includes(emailToAdd)) {
@@ -50,19 +35,24 @@ export default function AddEmail({
       return;
     }
 
-    await serverFunctions.appendRowActive(tableName, [
-      emailToAdd,
-      new Date().toString(),
-    ]);
-
-    alert('User has been registered successfully!');
-    setLoading(false);
-    refresh();
+    setLoading(true);
+    try {
+      await serverFunctions.appendRowActive(tableName, [
+        emailToAdd,
+        new Date().toString(),
+      ]);
+      await userListRefresh();
+    } catch (ex) {
+      console.error(ex);
+      alert('Failed to add user');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
   return (
     <div className="mt-10 mr-10 ml-10">
@@ -85,13 +75,17 @@ export default function AddEmail({
             required
           />
         </div>
-        <button
-          type="button"
-          onClick={addUser}
-          className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Add User
-        </button>
+        {loading ? (
+          <Loading />
+        ) : (
+          <button
+            type="button"
+            onClick={addUser}
+            className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Add User
+          </button>
+        )}
       </form>
     </div>
   );

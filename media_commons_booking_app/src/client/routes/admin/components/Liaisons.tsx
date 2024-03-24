@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
 import { DatabaseContext } from '../../../components/provider';
-import EmailListTable from '../../../components/emailListTable';
-import { LiaisonType } from '../../../../types';
+import EmailListTable from '../../../components/EmailListTable';
 import Loading from '../../../utils/Loading';
 import { TableNames } from '../../../../policy';
 import { formatDate } from '../../../utils/date';
@@ -19,27 +18,27 @@ const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
       alert('Please fill in all the fields');
       return;
     }
-    setLoading(true);
 
     if (liaisonEmails.includes(email)) {
       alert('This user is already registered');
       return;
     }
 
-    await serverFunctions.appendRowActive(TableNames.LIAISONS, [
-      email,
-      department,
-      new Date().toString(),
-    ]);
-
-    alert('User has been registered successfully!');
-    setLoading(false);
-    reloadLiaisonEmails();
+    setLoading(true);
+    try {
+      await serverFunctions.appendRowActive(TableNames.LIAISONS, [
+        email,
+        department,
+        new Date().toString(),
+      ]);
+      await reloadLiaisonEmails();
+    } catch (ex) {
+      console.error(ex);
+      alert('Failed to add user');
+    } finally {
+      setLoading(false);
+    }
   };
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <div className="mt-10 mr-10 ml-10">
@@ -83,13 +82,17 @@ const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
             <option value="others">Other Group</option>
           </select>
         </div>
-        <button
-          type="button"
-          onClick={addLiaisonUser}
-          className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Add User
-        </button>
+        {loading ? (
+          <Loading />
+        ) : (
+          <button
+            type="button"
+            onClick={addLiaisonUser}
+            className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Add User
+          </button>
+        )}
       </form>
     </div>
   );

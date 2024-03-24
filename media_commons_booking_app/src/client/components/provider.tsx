@@ -23,13 +23,13 @@ export interface DatabaseContextType {
   paUsers: PaUser[];
   safetyTrainedUsers: SafetyTraining[];
   userEmail: string | undefined;
-  reloadAdminUsers: () => void;
-  reloadBannedUsers: () => void;
-  reloadBookings: () => void;
-  reloadBookingStatuses: () => void;
-  reloadLiaisonUsers: () => void;
-  reloadPaUsers: () => void;
-  reloadSafetyTrainedUsers: () => void;
+  reloadAdminUsers: () => Promise<void>;
+  reloadBannedUsers: () => Promise<void>;
+  reloadBookings: () => Promise<void>;
+  reloadBookingStatuses: () => Promise<void>;
+  reloadLiaisonUsers: () => Promise<void>;
+  reloadPaUsers: () => Promise<void>;
+  reloadSafetyTrainedUsers: () => Promise<void>;
   setUserEmail: (x: string) => void;
 }
 
@@ -43,13 +43,13 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   paUsers: [],
   safetyTrainedUsers: [],
   userEmail: undefined,
-  reloadAdminUsers: () => {},
-  reloadBannedUsers: () => {},
-  reloadBookings: () => {},
-  reloadBookingStatuses: () => {},
-  reloadLiaisonUsers: () => {},
-  reloadPaUsers: () => {},
-  reloadSafetyTrainedUsers: () => {},
+  reloadAdminUsers: async () => {},
+  reloadBannedUsers: async () => {},
+  reloadBookings: async () => {},
+  reloadBookingStatuses: async () => {},
+  reloadLiaisonUsers: async () => {},
+  reloadPaUsers: async () => {},
+  reloadSafetyTrainedUsers: async () => {},
   setUserEmail: (x: string) => {},
 });
 

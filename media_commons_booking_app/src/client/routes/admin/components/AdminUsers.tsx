@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 
-import AddEmail from '../../../components/addEmail';
+import AddEmail from '../../../components/AddEmail';
 import { DatabaseContext } from '../../../components/provider';
-import EmailListTable from '../../../components/emailListTable';
+import EmailListTable from '../../../components/EmailListTable';
 import { TableNames } from '../../../../policy';
 import { formatDate } from '../../../utils/date';
 
@@ -13,8 +13,8 @@ export const AdminUsers = () => {
     <>
       <AddEmail
         tableName={TableNames.ADMINS}
-        userList="adminUsers"
-        userListRefresh="reloadAdminUsers"
+        userList={adminUsers}
+        userListRefresh={reloadAdminUsers}
       />
       <EmailListTable
         tableName={TableNames.ADMINS}

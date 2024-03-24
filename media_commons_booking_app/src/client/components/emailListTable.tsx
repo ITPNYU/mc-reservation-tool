@@ -1,5 +1,4 @@
-import { DatabaseContext, DatabaseContextType } from './provider';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Loading from '../utils/Loading';
 import { TableNames } from '../../policy';
@@ -14,7 +13,7 @@ interface Props<T extends EmailField> {
   columnFormatters?: { [key: string]: (value: string) => string };
   tableName: TableNames;
   userList: T[];
-  userListRefresh: () => void;
+  userListRefresh: () => Promise<void>;
 }
 
 export default function EmailListTable<T extends EmailField>(props: Props<T>) {
@@ -23,17 +22,32 @@ export default function EmailListTable<T extends EmailField>(props: Props<T>) {
 
   const [loading, setLoading] = useState(false);
 
-  if (props.userList.length === 0) {
-    return <p className="p-4">No results</p>;
-  }
+  const columnNames = useMemo<string[]>(() => {
+    if (props.userList.length === 0) {
+      return [];
+    }
+    return Object.keys(props.userList[0]) as Array<keyof T> as string[];
+  }, [props.userList]);
 
-  const columnNames = useMemo<string[]>(
-    () => Object.keys(props.userList[0]) as Array<keyof T> as string[],
-    [props.userList]
-  );
+  const onRemove = async (user: T) => {
+    setLoading(true);
+    try {
+      await serverFunctions.removeFromListByEmail(props.tableName, user.email);
+      await refresh();
+    } catch (ex) {
+      console.error(ex);
+      alert('Failed to remove user');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return <Loading />;
+  }
+
+  if (props.userList.length === 0) {
+    return <p className="p-4">No results</p>;
   }
 
   return (
@@ -71,16 +85,7 @@ export default function EmailListTable<T extends EmailField>(props: Props<T>) {
                   <td className="px-2 py-4 w-36">
                     <button
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      onClick={async () => {
-                        setLoading(true);
-                        await serverFunctions.removeFromListByEmail(
-                          props.tableName,
-                          user.email
-                        );
-                        alert('Successfully removed');
-                        setLoading(false);
-                        refresh();
-                      }}
+                      onClick={() => onRemove(user)}
                     >
                       Remove
                     </button>
