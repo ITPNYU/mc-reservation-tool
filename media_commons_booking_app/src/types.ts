@@ -27,6 +27,16 @@ export type BookingStatus = {
   checkedInAt: string;
 };
 
+export enum BookingStatusLabel {
+  APPROVED = 'Approved',
+  CANCELED = 'Canceled',
+  CHECKED_IN = 'Checked In',
+  PRE_APPROVED = 'Pre-Approved',
+  REJECTED = 'Rejected',
+  REQUESTED = 'Requested',
+  UNKNOWN = 'Unknown',
+}
+
 export type CalendarEvent = {
   title: string;
   start: string;

@@ -16,15 +16,15 @@ export enum TableNames {
 }
 
 export enum ActiveSheetBookingStatusColumns {
-  CALENDAR_ID = 1,
-  EMAIL = 2,
-  REQUESTED_DATE = 3,
-  FIRST_APPROVED_DATE = 4,
-  SECOND_APPROVED_DATE = 5,
-  REJECTED_DATE = 6,
+  CALENDAR_ID = 0,
+  EMAIL = 1,
+  REQUESTED_DATE = 2,
+  FIRST_APPROVED_DATE = 3,
+  SECOND_APPROVED_DATE = 4,
+  REJECTED_DATE = 5,
   CANCELLED_DATE = 7,
-  CHECKED_IN_DATE = 8,
-  STATUS = 9,
+  CHECKED_IN_DATE = 7,
+  STATUS = 8,
 }
 
 export enum ActiveSheetRoomsColumns {
