@@ -19,6 +19,7 @@ import { Header } from './Header';
 import { InitialModal } from './InitialModal';
 import { MultipleCalendars } from './MultipleCalendars';
 import { RoleModal } from './RoleModal';
+import { formatDate } from '../../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../../utils/serverFunctions';
 
@@ -148,8 +149,6 @@ const SheetEditor = () => {
       .map((r) => roomCalendarId(r))
       .filter((x) => x != null) as string[];
 
-    console.log(selectedRoom, room, otherRooms);
-
     const firstApprovers = firstApproverEmailsByDepartment(department);
 
     if (
@@ -159,8 +158,6 @@ const SheetEditor = () => {
     ) {
       return;
     }
-
-    console.log('adding to calendar');
 
     let calendarId = roomCalendarId(room);
     if (calendarId == null) {
@@ -180,14 +177,11 @@ const SheetEditor = () => {
       otherRoomIds
     );
 
-    console.log('added to calendar');
-
     // Record the event to the spread sheet.
     const contents = order.map(function (key) {
       return data[key];
     });
 
-    console.log('adding to booking table');
     serverFunctions.appendRowActive(TableNames.BOOKING, [
       calendarEventId,
       selectedRoomIds.join(', '),
@@ -197,21 +191,17 @@ const SheetEditor = () => {
       ...contents,
     ]);
 
-    console.log('added to booking table');
-    console.log('adding to booking status table');
-
     await serverFunctions.appendRowActive(TableNames.BOOKING_STATUS, [
       calendarEventId,
       email,
-      new Date().toString(),
+      formatDate(new Date()),
     ]);
-
-    console.log('added to booking status table');
 
     // TODO full auto approval logic
     const isAutoApproval = selectedRoomIds.every((r) =>
       INSTANT_APPROVAL_ROOMS.includes(r)
     );
+
     if (isAutoApproval) {
       serverFunctions.approveInstantBooking(calendarEventId);
     } else {

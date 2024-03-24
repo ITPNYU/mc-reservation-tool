@@ -19,7 +19,6 @@ const fetchRows_ = (
     .getDataRange()
     .getValues()
     .slice(includeHeaders ? 0 : 1); // potentially ignore the header row
-  console.log('fetchRows_', values);
   return sheetToStrings(values);
 };
 
@@ -88,7 +87,7 @@ export const updateActiveSheetValueById = (
   const rowIndex = fetchIndexById(sheetName, id);
   return SpreadsheetApp.openById(ACTIVE_SHEET_ID)
     .getSheetByName(sheetName)
-    .getRange(rowIndex + 1, column)
+    .getRange(rowIndex + 1, column + 1)
     .setValue(value);
 };
 
@@ -100,7 +99,7 @@ export const getActiveSheetValueById = (
   const rowIndex = fetchIndexById(sheetName, id);
   return SpreadsheetApp.openById(ACTIVE_SHEET_ID)
     .getSheetByName(sheetName)
-    .getRange(rowIndex + 1, column)
+    .getRange(rowIndex + 1, column + 1)
     .getValue();
 };
 

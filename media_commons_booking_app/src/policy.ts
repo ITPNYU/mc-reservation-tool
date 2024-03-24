@@ -22,7 +22,7 @@ export enum ActiveSheetBookingStatusColumns {
   FIRST_APPROVED_DATE = 3,
   SECOND_APPROVED_DATE = 4,
   REJECTED_DATE = 5,
-  CANCELLED_DATE = 7,
+  CANCELLED_DATE = 6,
   CHECKED_IN_DATE = 7,
   STATUS = 8,
 }

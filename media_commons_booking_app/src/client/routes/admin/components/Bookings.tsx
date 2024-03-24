@@ -60,7 +60,7 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <td className="px-2 py-4 w-40">
+                  <td className="px-2 py-4 w-40 flex flex-col items-start">
                     <BookingActions
                       status={status}
                       calendarEventId={booking.calendarEventId}
