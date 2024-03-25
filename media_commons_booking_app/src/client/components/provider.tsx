@@ -6,6 +6,7 @@ import {
   LiaisonType,
   PaUser,
   PagePermission,
+  RoomSetting,
   SafetyTraining,
 } from '../../types';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
@@ -21,6 +22,7 @@ export interface DatabaseContextType {
   liaisonUsers: LiaisonType[];
   pagePermission: PagePermission;
   paUsers: PaUser[];
+  roomSettings: RoomSetting[];
   safetyTrainedUsers: SafetyTraining[];
   userEmail: string | undefined;
   reloadAdminUsers: () => Promise<void>;
@@ -41,6 +43,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   liaisonUsers: [],
   pagePermission: PagePermission.BOOKING,
   paUsers: [],
+  roomSettings: [],
   safetyTrainedUsers: [],
   userEmail: undefined,
   reloadAdminUsers: async () => {},
@@ -60,6 +63,7 @@ export const DatabaseProvider = ({ children }) => {
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
   const [paUsers, setPaUsers] = useState<PaUser[]>([]);
+  const [roomSettings, setRoomSettings] = useState<RoomSetting[]>([]);
   const [safetyTrainedUsers, setSafetyTrainedUsers] = useState<
     SafetyTraining[]
   >([]);
@@ -77,14 +81,19 @@ export const DatabaseProvider = ({ children }) => {
   }, [userEmail, adminUsers, paUsers]);
 
   useEffect(() => {
-    fetchActiveUserEmail();
-    fetchAdminUsers();
-    fetchPaUsers();
-    fetchBookings();
-    fetchBookingStatuses();
-    fetchSafetyTrainedUsers();
-    fetchBannedUsers();
-    fetchLiaisonUsers();
+    // fetch most important tables first - determine page permissions
+    Promise.all([
+      fetchActiveUserEmail(),
+      fetchAdminUsers(),
+      fetchPaUsers(),
+    ]).then(() => {
+      fetchBookings();
+      fetchBookingStatuses();
+      fetchSafetyTrainedUsers();
+      fetchBannedUsers();
+      fetchLiaisonUsers();
+      fetchRoomSettings();
+    });
   }, []);
 
   const fetchActiveUserEmail = () => {
@@ -169,6 +178,21 @@ export const DatabaseProvider = ({ children }) => {
     setLiaisonUsers(liaisons);
   };
 
+  const fetchRoomSettings = async () => {
+    const settings = await serverFunctions
+      .getAllActiveSheetRows(TableNames.ROOMS)
+      .then((rows) =>
+        rows.map((roomRow) => ({
+          roomId: roomRow[0],
+          name: roomRow[1],
+          capacity: roomRow[2],
+          calendarId: roomRow[3],
+          calendarIdProd: roomRow[4],
+        }))
+      );
+    setRoomSettings(settings);
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -179,6 +203,7 @@ export const DatabaseProvider = ({ children }) => {
         liaisonUsers,
         paUsers,
         pagePermission,
+        roomSettings,
         safetyTrainedUsers,
         userEmail,
         reloadAdminUsers: fetchAdminUsers,

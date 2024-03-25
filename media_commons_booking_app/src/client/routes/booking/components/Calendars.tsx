@@ -23,6 +23,7 @@ export const Calendars = ({
   canBookFullTime,
 }: CalendarProps) => {
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
+
   const isOverlap = (info) => {
     return selectedRooms.some((room, i) => {
       const calendarApi = room.calendarRef.current.getApi();

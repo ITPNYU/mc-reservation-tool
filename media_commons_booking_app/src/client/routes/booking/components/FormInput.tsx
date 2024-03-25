@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { BookingContext } from '../bookingProvider';
+import { DatabaseContext } from '../../../components/provider';
 import { Inputs } from '../../../../types';
-import Loading from '../../../utils/Loading';
 import PropTypes from 'prop-types';
 
 const ErrorMessage = (message) => {
@@ -15,13 +16,9 @@ const ErrorMessage = (message) => {
   );
 };
 
-const FormInput = ({
-  userEmail,
-  handleParentSubmit,
-  selectedRoom,
-  role: initialRole,
-  department: initialDepartment,
-}) => {
+const FormInput = ({ handleParentSubmit }) => {
+  const { userEmail } = useContext(DatabaseContext);
+  const { role, department, selectedRooms } = useContext(BookingContext);
   const {
     register,
     handleSubmit,
@@ -36,14 +33,14 @@ const FormInput = ({
       sponsorLastName: '',
       sponsorEmail: '',
       mediaServicesDetails: '',
-      role: initialRole,
+      role,
       catering: '',
       chartFieldForCatering: '',
       chartFieldForSecurity: '',
       chartFieldForRoomSetup: '',
       hireSecurity: '',
       attendeeAffiliation: '',
-      department: initialDepartment,
+      department,
       roomSetup: '',
     },
     mode: 'onBlur',
@@ -52,11 +49,14 @@ const FormInput = ({
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
   const [showTextbox, setShowTextbox] = useState(false);
-  const roomNumber = selectedRoom.map((room) => room.roomId);
+  const roomNumber = selectedRooms.map((room) => room.roomId);
 
-  const maxCapacity = selectedRoom.reduce((sum, room) => {
+  console.log(selectedRooms);
+
+  const maxCapacity = selectedRooms.reduce((sum, room) => {
     return sum + parseInt(room.capacity);
   }, 0);
+
   const validateExpectedAttendance = (value) => {
     const attendance = parseInt(value);
     return (

@@ -43,6 +43,16 @@ export type CalendarEvent = {
   end: string;
 };
 
+export enum Department {
+  ALT = 'ALT',
+  GAMES = 'Game Center',
+  IDM = 'IDM',
+  ITP = 'ITP / IMA / Low Res',
+  MARL = 'MARL',
+  MUSIC_TECH = 'Music Tech',
+  RECORDED_MUSIC = 'Recorded Music',
+}
+
 export type Inputs = {
   firstName: string;
   lastName: string;
@@ -89,7 +99,12 @@ export enum PagePermission {
   PA,
 }
 
-export type Role = 'Student' | 'Resident/Fellow' | 'Faculty' | 'Admin/Staff';
+export enum Role {
+  STUDENT = 'Student',
+  RESIDENT_FELLOW = 'Resident/Fellow',
+  FACULTY = 'Faculty',
+  ADMIN_STAFF = 'Admin/Staff',
+}
 
 export type RoomSetting = {
   roomId: string;
