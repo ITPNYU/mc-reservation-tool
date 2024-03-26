@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 
-import { DatabaseContext } from '../../../components/Provider';
-import EmailListTable from '../../../components/EmailListTable';
+import { DatabaseContext } from '../../components/Provider';
+import EmailListTable from '../../components/EmailListTable';
 import Loading from '../../../utils/Loading';
 import { TableNames } from '../../../../policy';
 import { formatDate } from '../../../utils/date';

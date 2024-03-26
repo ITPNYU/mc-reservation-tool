@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 
-import Loading from '../utils/Loading';
-import { TableNames } from '../../policy';
+import Loading from '../../utils/Loading';
+import { TableNames } from '../../../policy';
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../utils/serverFunctions';
+import { serverFunctions } from '../../utils/serverFunctions';
 
 interface EmailField {
   email: string;

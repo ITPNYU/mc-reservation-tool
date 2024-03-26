@@ -3,7 +3,7 @@ import React, { useContext, useMemo, useState } from 'react';
 import { AdminUsers } from './AdminUsers';
 import { BannedUsers } from './Ban';
 import { Bookings } from './Bookings';
-import { DatabaseContext } from '../../../components/Provider';
+import { DatabaseContext } from '../../components/Provider';
 import { Liaisons } from './Liaisons';
 import Loading from '../../../utils/Loading';
 import { PAUsers } from './PAUsers';

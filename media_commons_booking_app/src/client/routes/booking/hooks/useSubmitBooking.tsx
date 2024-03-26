@@ -3,7 +3,7 @@ import { Inputs, RoomSetting } from '../../../../types';
 import { useContext, useMemo, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
-import { DatabaseContext } from '../../../components/Provider';
+import { DatabaseContext } from '../../components/Provider';
 import { formatDate } from '@fullcalendar/core';
 import { serverFunctions } from '../../../utils/serverFunctions';
 

@@ -1,7 +1,7 @@
 import { Booking, BookingStatusLabel } from '../../../../types';
 import React, { useContext, useMemo, useState } from 'react';
 
-import { DatabaseContext } from '../../../components/Provider';
+import { DatabaseContext } from '../../components/Provider';
 import Loading from '../../../utils/Loading';
 import { serverFunctions } from '../../../utils/serverFunctions';
 import useBookingStatus from '../hooks/getBookingStatus';

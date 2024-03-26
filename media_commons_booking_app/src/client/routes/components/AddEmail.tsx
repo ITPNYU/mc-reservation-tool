@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
-import Loading from '../utils/Loading';
-import { TableNames } from '../../policy';
-import { serverFunctions } from '../utils/serverFunctions';
+import Loading from '../../utils/Loading';
+import { TableNames } from '../../../policy';
+import { serverFunctions } from '../../utils/serverFunctions';
 
 interface EmailField {
   email: string;

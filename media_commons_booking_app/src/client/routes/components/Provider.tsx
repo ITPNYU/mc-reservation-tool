@@ -8,11 +8,11 @@ import {
   PagePermission,
   RoomSetting,
   SafetyTraining,
-} from '../../types';
+} from '../../../types';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { TableNames } from '../../policy';
-import { serverFunctions } from '../utils/serverFunctions';
+import { TableNames } from '../../../policy';
+import { serverFunctions } from '../../utils/serverFunctions';
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
