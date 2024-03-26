@@ -6,20 +6,20 @@ import EmailListTable from '../../../components/EmailListTable';
 import { TableNames } from '../../../../policy';
 import { formatDate } from '../../../utils/date';
 
-export const AdminUsers = () => {
-  const { adminUsers, reloadAdminUsers } = useContext(DatabaseContext);
+export const PAUsers = () => {
+  const { paUsers, reloadPaUsers } = useContext(DatabaseContext);
 
   return (
     <>
       <AddEmail
-        tableName={TableNames.ADMINS}
-        userList={adminUsers}
-        userListRefresh={reloadAdminUsers}
+        tableName={TableNames.PAS}
+        userList={paUsers}
+        userListRefresh={reloadPaUsers}
       />
       <EmailListTable
-        tableName={TableNames.ADMINS}
-        userList={adminUsers}
-        userListRefresh={reloadAdminUsers}
+        tableName={TableNames.PAS}
+        userList={paUsers}
+        userListRefresh={reloadPaUsers}
         columnFormatters={{ createdAt: formatDate }}
       />
     </>

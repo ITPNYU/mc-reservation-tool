@@ -1,64 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
 import { Bookings } from '../admin/components/Bookings';
-import { Loading } from '../../utils/Loading';
-import { PaUser } from './components/PAUsers';
-import { SafetyTraining } from '../admin/components/SafetyTraining';
-import { serverFunctions } from '../../utils/serverFunctions';
-
-// This is a wrapper for google.script.run that lets us use promises.
+import { DatabaseContext } from '../../components/Provider';
+import Loading from '../../utils/Loading';
+import { PagePermission } from '../../../types';
+import SafetyTrainedUsers from '../admin/components/SafetyTraining';
 
 const PAPage = () => {
-  const PA_USER_SHEET_NAME = 'pa_users';
-
   const [tab, setTab] = useState('bookings');
-  const [paUsers, setPaUsers] = useState([]);
-  const [paEmails, setPaEmails] = useState([]);
-  const [userEmail, setUserEmail] = useState();
+  const { paUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
-  useEffect(() => {
-    fetchPaUsers();
-    getActiveUserEmail();
-  }, []);
-  useEffect(() => {
-    const mappings = paUsers
-      .map((paUser, index) => {
-        if (index !== 0) {
-          return mappingPaUserRows(paUser);
-        }
-      })
-      .filter((paUser) => paUser !== undefined);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setPaEmails(emails);
-  }, [paUsers]);
+  const paEmails = useMemo<string[]>(
+    () => paUsers.map((user) => user.email),
+    [paUsers]
+  );
 
-  const getActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail response', response);
-      setUserEmail(response);
-    });
-  };
+  const userHasPermission =
+    pagePermission === PagePermission.ADMIN ||
+    pagePermission === PagePermission.PA;
 
-  const fetchPaUsers = async () => {
-    serverFunctions.fetchRows(PA_USER_SHEET_NAME).then((rows) => {
-      setPaUsers(rows);
-    });
-  };
-
-  const mappingPaUserRows = (values: string[]): PaUser => {
-    return {
-      email: values[0],
-      createdAt: values[1],
-    };
-  };
-  const userHasPermission = paEmails.includes(userEmail);
-  console.log('paEmails', paEmails);
-  console.log('userHasPermission', userHasPermission);
   if (paEmails.length === 0 || userEmail === null) {
     return <Loading />;
   }
+
   return (
     <div className="m-10">
       {!userHasPermission ? (
@@ -94,7 +58,7 @@ const PAPage = () => {
               </a>
             </li>
           </ul>
-          {tab === 'safety_training' && <SafetyTraining />}
+          {tab === 'safety_training' && <SafetyTrainedUsers />}
           {tab === 'bookings' && <Bookings showNnumber={false} />}
         </div>
       )}

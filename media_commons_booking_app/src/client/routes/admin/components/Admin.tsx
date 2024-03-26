@@ -1,61 +1,28 @@
-import { ADMIN_USER_SHEET_NAME, AdminUser, AdminUsers } from './AdminUsers';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
-import { Ban } from './Ban';
+import { AdminUsers } from './AdminUsers';
+import { BannedUsers } from './Ban';
 import { Bookings } from './Bookings';
+import { DatabaseContext } from '../../../components/Provider';
 import { Liaisons } from './Liaisons';
-import { Loading } from '../../../utils/Loading';
-import { PAUsers } from '../../pa/components/PAUsers';
-import { SafetyTraining } from './SafetyTraining';
-import { serverFunctions } from '../../../utils/serverFunctions';
+import Loading from '../../../utils/Loading';
+import { PAUsers } from './PAUsers';
+import { PagePermission } from '../../../../types';
+import SafetyTrainedUsers from './SafetyTraining';
 
 // This is a wrapper for google.script.run that lets us use promises.
 
-const Admin = () => {
+export default function Admin() {
   const [tab, setTab] = useState('bookings');
+  const { adminUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
-  const [adminUsers, setAdminUsers] = useState([]);
-  const [adminEmails, setAdminEmails] = useState([]);
-  const [userEmail, setUserEmail] = useState();
+  const adminEmails = useMemo<string[]>(
+    () => adminUsers.map((user) => user.email),
+    [adminUsers]
+  );
+  const userHasPermission = pagePermission === PagePermission.ADMIN;
 
-  useEffect(() => {
-    fetchAdminUsers();
-    getActiveUserEmail();
-  }, []);
-  const getActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail response', response);
-      setUserEmail(response);
-    });
-  };
-  useEffect(() => {
-    const mappings = adminUsers
-      .map((adminUser, index) => {
-        if (index !== 0) {
-          return mappingAdminUserRows(adminUser);
-        }
-      })
-      .filter((adminUser) => adminUser !== undefined);
-    const emails = mappings.map((mapping) => {
-      return mapping.email;
-    });
-    setAdminEmails(emails);
-  }, [adminUsers]);
-
-  const fetchAdminUsers = async () => {
-    serverFunctions.fetchRows(ADMIN_USER_SHEET_NAME).then((rows) => {
-      setAdminUsers(rows);
-    });
-  };
-
-  const mappingAdminUserRows = (values: string[]): AdminUser => {
-    return {
-      email: values[0],
-      createdAt: values[1],
-    };
-  };
-  const userHasPermission = adminEmails.includes(userEmail);
-  if (adminEmails.length === 0 || userEmail === null) {
+  if (adminEmails.length === 0 || userEmail == null) {
     return <Loading />;
   }
 
@@ -142,8 +109,8 @@ const Admin = () => {
               </a>
             </li>
           </ul>
-          {tab === 'safety_training' && <SafetyTraining />}
-          {tab === 'ban' && <Ban />}
+          {tab === 'safety_training' && <SafetyTrainedUsers />}
+          {tab === 'ban' && <BannedUsers />}
           {tab === 'adminUsers' && <AdminUsers />}
           {tab === 'paUsers' && <PAUsers />}
           {tab === 'liaesons' && <Liaisons />}
@@ -152,6 +119,4 @@ const Admin = () => {
       )}
     </div>
   );
-};
-
-export default Admin;
+}

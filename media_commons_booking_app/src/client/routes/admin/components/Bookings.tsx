@@ -1,155 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 
-import { Inputs } from '../../booking/components/FormInput';
+import BookingActions from './BookingActions';
+import { DatabaseContext } from '../../../components/Provider';
 import { formatDate } from '../../../utils/date';
-// This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../../utils/serverFunctions';
-
-const BOOKING_SHEET_NAME = 'bookings';
-
-type Booking = Inputs & {
-  calendarEventId: string;
-  email: string;
-  startDate: string;
-  endDate: string;
-  roomId: string;
-};
-
-type BookingStatus = {
-  calendarEventId: string;
-  email: string;
-  requestedAt: string;
-  firstApprovedAt: string;
-  secondApprovedAt: string;
-  rejectedAt: string;
-  canceledAt: string;
-  checkedInAt: string;
-};
+import getBookingStatus from '../hooks/getBookingStatus';
 
 interface BookingsProps {
   showNnumber: boolean;
 }
 
+const TableHeader = (text: string) => (
+  <th scope="col" className="px-2 py-3 align-bottom">
+    {text}
+  </th>
+);
+
 export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
-  const [bookings, setBookings] = useState([]);
-  const [mappingBookings, setMappingBookings] = useState([]);
-  const [mappingBookingStatuses, setMappingBookingStatuses] = useState([]);
-  const [bookingStatuses, setBookingStatuses] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedInfo, setSelectedInfo] = useState<Booking>();
-  const [tab, setTab] = useState('bookings');
-  const [reload, setReload] = useState(false);
-
-  useEffect(() => {
-    fetchBookings();
-    fetchBookingStatuses();
-  }, [reload]);
-
-  useEffect(() => {
-    const mappings = bookings
-      .map((booking, index) => {
-        if (index !== 0) {
-          return mappingBookingRows(booking);
-        }
-      })
-      .filter((booking) => booking !== undefined);
-    //TODO: filter out bookings that are not in the future
-    console.log('BOOKINGS', mappings);
-    setMappingBookings(mappings);
-  }, [bookings]);
-
-  useEffect(() => {
-    const mappings = bookingStatuses
-      .map((bookingStatus, index) => {
-        if (index !== 0) {
-          return mappingBookingStatusRow(bookingStatus);
-        }
-      })
-      .filter((booking) => booking !== undefined);
-    setMappingBookingStatuses(mappings);
-  }, [bookingStatuses]);
-
-  const fetchBookings = async () => {
-    serverFunctions.getFutureDates(BOOKING_SHEET_NAME).then((rows) => {
-      setBookings(rows);
-    });
-  };
-
-  const fetchBookingStatuses = async () => {
-    serverFunctions.fetchRows('bookingStatus').then((statusRows) => {
-      setBookingStatuses(statusRows);
-    });
-  };
-
-  const mappingBookingRows = (values: string[]): Booking => {
-    return {
-      calendarEventId: values[0],
-      roomId: values[1],
-      email: values[2],
-      startDate: values[3],
-      endDate: values[4],
-      firstName: values[5],
-      lastName: values[6],
-      secondaryName: values[7],
-      nNumber: values[8],
-      netId: values[9],
-      phoneNumber: values[10],
-      department: values[11],
-      role: values[12],
-      sponsorFirstName: values[13],
-      sponsorLastName: values[14],
-      sponsorEmail: values[15],
-      reservationTitle: values[16],
-      reservationDescription: values[17],
-      expectedAttendance: values[18],
-      attendeeAffiliation: values[19],
-      roomSetup: values[20],
-      setupDetails: values[21],
-      mediaServices: values[22],
-      mediaServicesDetails: values[23],
-      catering: values[24],
-      cateringService: values[25],
-      hireSecurity: values[26],
-      chartFieldForCatering: values[27],
-      chartFieldForSecurity: values[28],
-      chartFieldForRoomSetup: values[29],
-    };
-  };
-
-  const mappingBookingStatusRow = (values: string[]): BookingStatus => {
-    return {
-      calendarEventId: values[0],
-      email: values[1],
-      requestedAt: values[2],
-      firstApprovedAt: values[3],
-      secondApprovedAt: values[4],
-      rejectedAt: values[5],
-      canceledAt: values[6],
-      checkedInAt: values[7],
-    };
-  };
-
-  const BookingStatusName = (id) => {
-    const target = mappingBookingStatuses.filter(
-      (item) => item.calendarEventId === id
-    )[0];
-    if (target === undefined) return 'Unknown';
-    if (target.checkedInAt !== '') {
-      return 'Checked In';
-    } else if (target.canceledAt !== '') {
-      return 'Canceled';
-    } else if (target.rejectedAt !== '') {
-      return 'Rejected';
-    } else if (target.secondApprovedAt !== '') {
-      return 'Approved';
-    } else if (target.firstApprovedAt !== '') {
-      return 'Pre Approved';
-    } else if (target.requestedAt !== '') {
-      return 'Requested';
-    } else {
-      return 'Unknown';
-    }
-  };
+  const { bookings, bookingStatuses } = useContext(DatabaseContext);
 
   return (
     <div className="m-10">
@@ -157,182 +24,84 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
         <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              <th scope="col" className="px-2 py-3">
-                Action
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Status
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Room ID
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Name
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Booking Date
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Secondary name
-              </th>
-              {showNnumber && (
-                <th scope="col" className="px-2 py-3">
-                  N number
-                </th>
-              )}
-              <th scope="col" className="px-2 py-3">
-                Net Id
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Phone number
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Department
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Role
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Sponsor name
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Sponsor email
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Title
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Description
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Expected Attendee
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Attendee Affiliation
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Set up
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Chartfield Information for Room Setup
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Media Service
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Catering
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Catering Service
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Chartfield Information for catering
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Hire security
-              </th>
-              <th scope="col" className="px-2 py-3">
-                Chartfield Information for security
-              </th>
+              {TableHeader('Action')}
+              {TableHeader('Status')}
+              {TableHeader('Room ID')}
+              {TableHeader('Contact')}
+              {TableHeader('Booking Start')}
+              {TableHeader('Booking End')}
+              {TableHeader('Secondary Name')}
+              {showNnumber && TableHeader('N Number')}
+              {TableHeader('Net ID')}
+              {/* {TableHeader('Phone Number')} */}
+              {TableHeader('Department')}
+              {TableHeader('Role')}
+              {TableHeader('Sponsor Name')}
+              {TableHeader('Sponsor Email')}
+              {TableHeader('Title')}
+              {TableHeader('Description')}
+              {TableHeader('Expected Attendees')}
+              {TableHeader('Attendee Affiliation')}
+              {TableHeader('Setup')}
+              {TableHeader('Chartfield Info for Room Setup')}
+              {TableHeader('Media Service')}
+              {TableHeader('Catering')}
+              {TableHeader('Catering Service')}
+              {TableHeader('Chartfield Info for Catering')}
+              {TableHeader('Security')}
+              {TableHeader('Chartfield Info for Security')}
             </tr>
           </thead>
           <tbody>
-            {mappingBookings.map((booking, index) => {
-              const status = BookingStatusName(booking.calendarEventId);
+            {bookings.map((booking, index) => {
+              const status = getBookingStatus(booking, bookingStatuses);
               return (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <td className="px-2 py-4 w-20">
-                    {status === 'Pre Approved' && (
-                      <button
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2"
-                        onClick={async () => {
-                          await serverFunctions.approveBooking(
-                            booking.calendarEventId
-                          );
-                          setReload(true);
-                        }}
-                      >
-                        Second Approve
-                      </button>
-                    )}
-                    {status === 'Requested' && (
-                      <button
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2"
-                        onClick={async () => {
-                          await serverFunctions.approveBooking(
-                            booking.calendarEventId
-                          );
-                          setReload(true);
-                        }}
-                      >
-                        First Approve
-                      </button>
-                    )}
-                    <button
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2"
-                      onClick={async () => {
-                        await serverFunctions.reject(booking.calendarEventId);
-                        setReload(true);
-                      }}
-                    >
-                      Reject
-                    </button>
-                    <button
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2"
-                      onClick={async () => {
-                        await serverFunctions.cancel(booking.calendarEventId);
-                        setReload(true);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    {status !== 'Checked In' && (
-                      <button
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        onClick={async () => {
-                          await serverFunctions.checkin(
-                            booking.calendarEventId
-                          );
-                          setReload(true);
-                        }}
-                      >
-                        Check In
-                      </button>
-                    )}
+                  <td className="px-2 py-4 w-40 flex flex-col items-start">
+                    <BookingActions
+                      status={status}
+                      calendarEventId={booking.calendarEventId}
+                    />
                   </td>
                   <td className="px-2 py-4 w-24">{status}</td>
-                  <td className="px-2 py-4 w-24">{booking.roomId}</td>
+                  <td className="px-2 py-4 w-36">{booking.roomId}</td>
                   <td
                     scope="row"
-                    className="flex items-center px-2 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+                    className="px-2 py-4 w-40 text-gray-900 dark:text-white"
                   >
                     <div className="pl-3 w-full">
-                      <div className="text-base font-semibold">
-                        <button onClick={() => setShowModal(true)}>
+                      <div className="flex flex-col">
+                        <div className="text-base font-semibold">
                           {booking.firstName} {booking.lastName}
-                        </button>
-                      </div>
-                      <div className="font-normal text-gray-500">
-                        {booking.email}
+                        </div>
+                        <div className="font-normal text-gray-500">
+                          {booking.email}
+                        </div>
+                        <div className="font-normal text-gray-500">
+                          {booking.phoneNumber}
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 py-4 w-36">
+                  <td className="px-2 py-4 w-40">
                     <div className=" flex items-center flex-col">
-                      <div>{formatDate(booking.startDate)}</div> <div>~</div>
+                      <div>{formatDate(booking.startDate)}</div>
+                    </div>
+                  </td>
+                  <td className="px-2 py-4 w-40">
+                    <div className=" flex items-center flex-col">
                       <div>{formatDate(booking.endDate)}</div>
                     </div>
                   </td>
-
                   <td className="px-2 py-4 w-36">{booking.secondaryName}</td>
                   {showNnumber && (
                     <td className="px-2 py-4 w-20">{booking.nNumber}</td>
                   )}
                   <td className="px-2 py-4 w-20">{booking.netId}</td>
-                  <td className="px-2 py-4 w-20">{booking.phoneNumber}</td>
+                  {/* <td className="px-2 py-4 w-20">{booking.phoneNumber}</td> */}
                   <td className="px-2 py-4 w-36">{booking.department}</td>
                   <td className="px-2 py-4 w-20">{booking.role}</td>
                   <td className="px-2 py-4 w-24">
@@ -351,7 +120,7 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
                   <td className="px-2 py-4 w-20">
                     {booking.attendeeAffiliation}
                   </td>
-                  <td className="px-2 py-4 w-24">
+                  <td className="px-2 py-4 w-40">
                     {booking.roomSetup}
                     {booking.setupDetails && (
                       <>
@@ -365,7 +134,7 @@ export const Bookings: React.FC<BookingsProps> = ({ showNnumber = false }) => {
                   <td className="px-2 py-4 w-24">
                     {booking.chartFieldForRoomSetup}
                   </td>
-                  <td className="px-2 py-4 w-24">
+                  <td className="px-2 py-4 w-40">
                     {booking.mediaServices}
                     {booking.mediaServicesDetails && (
                       <>

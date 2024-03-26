@@ -1,40 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { Loading } from '../../../utils/Loading';
+import { BookingContext } from '../bookingProvider';
+import { DatabaseContext } from '../../../components/Provider';
+import { Inputs } from '../../../../types';
 import PropTypes from 'prop-types';
 
-export type Inputs = {
-  firstName: string;
-  lastName: string;
-  secondaryName: string;
-  nNumber: string;
-  netId: string;
-  phoneNumber: string;
-  department: string;
-  role: string;
-  sponsorFirstName: string;
-  sponsorLastName: string;
-  sponsorEmail: string;
-  reservationTitle: string;
-  reservationDescription: string;
-  attendeeAffiliation: string;
-  roomSetup: string;
-  setupDetails: string;
-  mediaServices: string;
-  mediaServicesDetails: string;
-  catering: string;
-  hireSecurity: string;
-  expectedAttendance: string;
-  cateringService: string;
-  missingEmail?: string;
-  chartFieldForCatering: string;
-  chartFieldForSecurity: string;
-  chartFieldForRoomSetup: string;
-};
-
 const ErrorMessage = (message) => {
-  console.log('message', message);
   return (
     <p className="mt-2 w-4/5 text-xs text-red-600 dark:text-red-500">
       {message.errors && message.errors !== ''
@@ -44,13 +16,9 @@ const ErrorMessage = (message) => {
   );
 };
 
-const FormInput = ({
-  userEmail,
-  handleParentSubmit,
-  selectedRoom,
-  role: initialRole,
-  department: initialDepartment,
-}) => {
+const FormInput = ({ handleParentSubmit }) => {
+  const { userEmail } = useContext(DatabaseContext);
+  const { role, department, selectedRooms } = useContext(BookingContext);
   const {
     register,
     handleSubmit,
@@ -65,14 +33,14 @@ const FormInput = ({
       sponsorLastName: '',
       sponsorEmail: '',
       mediaServicesDetails: '',
-      role: initialRole,
+      role,
       catering: '',
       chartFieldForCatering: '',
       chartFieldForSecurity: '',
       chartFieldForRoomSetup: '',
       hireSecurity: '',
       attendeeAffiliation: '',
-      department: initialDepartment,
+      department,
       roomSetup: '',
     },
     mode: 'onBlur',
@@ -81,11 +49,14 @@ const FormInput = ({
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
   const [showTextbox, setShowTextbox] = useState(false);
-  const roomNumber = selectedRoom.map((room) => room.roomId);
+  const roomNumber = selectedRooms.map((room) => room.roomId);
 
-  const maxCapacity = selectedRoom.reduce((sum, room) => {
+  console.log(selectedRooms);
+
+  const maxCapacity = selectedRooms.reduce((sum, room) => {
     return sum + parseInt(room.capacity);
   }, 0);
+
   const validateExpectedAttendance = (value) => {
     const attendance = parseInt(value);
     return (
@@ -93,7 +64,6 @@ const FormInput = ({
       `Expected attendance exceeds maximum capacity of ${maxCapacity}`
     );
   };
-  console.log('maxCapacity', maxCapacity);
 
   const validateSponsorEmail = (value: string) => {
     if (value === userEmail) {
@@ -169,7 +139,6 @@ const FormInput = ({
         <input
           type="firstName"
           id="firstName"
-          name="firstName"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('firstName', { required: true })}
@@ -186,7 +155,6 @@ const FormInput = ({
         <input
           type="lastName"
           id="lastName"
-          name="lastName"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
           {...register('lastName', { required: true })}
@@ -562,7 +530,6 @@ const FormInput = ({
             <input
               type="checkbox"
               value="Checkout equipment"
-              name="mediaServices"
               {...register('mediaServices')}
             />
             Checkout equipment
@@ -572,7 +539,6 @@ const FormInput = ({
               <input
                 type="checkbox"
                 value="(For Garage 103) Request an audio technician"
-                name="mediaServices"
                 {...register('mediaServices')}
               />
               (For Garage 103) Request an audio technician
@@ -583,7 +549,6 @@ const FormInput = ({
               <input
                 type="checkbox"
                 value="(For Garage 103) Request a lighting technician"
-                name="mediaServices"
                 {...register('mediaServices')}
               />
               (For Garage 103) Request a lighting technician
@@ -594,7 +559,6 @@ const FormInput = ({
               <input
                 type="checkbox"
                 value="(For Audio Lab 230) Request an audio technician"
-                name="mediaServices"
                 {...register('mediaServices')}
               />
               (For Audio Lab 230) Request an audio technician
@@ -607,7 +571,6 @@ const FormInput = ({
               <input
                 type="checkbox"
                 value="(For Garage 103) Request an audio technician"
-                name="mediaServices"
                 {...register('mediaServices')}
               />
               (For 220-224) Using DMX lights in ceiling grid
@@ -619,7 +582,6 @@ const FormInput = ({
                 <input
                   type="checkbox"
                   value="(For 202 and 1201) Contact Campus Media for technical and event support"
-                  name="mediaServices"
                   {...register('mediaServices')}
                 />
                 (For 202 and 1201) Contact Campus Media for technical and event

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { Calendars } from './Calendars';
+import { RoomSetting } from '../../../../types';
 import { SelectRooms } from './SelectRooms';
-import { SelectMotionCapture } from './SelectMotionCapture';
 
 export const MultipleCalendars = ({
   allRooms,
@@ -10,19 +11,21 @@ export const MultipleCalendars = ({
 }) => {
   const [calendarRefs, setCalendarRefs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [checkedRoomIds, setCheckedRoomIds] = useState([]);
-  const [checkedRooms, setCheckedRooms] = useState([]);
+  const [checkedRoomIds, setCheckedRoomIds] = useState<string[]>([]);
+  const [checkedRooms, setCheckedRooms] = useState<RoomSetting[]>([]);
   const [showMotionCaptureModal, setShowMotionCaptureModal] = useState(false);
   const [hasModalBeenShown, setHasModalBeenShown] = useState(false);
 
   const allRoomWithCalendarRefs = allRooms.map((room, i) => {
     room.calendarRef = React.createRef();
   });
+
   useEffect(() => {
     const refs = allRoomWithCalendarRefs;
     setCalendarRefs(refs);
     setLoading(false);
   }, [allRooms]);
+
   useEffect(() => {
     const checked = allRooms.filter((room) =>
       checkedRoomIds.includes(room.roomId)
@@ -55,12 +58,15 @@ export const MultipleCalendars = ({
       );
     }
   };
+
   const handleSubmit = (bookInfo) => {
     handleSetDate(bookInfo, checkedRooms);
   };
+
   const handleModalClick = () => {
     setShowMotionCaptureModal(false);
   };
+
   return (
     <div className="my-4 flex flex-col items-center">
       {showMotionCaptureModal && (

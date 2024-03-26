@@ -1,12 +1,16 @@
 import { RouterProvider, createHashRouter } from 'react-router-dom';
 
 import AdminPage from './routes/admin/adminPage';
-import BookingPage from './routes/booking/bookingPage';
+import BookingForm from './routes/booking/BookingForm';
 import ErrorPage from './errorPage';
+import LandingPage from './routes/booking/formPages/LandingPage';
 import PAPage from './routes/pa/PAPage';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './routes/root';
+import SelectRoomPage from './routes/booking/formPages/SelectRoomPage';
+import UserRolePage from './routes/booking/formPages/UserRolePage';
+import UserSectionPage from './routes/booking/formPages/UserSectionPage';
 
 const router = createHashRouter([
   {
@@ -24,7 +28,25 @@ const router = createHashRouter([
       },
       {
         path: '/',
-        element: <BookingPage />,
+        element: <BookingForm />,
+        children: [
+          {
+            path: '/book/role',
+            element: <UserRolePage />,
+          },
+          {
+            path: '/book/selectRoom',
+            element: <SelectRoomPage />,
+          },
+          {
+            path: '/book/form',
+            element: <UserSectionPage />,
+          },
+          {
+            path: '/',
+            element: <LandingPage />,
+          },
+        ],
       },
     ],
   },

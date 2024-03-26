@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Role, RoomSetting } from './SheetEditor';
+import React, { useEffect, useState } from 'react';
 
 import { CalendarDatePicker } from './CalendarDatePicker';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomCalendar } from './RoomCalendar';
+import { RoomSetting } from '../../../../types';
 import { formatDate } from '../../../utils/date';
 
 type CalendarProps = {
@@ -22,8 +22,8 @@ export const Calendars = ({
   handleSetDate,
   canBookFullTime,
 }: CalendarProps) => {
-  console.log('allrooms', allRooms);
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
+
   const isOverlap = (info) => {
     return selectedRooms.some((room, i) => {
       const calendarApi = room.calendarRef.current.getApi();
@@ -43,7 +43,9 @@ export const Calendars = ({
   const validateEvents = (e) => {
     e.stopPropagation;
     const overlap = isOverlap(bookingTimeEvent);
-    const past = bookingTimeEvent.start < new Date();
+    const past = bookingTimeEvent?.start
+      ? bookingTimeEvent.start < new Date()
+      : true;
     if (past) {
       alert("You can't schedule events in the past");
       return;
@@ -114,6 +116,7 @@ export const Calendars = ({
             setBookingTimeEvent={setBookingTimeEvent}
             canBookFullTime={canBookFullTime}
             isOverlap={isOverlap}
+            key={i}
           />
         ))}
       </div>
