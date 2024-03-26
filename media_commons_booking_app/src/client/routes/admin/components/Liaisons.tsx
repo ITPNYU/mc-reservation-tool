@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState } from 'react';
 
-import { DatabaseContext } from '../../../components/provider';
+import { DatabaseContext } from '../../../components/Provider';
 import EmailListTable from '../../../components/EmailListTable';
 import Loading from '../../../utils/Loading';
 import { TableNames } from '../../../../policy';

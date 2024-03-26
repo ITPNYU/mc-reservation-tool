@@ -1,6 +1,6 @@
 import '../styles.css';
 
-import { DatabaseProvider } from '../components/provider';
+import { DatabaseProvider } from '../components/Provider';
 import NavBar from '../components/navBar';
 import { Outlet } from 'react-router-dom';
 import React from 'react';

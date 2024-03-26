@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import { BookingContext } from '../bookingProvider';
-import { DatabaseContext } from '../../../components/provider';
+import { DatabaseContext } from '../../../components/Provider';
 import { useLocation } from 'react-router-dom';
 
 export const Header = () => {

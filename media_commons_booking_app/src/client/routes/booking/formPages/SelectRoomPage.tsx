@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
-import { DatabaseContext } from '../../../components/provider';
+import { DatabaseContext } from '../../../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import { MultipleCalendars } from '../components/MultipleCalendars';
 import { RoomSetting } from '../../../../types';

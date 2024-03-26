@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
-import { DatabaseContext } from '../../../components/provider';
+import { DatabaseContext } from '../../../components/Provider';
 import FormInput from '../components/FormInput';
 import Loading from '../../../utils/Loading';
 import { useNavigate } from 'react-router-dom';

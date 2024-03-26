@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { BookingContext } from '../bookingProvider';
-import { DatabaseContext } from '../../../components/provider';
+import { DatabaseContext } from '../../../components/Provider';
 import { Inputs } from '../../../../types';
 import PropTypes from 'prop-types';
 

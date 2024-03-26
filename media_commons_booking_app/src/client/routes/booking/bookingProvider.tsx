@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 
-import { DatabaseContext } from '../../components/provider';
+import { DatabaseContext } from '../../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import { serverFunctions } from '../../utils/serverFunctions';
 

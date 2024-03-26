@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 
 import { Bookings } from '../admin/components/Bookings';
-import { DatabaseContext } from '../../components/provider';
+import { DatabaseContext } from '../../components/Provider';
 import Loading from '../../utils/Loading';
 import { PagePermission } from '../../../types';
 import SafetyTrainedUsers from '../admin/components/SafetyTraining';

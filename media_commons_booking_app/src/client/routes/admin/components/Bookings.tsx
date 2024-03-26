@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import BookingActions from './BookingActions';
-import { DatabaseContext } from '../../../components/provider';
+import { DatabaseContext } from '../../../components/Provider';
 import { formatDate } from '../../../utils/date';
 import getBookingStatus from '../hooks/getBookingStatus';
 
