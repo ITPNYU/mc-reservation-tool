@@ -265,11 +265,17 @@ const SheetEditor = () => {
       bookInfo.endStr,
       ...contents,
     ]);
-    serverFunctions.request(calendarEventId, email).then(() => {
-      const isAutoApproval = selectedRoomIds.every((r) =>
-        INSTANT_APPROVAL_ROOMS.includes(r)
+    const isAutoApproval = (selectedRoomIds, data) => {
+      // If the selected rooms are all instant approval rooms and the user does not need catering, and hire security, and room setup, then it is auto-approval.
+      return (
+        selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
+        data['catering'] === 'no' &&
+        data['hireSecurity'] === 'no' &&
+        data['roomSetup'] === 'no'
       );
-      if (isAutoApproval) {
+    };
+    serverFunctions.request(calendarEventId, email).then(() => {
+      if (isAutoApproval(selectedRoomIds, data)) {
         serverFunctions.approveInstantBooking(calendarEventId);
       } else {
         const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
