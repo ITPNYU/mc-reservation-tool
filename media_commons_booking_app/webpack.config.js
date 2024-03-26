@@ -12,6 +12,7 @@ const HtmlWebpackInlineSourcePlugin = require('@effortlessmotion/html-webpack-in
 const DynamicCdnWebpackPlugin = require('@effortlessmotion/dynamic-cdn-webpack-plugin');
 const moduleToCdn = require('module-to-cdn');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 
 /*********************************
  *    set up environment variables
@@ -246,6 +247,27 @@ const DynamicCdnWebpackPluginConfig = {
           version: packageVersion,
           url: `https://unpkg.com/@types/react@${packageVersion}/index.d.ts`,
         };
+      case 'react-router-dom':
+        return {
+          name: packageName,
+          var: 'ReactRouterDOM',
+          version: packageVersion,
+          url: `https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/${packageVersion}/react-router-dom.production.min.js`,
+        };
+      case 'react-router':
+        return {
+          name: packageName,
+          var: 'reactRouter',
+          version: packageVersion,
+          url: `https://cdnjs.cloudflare.com/ajax/libs/react-router/${packageVersion}/react-router.production.min.js`,
+        };
+      case '@remix-run/router':
+        return {
+          name: packageName,
+          var: 'router',
+          version: packageVersion,
+          url: `https://cdn.jsdelivr.net/npm/@remix-run/router@${packageVersion}/dist/router.umd.min.js`,
+        };
       // return defaults/null depending if Dynamic CDN plugin finds package
       default:
         return moduleDetails;
@@ -267,13 +289,14 @@ const clientConfigs = clientEntrypoints.map((clientEntrypoint) => {
       }),
       new HtmlWebpackPlugin({
         template: clientEntrypoint.template,
-        filename: `${clientEntrypoint.filename}.html`,
+        filename: `${clientEntrypoint.filename}${isProd ? '' : '-impl'}.html`,
         inlineSource: '^/.*(js|css)$', // embed all js and css inline, exclude packages from dynamic cdn insertion
         scriptLoading: 'blocking',
         inject: 'body',
       }),
       // add the generated js code to the html file inline
       new HtmlWebpackInlineSourcePlugin(),
+      new WebpackManifestPlugin({ fileName: 'manifest.json' }),
       // this plugin allows us to add dynamically load packages from a CDN
       new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig),
     ].filter(Boolean),
