@@ -188,6 +188,13 @@ const DynamicCdnWebpackPluginConfig = {
     if (!isProd && packageName === 'react') {
       return null;
     }
+    if (
+      packageName === 'react-router-dom' ||
+      packageName === 'react-router' ||
+      packageName === '@remix-run/router'
+    ) {
+      return null;
+    }
 
     // define custom CDN configuration for new packages
     // "name" should match the package being imported
@@ -267,7 +274,7 @@ const clientConfigs = clientEntrypoints.map((clientEntrypoint) => {
       }),
       new HtmlWebpackPlugin({
         template: clientEntrypoint.template,
-        filename: `${clientEntrypoint.filename}.html`,
+        filename: `${clientEntrypoint.filename}${isProd ? '' : '-impl'}.html`,
         inlineSource: '^/.*(js|css)$', // embed all js and css inline, exclude packages from dynamic cdn insertion
         scriptLoading: 'blocking',
         inject: 'body',
