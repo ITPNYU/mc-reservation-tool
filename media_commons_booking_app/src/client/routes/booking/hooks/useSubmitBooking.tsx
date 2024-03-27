@@ -102,6 +102,7 @@ export default function useSubmitBooking(): [(any) => Promise<void>, boolean] {
       bookingCalendarInfo.startStr,
       bookingCalendarInfo.endStr,
       ...contents,
+      process.env.BRANCH_NAME,
     ]);
 
     await serverFunctions.appendRowActive(TableNames.BOOKING_STATUS, [

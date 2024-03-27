@@ -32,7 +32,6 @@ export const getActiveBookingsFutureDates = () => {
   today.setHours(0, 0, 0, 0); // set hours 00:00:00.000
 
   var filteredData = values.filter(function (row, index) {
-    if (index === 0) return true; // if header row, return true (include in filtered data)
     var startDate = new Date(row[3]); // 'start date' column
     return startDate > today; // 'start date' is after today
   });

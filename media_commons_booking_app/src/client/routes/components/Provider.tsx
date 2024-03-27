@@ -3,6 +3,7 @@ import {
   Ban,
   Booking,
   BookingStatus,
+  DevBranch,
   LiaisonType,
   PaUser,
   PagePermission,
@@ -104,9 +105,14 @@ export const DatabaseProvider = ({ children }) => {
   };
 
   const fetchBookings = async () => {
+    console.log('CURRENT BRANCH:', process.env.BRANCH_NAME);
     const bookingRows = await serverFunctions
       .getActiveBookingsFutureDates()
-      .then((rows) => rows.map((row) => mappingBookingRows(row)));
+      .then((rows) =>
+        rows
+          .map((row) => mappingBookingRows(row))
+          .filter((booking) => booking.devBranch === process.env.BRANCH_NAME)
+      );
     setBookings(bookingRows);
   };
 
@@ -253,6 +259,7 @@ const mappingBookingRows = (values: string[]): Booking => {
     chartFieldForCatering: values[27],
     chartFieldForSecurity: values[28],
     chartFieldForRoomSetup: values[29],
+    devBranch: values[30] as DevBranch,
   };
 };
 

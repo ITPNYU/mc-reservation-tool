@@ -14,6 +14,7 @@ export type Booking = Inputs & {
   startDate: string;
   endDate: string;
   roomId: string;
+  devBranch: DevBranch;
 };
 
 export type BookingStatus = {
@@ -52,6 +53,8 @@ export enum Department {
   MUSIC_TECH = 'Music Tech',
   RECORDED_MUSIC = 'Recorded Music',
 }
+
+export type DevBranch = 'development' | 'staging' | 'production' | '';
 
 export type Inputs = {
   firstName: string;
