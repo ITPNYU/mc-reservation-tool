@@ -1,5 +1,3 @@
-'use client';
-
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 
 import AdminPage from './routes/admin/adminPage';
@@ -13,8 +11,6 @@ import SelectRoomPage from './routes/booking/formPages/SelectRoomPage';
 import UserRolePage from './routes/booking/formPages/UserRolePage';
 import UserSectionPage from './routes/booking/formPages/UserSectionPage';
 import { createRoot } from 'react-dom/client';
-
-console.log('TEST IN INDEX.JS');
 
 const router = createMemoryRouter([
   {

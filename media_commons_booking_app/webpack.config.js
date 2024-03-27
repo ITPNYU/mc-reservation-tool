@@ -189,6 +189,13 @@ const DynamicCdnWebpackPluginConfig = {
     if (!isProd && packageName === 'react') {
       return null;
     }
+    if (
+      packageName === 'react-router-dom' ||
+      packageName === 'react-router' ||
+      packageName === '@remix-run/router'
+    ) {
+      return null;
+    }
 
     // define custom CDN configuration for new packages
     // "name" should match the package being imported
