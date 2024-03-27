@@ -22,7 +22,7 @@
     "deploy:staging": "rimraf dist && npm run build:staging && npx clasp push",
     "deploy": "rimraf dist && npm run build && npx clasp push",
     "serve": "cross-env NODE_ENV=development CALENDAR_ENV=development webpack serve",
-    "start": "npm run deploy:dev && npm run serve"
+    "start": "npm run deploy:local && npm run serve"
   },
   "keywords": [
     "react",
