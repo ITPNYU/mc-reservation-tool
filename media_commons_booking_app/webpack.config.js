@@ -12,7 +12,6 @@ const HtmlWebpackInlineSourcePlugin = require('@effortlessmotion/html-webpack-in
 const DynamicCdnWebpackPlugin = require('@effortlessmotion/dynamic-cdn-webpack-plugin');
 const moduleToCdn = require('module-to-cdn');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 
 /*********************************
  *    set up environment variables
@@ -303,7 +302,6 @@ const clientConfigs = clientEntrypoints.map((clientEntrypoint) => {
       }),
       // add the generated js code to the html file inline
       new HtmlWebpackInlineSourcePlugin(),
-      new WebpackManifestPlugin({ fileName: 'manifest.json' }),
       // this plugin allows us to add dynamically load packages from a CDN
       new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig),
     ].filter(Boolean),
