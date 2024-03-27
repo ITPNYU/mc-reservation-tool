@@ -14,7 +14,7 @@ import {
 } from './db';
 import { inviteUserToCalendarEvent, updateEventPrefix } from './calendars';
 
-import { sendHTMLEmail } from './emails';
+import { sendHTMLEmail, sendTextEmail } from './emails';
 
 export const bookingContents = (id: string) => {
   const values = fetchById(TableNames.BOOKING, id);
@@ -112,6 +112,11 @@ export const approveEvent = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
+  sendTextEmail(
+    guestEmail,
+    'Media Commons Reservation Approved',
+    'Your reservation request for Media Commons is approved.'
+  );
 
   updateEventPrefix(id, 'APPROVED');
   inviteUserToCalendarEvent(id, guestEmail);
@@ -125,7 +130,16 @@ export const reject = (id: string) => {
     new Date()
   );
 
-  //TODO: send email to user
+  const guestEmail = getActiveSheetValueById(
+    TableNames.BOOKING_STATUS,
+    id,
+    ActiveSheetBookingStatusColumns.EMAIL
+  );
+  sendTextEmail(
+    guestEmail,
+    'Media Commons Reservation Has Been Rejected',
+    'Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
+  );
   updateEventPrefix(id, 'REJECTED');
 };
 
@@ -136,6 +150,16 @@ export const cancel = (id: string) => {
     ActiveSheetBookingStatusColumns.CANCELLED_DATE,
     new Date()
   );
+  const guestEmail = getActiveSheetValueById(
+    TableNames.BOOKING_STATUS,
+    id,
+    ActiveSheetBookingStatusColumns.EMAIL
+  );
+  sendTextEmail(
+    guestEmail,
+    'Media Commons Reservation Has Been Cancelled',
+    'Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
+  );
   updateEventPrefix(id, 'CANCELLED');
 };
 
@@ -145,6 +169,16 @@ export const checkin = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.CHECKED_IN_DATE,
     new Date()
+  );
+  const guestEmail = getActiveSheetValueById(
+    TableNames.BOOKING_STATUS,
+    id,
+    ActiveSheetBookingStatusColumns.EMAIL
+  );
+  sendTextEmail(
+    guestEmail,
+    'Media Commons Reservation Has Been Checked In',
+    'Your reservation request for Media Commons has been checked in. Thank you for choosing Media Commons.'
   );
   updateEventPrefix(id, 'CHECKED IN');
 };
