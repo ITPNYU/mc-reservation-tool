@@ -117,6 +117,7 @@ export default function useSubmitBooking(): [(any) => Promise<void>, boolean] {
         selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
         data['catering'] === 'no' &&
         data['hireSecurity'] === 'no' &&
+        data['mediaServices'] === '' &&
         data['roomSetup'] === 'no'
       );
     };
