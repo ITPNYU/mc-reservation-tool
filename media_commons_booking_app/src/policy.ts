@@ -59,4 +59,4 @@ export const SAFETY_TRAINING_REQUIRED_ROOM = [
   '230',
 ];
 
-export const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224'];
+export const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224', '233'];
