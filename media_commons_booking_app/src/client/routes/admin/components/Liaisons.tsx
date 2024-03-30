@@ -1,9 +1,9 @@
 import React, { useContext, useMemo, useState } from 'react';
+import { TableNames, getLiaisonTableName } from '../../../../policy';
 
 import { DatabaseContext } from '../../components/Provider';
 import EmailListTable from '../../components/EmailListTable';
 import Loading from '../../../utils/Loading';
-import { TableNames } from '../../../../policy';
 import { formatDate } from '../../../utils/date';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../../utils/serverFunctions';
@@ -26,7 +26,7 @@ const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
 
     setLoading(true);
     try {
-      await serverFunctions.appendRowActive(TableNames.LIAISONS, [
+      await serverFunctions.appendRowActive(getLiaisonTableName(), [
         email,
         department,
         new Date().toString(),
@@ -113,7 +113,7 @@ export const Liaisons = () => {
         reloadLiaisonEmails={reloadLiaisonUsers}
       />
       <EmailListTable
-        tableName={TableNames.LIAISONS}
+        tableName={getLiaisonTableName()}
         userList={liaisonUsers}
         userListRefresh={reloadLiaisonUsers}
         columnFormatters={{ createdAt: formatDate }}

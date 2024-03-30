@@ -1,14 +1,29 @@
 /********** GOOGLE SHEETS ************/
 
+import { DevBranch } from './types';
+
 /** ACTIVE master Google Sheet  */
 export const ACTIVE_SHEET_ID = '1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68';
+
+export function getLiaisonTableName() {
+  switch (process.env.BRANCH_NAME as DevBranch) {
+    case 'development':
+      return TableNames.LIAISONS_DEV;
+    case 'staging':
+      return TableNames.LIAISONS_STAGING;
+    default:
+      return TableNames.LIAISONS_PROD;
+  }
+}
 
 export enum TableNames {
   ADMINS = 'admin_users',
   BANNED = 'banned_users',
   BOOKING = 'bookings',
   BOOKING_STATUS = 'bookingStatus',
-  LIAISONS = 'liaisons',
+  LIAISONS_DEV = 'liaisonsDev',
+  LIAISONS_PROD = 'liaisonsProd',
+  LIAISONS_STAGING = 'liaisonsStaging',
   PAS = 'pa_users',
   ROOMS = 'rooms',
   SAFETY_TRAINING = 'safety_training_users',

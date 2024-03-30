@@ -10,8 +10,8 @@ import {
   SafetyTraining,
 } from '../../../types';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
+import { TableNames, getLiaisonTableName } from '../../../policy';
 
-import { TableNames } from '../../../policy';
 import { serverFunctions } from '../../utils/serverFunctions';
 
 export interface DatabaseContextType {
@@ -152,7 +152,7 @@ export const DatabaseProvider = ({ children }) => {
 
   const fetchLiaisonUsers = async () => {
     const liaisons = await serverFunctions
-      .getAllActiveSheetRows(TableNames.LIAISONS)
+      .getAllActiveSheetRows(getLiaisonTableName())
       .then((rows) => JSON.parse(rows) as LiaisonType[]);
     setLiaisonUsers(liaisons);
   };
