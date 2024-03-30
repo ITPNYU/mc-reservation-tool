@@ -6,53 +6,20 @@ import {
 import { approvalUrl, rejectUrl } from './ui';
 import {
   fetchById,
-  fetchIndexById,
   fetchIndexByUniqueValue,
   getActiveSheetValueById,
   removeRowActive,
   updateActiveSheetValueById,
 } from './db';
 import { inviteUserToCalendarEvent, updateEventPrefix } from './calendars';
-
 import { sendHTMLEmail, sendTextEmail } from './emails';
 
 export const bookingContents = (id: string) => {
-  const values = fetchById(TableNames.BOOKING, id);
-  return {
-    calendarEventId: id,
-    roomId: values[2],
-    email: values[3],
-    startDate: values[4],
-    endDate: values[5],
-    firstName: values[6],
-    lastName: values[7],
-    secondaryName: values[8],
-    nNumber: values[9],
-    netId: values[10],
-    phoneNumber: values[11],
-    department: values[12],
-    role: values[13],
-    sponsorFirstName: values[14],
-    sponsorLastName: values[15],
-    sponsorEmail: values[16],
-    reservationTitle: values[17],
-    reservationDescription: values[18],
-    expectedAttendance: values[19],
-    attendeeAffiliation: values[20],
-    roomSetup: values[21],
-    setupDetails: values[22],
-    mediaServices: values[23],
-    mediaServicesDetails: values[24],
-    catering: values[25],
-    cateringService: values[26],
-
-    hireSecurity: values[27],
-    chartFieldForCatering: values[28],
-    chartFieldForSecurity: values[29],
-    chartFieldForRoomSetup: values[30],
-    approvalUrl: approvalUrl(id),
-    rejectedUrl: rejectUrl(id),
-  };
+  const bookingObj = fetchById(TableNames.BOOKING, id);
+  bookingObj.calendarEventId = id;
+  bookingObj.approvalUrl = approvalUrl(id);
+  bookingObj.rejectedUrl = rejectUrl(id);
+  return bookingObj;
 };
 
 export const approveInstantBooking = (id: string) => {

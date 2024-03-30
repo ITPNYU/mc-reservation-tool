@@ -14,7 +14,7 @@ export type Booking = Inputs & {
   startDate: string;
   endDate: string;
   roomId: string;
-  devBranch: DevBranch;
+  devBranch: string;
 };
 
 export type BookingStatus = {
@@ -68,8 +68,8 @@ export type Inputs = {
   sponsorFirstName: string;
   sponsorLastName: string;
   sponsorEmail: string;
-  reservationTitle: string;
-  reservationDescription: string;
+  title: string;
+  description: string;
   attendeeAffiliation: string;
   roomSetup: string;
   setupDetails: string;

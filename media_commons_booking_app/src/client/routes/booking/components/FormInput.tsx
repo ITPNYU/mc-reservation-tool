@@ -51,8 +51,6 @@ const FormInput = ({ handleParentSubmit }) => {
   const [showTextbox, setShowTextbox] = useState(false);
   const roomNumber = selectedRooms.map((room) => room.roomId);
 
-  console.log(selectedRooms);
-
   const maxCapacity = selectedRooms.reduce((sum, room) => {
     return sum + parseInt(room.capacity);
   }, 0);
@@ -333,38 +331,36 @@ const FormInput = ({ handleParentSubmit }) => {
       )}
       <div className="mb-6">
         <label
-          htmlFor="reservationTitle"
+          htmlFor="title"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           Reservation Title
         </label>
-        {errors.reservationTitle && (
-          <ErrorMessage errors={errors.reservationTitle.message} />
-        )}
+        {errors.title && <ErrorMessage errors={errors.title.message} />}
         <input
-          type="reservationTitle"
-          id="reservationTitle"
+          type="title"
+          id="title"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('reservationTitle', { required: true })}
+          {...register('title', { required: true })}
         />
       </div>
       <div className="mb-6">
         <label
-          htmlFor="reservationDescription"
+          htmlFor="description"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           Reservation Description
         </label>
-        {errors.reservationDescription && (
-          <ErrorMessage errors={errors.reservationDescription.message} />
+        {errors.description && (
+          <ErrorMessage errors={errors.description.message} />
         )}
         <input
-          type="reservationDescription"
-          id="reservationDescription"
+          type="description"
+          id="description"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder=""
-          {...register('reservationDescription', { required: true })}
+          {...register('description', { required: true })}
         />
       </div>
       <div className="mb-6">
