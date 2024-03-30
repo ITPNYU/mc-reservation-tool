@@ -1,5 +1,5 @@
+import { Booking, Inputs, RoomSetting } from '../../../../types';
 import { INSTANT_APPROVAL_ROOMS, TableNames } from '../../../../policy';
-import { Inputs, RoomSetting } from '../../../../types';
 import { useContext, useMemo, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
@@ -7,7 +7,10 @@ import { DatabaseContext } from '../../components/Provider';
 import { formatDate } from '@fullcalendar/core';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
-export default function useSubmitBooking(): [(any) => Promise<void>, boolean] {
+export default function useSubmitBooking(): [
+  (x: Inputs) => Promise<void>,
+  boolean
+] {
   const { liaisonUsers, userEmail, reloadBookings, reloadBookingStatuses } =
     useContext(DatabaseContext);
   const { bookingCalendarInfo, department, role, selectedRooms } =
@@ -43,15 +46,16 @@ export default function useSubmitBooking(): [(any) => Promise<void>, boolean] {
     }
   };
 
-  const sendApprovalEmail = (recipient, contents) => {
+  const sendApprovalEmail = (recipients: string[], contents: Booking) => {
     var subject = 'Approval Request';
-
-    serverFunctions.sendHTMLEmail(
-      'approval_email',
-      contents,
-      recipient,
-      subject,
-      ''
+    recipients.forEach((recipient) =>
+      serverFunctions.sendHTMLEmail(
+        'approval_email',
+        contents,
+        recipient,
+        subject,
+        ''
+      )
     );
   };
 
@@ -128,7 +132,7 @@ export default function useSubmitBooking(): [(any) => Promise<void>, boolean] {
       const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
       const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
       Promise.all([getApprovalUrl, getRejectedUrl]).then((values) => {
-        const userEventInputs = {
+        const userEventInputs: Booking = {
           calendarEventId: calendarEventId,
           roomId: selectedRoomIds,
           email: email,
@@ -169,8 +173,8 @@ const order: (keyof Inputs)[] = [
   'sponsorFirstName',
   'sponsorLastName',
   'sponsorEmail',
-  'reservationTitle',
-  'reservationDescription',
+  'title',
+  'description',
   'expectedAttendance',
   'attendeeAffiliation',
   'roomSetup',

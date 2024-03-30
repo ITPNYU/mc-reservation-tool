@@ -120,11 +120,9 @@ export const Bookings: React.FC<BookingsProps> = ({
                     {booking.sponsorFirstName} {booking.sponsorLastName}
                   </td>
                   <td className="px-2 py-4 w-20">{booking.sponsorEmail}</td>
-                  <td className="px-2 py-4 w-52 break-all">
-                    {booking.reservationTitle}
-                  </td>
+                  <td className="px-2 py-4 w-52 break-all">{booking.title}</td>
                   <td className="px-2 py-4 w-60 break-all">
-                    {booking.reservationDescription}
+                    {booking.description}
                   </td>
                   <td className="px-2 py-4 w-20">
                     {booking.expectedAttendance}

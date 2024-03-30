@@ -1,3 +1,5 @@
+import { Booking } from '../types';
+
 export const sendTextEmail = (
   targetEmail: string,
   title: string,
@@ -8,7 +10,7 @@ export const sendTextEmail = (
 
 export const sendHTMLEmail = (
   templateName: string,
-  contents: any,
+  contents: Booking,
   targetEmail: string,
   title: string,
   body
