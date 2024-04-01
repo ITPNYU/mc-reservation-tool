@@ -16,7 +16,6 @@ export const RoomCalendar = ({
   allRooms,
   bookingTimeEvent,
   setBookingTimeEvent,
-  canBookFullTime,
   isOverlap,
 }) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -80,16 +79,6 @@ export const RoomCalendar = ({
     setBookingTimeEvent(selectInfo);
   };
   const handleSelectAllow = (selectInfo) => {
-    console.log('selectInfo', selectInfo);
-    // only enrolledThesis user can book over 4 hours
-    if (
-      !canBookFullTime &&
-      selectInfo.end.getTime() / 1000 - selectInfo.start.getTime() / 1000 >
-        60 * 60 * 4
-    ) {
-      return false;
-    }
-
     console.log('isOverlap', !isOverlap(selectInfo));
     return !isOverlap(selectInfo);
   };
