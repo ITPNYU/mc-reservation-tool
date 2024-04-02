@@ -1,7 +1,7 @@
 import {
   ActiveSheetBookingStatusColumns,
-  SECOND_APPROVER_EMAIL,
   TableNames,
+  getSecondApproverEmail,
 } from '../policy';
 import { approvalUrl, rejectUrl } from './ui';
 import {
@@ -22,51 +22,15 @@ export const bookingContents = (id: string) => {
   return bookingObj;
 };
 
-export const approveInstantBooking = (id: string) => {
+const firstApprove = (id: string) =>
   updateActiveSheetValueById(
     TableNames.BOOKING_STATUS,
     id,
     ActiveSheetBookingStatusColumns.FIRST_APPROVED_DATE,
     new Date()
   );
-  approveEvent(id);
-};
 
-export const approveBooking = (id: string) => {
-  const firstApproveDateRange = updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.FIRST_APPROVED_DATE,
-    new Date()
-  );
-  console.log('first approve date', firstApproveDateRange.getValue());
-
-  //COMPLETE ALL APPROVAL
-  if (firstApproveDateRange.getValue() !== '') {
-    // second approve
-    approveEvent(id);
-  } else {
-    // TODO fix logic here? why are we trying to do this twice?
-    // first approve
-    updateActiveSheetValueById(
-      TableNames.BOOKING_STATUS,
-      id,
-      ActiveSheetBookingStatusColumns.FIRST_APPROVED_DATE,
-      new Date()
-    );
-
-    //TODO: send email to user
-    updateEventPrefix(id, 'PRE-APPROVED');
-
-    const subject = 'Second Approval Request';
-    const contents = bookingContents(id);
-    const recipient = SECOND_APPROVER_EMAIL;
-    sendHTMLEmail('approval_email', contents, recipient, subject, '');
-  }
-};
-
-export const approveEvent = (id: string) => {
-  // add 2nd approval timestamp
+const secondApprove = (id: string) =>
   updateActiveSheetValueById(
     TableNames.BOOKING_STATUS,
     id,
@@ -74,6 +38,39 @@ export const approveEvent = (id: string) => {
     new Date()
   );
 
+export const approveInstantBooking = (id: string) => {
+  firstApprove(id);
+  approveEvent(id);
+};
+
+// both first approve and second approve flows hit here
+export const approveBooking = (id: string) => {
+  const firstApproveDateRange = getActiveSheetValueById(
+    TableNames.BOOKING_STATUS,
+    id,
+    ActiveSheetBookingStatusColumns.FIRST_APPROVED_DATE
+  );
+
+  console.log('first approve date', firstApproveDateRange);
+
+  // if already first approved, then this is a second approve
+  if (firstApproveDateRange !== '') {
+    secondApprove(id);
+    approveEvent(id);
+  } else {
+    firstApprove(id);
+
+    //TODO: send email to user
+    updateEventPrefix(id, 'PRE-APPROVED');
+
+    const subject = 'Second Approval Request';
+    const contents = bookingContents(id);
+    const recipient = getSecondApproverEmail(process.env.BRANCH_NAME);
+    sendHTMLEmail('approval_email', contents, recipient, subject, '');
+  }
+};
+
+export const approveEvent = (id: string) => {
   const guestEmail = getActiveSheetValueById(
     TableNames.BOOKING_STATUS,
     id,

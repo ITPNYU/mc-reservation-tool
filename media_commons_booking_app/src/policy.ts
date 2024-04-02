@@ -58,7 +58,11 @@ export const OLD_SAFETY_TRAINING_SHEET_NAME = 'Sheet1';
 
 /********** CONTACTS ************/
 
-export const SECOND_APPROVER_EMAIL = 'ss12430@nyu.edu';
+// TODO configure this via admin UI
+export const getSecondApproverEmail = (branchName: string) =>
+  branchName === 'development'
+    ? 'media-commons-devs@itp.nyu.edu'
+    : 'jg5626@nyu.edu'; // Jhanele
 
 /********** ROOMS ************/
 
