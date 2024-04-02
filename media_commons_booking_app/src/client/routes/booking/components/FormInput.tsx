@@ -497,7 +497,7 @@ const FormInput = ({ handleParentSubmit }) => {
             htmlFor="chartFieldForRoomSetup"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
-            ChartField for Campus Safety
+            ChartField for Room Setup
           </label>
           <div className="flex items-center mb-4">
             <input
@@ -682,7 +682,7 @@ const FormInput = ({ handleParentSubmit }) => {
             htmlFor="chartFieldForCatering"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
-            ChartField for Event Cleanup
+            ChartField for Catering
           </label>
           <div className="flex items-center mb-4">
             <input
@@ -737,7 +737,7 @@ const FormInput = ({ handleParentSubmit }) => {
             htmlFor="chartFieldForSecurity"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
-            ChartField for Campus Safety
+            ChartField for Security
           </label>
           <div className="flex items-center mb-4">
             <input
