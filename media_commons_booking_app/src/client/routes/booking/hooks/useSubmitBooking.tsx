@@ -6,6 +6,7 @@ import { BookingContext } from '../bookingProvider';
 import { DatabaseContext } from '../../components/Provider';
 import { formatDate } from '@fullcalendar/core';
 import { serverFunctions } from '../../../utils/serverFunctions';
+import { useNavigate } from 'react-router';
 
 export default function useSubmitBooking(): [
   (x: Inputs) => Promise<void>,
@@ -17,6 +18,7 @@ export default function useSubmitBooking(): [
     useContext(BookingContext);
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const firstApprovers = useMemo(
     () =>
@@ -147,6 +149,7 @@ export default function useSubmitBooking(): [
     }
 
     alert('Your request has been sent.');
+    navigate('/');
 
     serverFunctions.sendTextEmail(
       email,
