@@ -74,7 +74,7 @@ export const Bookings: React.FC<BookingsProps> = ({
                     <td className="px-2 py-4 w-40 flex flex-col items-start">
                       <BookingActions
                         status={status}
-                        calendarEventId={booking.calendarEventId}
+                        calendarEventId={booking.calendarId}
                       />
                     </td>
                   )}

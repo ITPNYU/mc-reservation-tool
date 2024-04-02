@@ -9,7 +9,7 @@ export type Ban = {
 };
 
 export type Booking = Inputs & {
-  calendarEventId: string;
+  calendarId: string;
   email: string;
   startDate: string;
   endDate: string;
@@ -18,7 +18,7 @@ export type Booking = Inputs & {
 };
 
 export type BookingStatus = {
-  calendarEventId: string;
+  calendarId: string;
   email: string;
   requestedAt: string;
   firstApprovedAt: string;
