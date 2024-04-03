@@ -11,6 +11,8 @@ export default function getBookingStatus(
     if (bookingStatusMatch === undefined) return BookingStatusLabel.UNKNOWN;
     if (bookingStatusMatch.checkedInAt !== '') {
       return BookingStatusLabel.CHECKED_IN;
+    } else if (bookingStatusMatch.noShowedAt !== '') {
+      return BookingStatusLabel.NO_SHOW;
     } else if (bookingStatusMatch.canceledAt !== '') {
       return BookingStatusLabel.CANCELED;
     } else if (bookingStatusMatch.rejectedAt !== '') {

@@ -168,6 +168,29 @@ export const checkin = (id: string) => {
   updateEventPrefix(id, BookingStatusLabel.CHECKED_IN);
 };
 
+export const noShow = (id: string) => {
+  updateActiveSheetValueById(
+    TableNames.BOOKING_STATUS,
+    id,
+    ActiveSheetBookingStatusColumns.NO_SHOWED_DATE,
+    new Date()
+  );
+  const guestEmail = getActiveSheetValueById(
+    TableNames.BOOKING_STATUS,
+    id,
+    ActiveSheetBookingStatusColumns.EMAIL
+  );
+  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
+
+  sendTextEmail(
+    guestEmail,
+    BookingStatusLabel.NO_SHOW,
+    eventTitle,
+    'You did not check-in for your Media Commons Reservation and have been marked as a no-show.'
+  );
+  updateEventPrefix(id, BookingStatusLabel.NO_SHOW);
+};
+
 // assumes the email is in column 0 but that can be overridden
 export const removeFromListByEmail = (
   sheetName: TableNames,

@@ -26,6 +26,7 @@ export type BookingStatus = {
   rejectedAt: string;
   canceledAt: string;
   checkedInAt: string;
+  noShowedAt: string;
 };
 
 export enum BookingStatusLabel {
