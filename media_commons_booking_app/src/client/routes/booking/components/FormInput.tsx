@@ -490,13 +490,18 @@ const FormInput = ({ handleParentSubmit }) => {
           >
             ChartField for Room Setup
           </label>
+          {errors.chartFieldForRoomSetup && (
+            <ErrorMessage errors={errors.chartFieldForRoomSetup.message} />
+          )}
           <div className="flex items-center mb-4">
             <input
               type="text"
               id="chartFieldForRoomSetup"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder=""
-              {...register('chartFieldForRoomSetup')}
+              {...register('chartFieldForRoomSetup', {
+                required: watch('roomSetup') === 'yes',
+              })}
             />
           </div>
         </div>
