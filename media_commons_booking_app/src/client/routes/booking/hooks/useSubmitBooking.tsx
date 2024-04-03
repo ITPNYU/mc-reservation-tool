@@ -117,13 +117,13 @@ export default function useSubmitBooking(): [
       formatDate(new Date()),
     ]);
 
-    const isAutoApproval = (selectedRoomIds, data) => {
+    const isAutoApproval = (selectedRoomIds: string[], data: Booking) => {
       // If the selected rooms are all instant approval rooms and the user does not need catering, and hire security, and room setup, then it is auto-approval.
       return (
         selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
         data['catering'] === 'no' &&
         data['hireSecurity'] === 'no' &&
-        data['mediaServices'] === '' &&
+        data['mediaServices'].length === 0 &&
         data['roomSetup'] === 'no'
       );
     };
