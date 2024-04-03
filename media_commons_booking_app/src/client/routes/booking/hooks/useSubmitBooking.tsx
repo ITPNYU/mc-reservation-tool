@@ -60,7 +60,8 @@ export default function useSubmitBooking(): [
         'approval_email',
         contents,
         recipient,
-        subject,
+        BookingStatusLabel.REQUESTED,
+        contents.title,
         ''
       )
     );

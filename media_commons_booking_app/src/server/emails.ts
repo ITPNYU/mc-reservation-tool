@@ -3,10 +3,10 @@ import { Booking, BookingStatusLabel } from '../types';
 export const sendTextEmail = (
   targetEmail: string,
   status: BookingStatusLabel,
-  title: string,
+  eventTitle: string,
   body: string
 ) => {
-  const subj = `${status}: Media Commons request for \"${title}\"`;
+  const subj = `${status}: Media Commons request for \"${eventTitle}\"`;
   GmailApp.sendEmail(targetEmail, subj, body);
 };
 
@@ -14,10 +14,12 @@ export const sendHTMLEmail = (
   templateName: string,
   contents: Booking,
   targetEmail: string,
-  title: string,
+  status: BookingStatusLabel,
+  eventTitle: string,
   body
 ) => {
   console.log('contents', contents);
+  const subj = `${status}: Media Commons request for \"${eventTitle}\"`;
   const htmlTemplate = HtmlService.createTemplateFromFile(templateName);
   for (const key in contents) {
     htmlTemplate[key] = contents[key] || '';
@@ -26,5 +28,5 @@ export const sendHTMLEmail = (
   const options = {
     htmlBody,
   };
-  GmailApp.sendEmail(targetEmail, title, body, options);
+  GmailApp.sendEmail(targetEmail, subj, body, options);
 };

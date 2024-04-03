@@ -69,7 +69,14 @@ export const approveBooking = (id: string) => {
     const subject = 'Second Approval Request';
     const contents = bookingContents(id);
     const recipient = getSecondApproverEmail(process.env.BRANCH_NAME);
-    sendHTMLEmail('approval_email', contents, recipient, subject, '');
+    sendHTMLEmail(
+      'approval_email',
+      contents,
+      recipient,
+      BookingStatusLabel.PRE_APPROVED,
+      contents.title,
+      ''
+    );
   }
 };
 
