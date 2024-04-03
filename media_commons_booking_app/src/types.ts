@@ -29,13 +29,14 @@ export type BookingStatus = {
 };
 
 export enum BookingStatusLabel {
-  APPROVED = 'Approved',
-  CANCELED = 'Canceled',
-  CHECKED_IN = 'Checked In',
-  PRE_APPROVED = 'Pre-Approved',
-  REJECTED = 'Rejected',
-  REQUESTED = 'Requested',
-  UNKNOWN = 'Unknown',
+  APPROVED = 'APPROVED',
+  CANCELED = 'CANCELED',
+  CHECKED_IN = 'CHECKED-IN',
+  NO_SHOW = 'NO-SHOW',
+  PRE_APPROVED = 'PRE-APPROVED',
+  REJECTED = 'REJECTED',
+  REQUESTED = 'REQUESTED',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export type CalendarEvent = {

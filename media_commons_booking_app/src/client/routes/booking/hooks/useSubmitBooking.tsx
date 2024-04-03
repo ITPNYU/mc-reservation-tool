@@ -1,4 +1,9 @@
-import { Booking, Inputs, RoomSetting } from '../../../../types';
+import {
+  Booking,
+  BookingStatusLabel,
+  Inputs,
+  RoomSetting,
+} from '../../../../types';
 import { INSTANT_APPROVAL_ROOMS, TableNames } from '../../../../policy';
 import { useContext, useMemo, useState } from 'react';
 
@@ -87,9 +92,9 @@ export default function useSubmitBooking(): [
     // Add the event to the calendar.
     const calendarEventId = await serverFunctions.addEventToCalendar(
       calendarId,
-      `[REQUESTED] ${selectedRoomIds.join(', ')} ${department} - ${
-        data.firstName
-      } ${data.lastName} (${data.netId})`,
+      `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(
+        ', '
+      )} ${department} - ${data.firstName} ${data.lastName} (${data.netId})`,
       'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
       bookingCalendarInfo.startStr,
       bookingCalendarInfo.endStr,
@@ -153,7 +158,8 @@ export default function useSubmitBooking(): [
 
     serverFunctions.sendTextEmail(
       email,
-      'Your Request Sent to Media Commons',
+      BookingStatusLabel.REQUESTED,
+      data.title,
       'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.'
     );
     setLoading(false);

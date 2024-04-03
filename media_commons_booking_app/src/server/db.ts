@@ -1,6 +1,5 @@
 import {
   ACTIVE_SHEET_ID,
-  ActiveSheetBookingStatusColumns,
   OLD_SAFETY_TRAINING_SHEET_ID,
   OLD_SAFETY_TRAINING_SHEET_NAME,
   TableNames,
@@ -96,18 +95,14 @@ export const fetchIndexByUniqueValue = (
 };
 
 export const fetchIndexById = (sheetName: TableNames, id: string) => {
-  return fetchIndexByUniqueValue(
-    sheetName,
-    ActiveSheetBookingStatusColumns.CALENDAR_ID,
-    id
-  );
+  return fetchIndexByUniqueValue(sheetName, 0, id);
 };
 
 // sheet --> row --> column --> new value
 export const updateActiveSheetValueById = (
   sheetName: TableNames,
   id: string,
-  column: ActiveSheetBookingStatusColumns,
+  column: number,
   value: any
 ) => {
   const rowIndex = fetchIndexById(sheetName, id);
@@ -120,7 +115,7 @@ export const updateActiveSheetValueById = (
 export const getActiveSheetValueById = (
   sheetName: TableNames,
   id: string,
-  column: ActiveSheetBookingStatusColumns
+  column: number
 ) => {
   const rowIndex = fetchIndexById(sheetName, id);
   return SpreadsheetApp.openById(ACTIVE_SHEET_ID)

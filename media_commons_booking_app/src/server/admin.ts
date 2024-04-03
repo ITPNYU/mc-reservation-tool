@@ -14,6 +14,8 @@ import {
 import { inviteUserToCalendarEvent, updateEventPrefix } from './calendars';
 import { sendHTMLEmail, sendTextEmail } from './emails';
 
+import { BookingStatusLabel } from '../types';
+
 export const bookingContents = (id: string) => {
   const bookingObj = fetchById(TableNames.BOOKING, id);
   bookingObj.calendarEventId = id;
@@ -40,6 +42,7 @@ const secondApprove = (id: string) =>
 
 export const approveInstantBooking = (id: string) => {
   firstApprove(id);
+  secondApprove(id);
   approveEvent(id);
 };
 
@@ -61,7 +64,7 @@ export const approveBooking = (id: string) => {
     firstApprove(id);
 
     //TODO: send email to user
-    updateEventPrefix(id, 'PRE-APPROVED');
+    updateEventPrefix(id, BookingStatusLabel.PRE_APPROVED);
 
     const subject = 'Second Approval Request';
     const contents = bookingContents(id);
@@ -76,13 +79,15 @@ export const approveEvent = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
+  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
   sendTextEmail(
     guestEmail,
-    'Media Commons Reservation Approved',
+    BookingStatusLabel.APPROVED,
+    eventTitle,
     'Your reservation request for Media Commons is approved.'
   );
 
-  updateEventPrefix(id, 'APPROVED');
+  updateEventPrefix(id, BookingStatusLabel.APPROVED);
   inviteUserToCalendarEvent(id, guestEmail);
 };
 
@@ -99,12 +104,15 @@ export const reject = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
+  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
+
   sendTextEmail(
     guestEmail,
-    'Media Commons Reservation Has Been Rejected',
+    BookingStatusLabel.REJECTED,
+    eventTitle,
     'Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
   );
-  updateEventPrefix(id, 'REJECTED');
+  updateEventPrefix(id, BookingStatusLabel.REJECTED);
 };
 
 export const cancel = (id: string) => {
@@ -119,12 +127,15 @@ export const cancel = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
+  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
+
   sendTextEmail(
     guestEmail,
-    'Media Commons Reservation Has Been Cancelled',
+    BookingStatusLabel.CANCELED,
+    eventTitle,
     'Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
   );
-  updateEventPrefix(id, 'CANCELLED');
+  updateEventPrefix(id, BookingStatusLabel.CANCELED);
 };
 
 export const checkin = (id: string) => {
@@ -139,12 +150,15 @@ export const checkin = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
+  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
+
   sendTextEmail(
     guestEmail,
-    'Media Commons Reservation Has Been Checked In',
+    BookingStatusLabel.CHECKED_IN,
+    eventTitle,
     'Your reservation request for Media Commons has been checked in. Thank you for choosing Media Commons.'
   );
-  updateEventPrefix(id, 'CHECKED IN');
+  updateEventPrefix(id, BookingStatusLabel.CHECKED_IN);
 };
 
 // assumes the email is in column 0 but that can be overridden

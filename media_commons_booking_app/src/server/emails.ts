@@ -1,11 +1,13 @@
-import { Booking } from '../types';
+import { Booking, BookingStatusLabel } from '../types';
 
 export const sendTextEmail = (
   targetEmail: string,
+  status: BookingStatusLabel,
   title: string,
   body: string
 ) => {
-  GmailApp.sendEmail(targetEmail, title, body);
+  const subj = `${status}: Media Commons request for \"${title}\"`;
+  GmailApp.sendEmail(targetEmail, subj, body);
 };
 
 export const sendHTMLEmail = (

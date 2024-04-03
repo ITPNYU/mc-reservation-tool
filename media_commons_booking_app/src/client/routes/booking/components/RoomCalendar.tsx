@@ -1,6 +1,6 @@
+import { BookingStatusLabel, CalendarEvent } from '../../../../types';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CalendarEvent } from '../../../../types';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
@@ -138,17 +138,19 @@ export const RoomCalendar = ({
             }
           }
           // Change the background color of the event depending on its title
-          if (info.event.title.includes('REQUESTED')) {
+          if (info.event.title.includes(BookingStatusLabel.REQUESTED)) {
             info.el.style.backgroundColor = '#d60000';
-          } else if (info.event.title.includes('PRE-APPROVED')) {
+          } else if (
+            info.event.title.includes(BookingStatusLabel.PRE_APPROVED)
+          ) {
             info.el.style.backgroundColor = '#f6c026';
-          } else if (info.event.title.includes('APPROVED')) {
+          } else if (info.event.title.includes(BookingStatusLabel.APPROVED)) {
             info.el.style.backgroundColor = '#33b679';
-          } else if (info.event.title.includes('CONFIRMED')) {
-            info.el.style.backgroundColor = '#0b8043';
-          } else if (info.event.title.includes('REJECTED')) {
+          } else if (info.event.title.includes(BookingStatusLabel.REJECTED)) {
             info.el.style.display = 'none';
-          } else if (info.event.title.includes('CANCELLED')) {
+          } else if (info.event.title.includes(BookingStatusLabel.CANCELED)) {
+            info.el.style.display = 'none';
+          } else if (info.event.title.includes(BookingStatusLabel.NO_SHOW)) {
             info.el.style.display = 'none';
           }
         }}
