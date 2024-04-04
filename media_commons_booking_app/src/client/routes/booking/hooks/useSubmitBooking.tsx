@@ -157,12 +157,15 @@ export default function useSubmitBooking(): [
     alert('Your request has been sent.');
     navigate('/');
 
-    serverFunctions.sendTextEmail(
+    const headerMessage =
+      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.';
+    serverFunctions.sendBookingDetailEmail(
+      calendarEventId,
       email,
-      BookingStatusLabel.REQUESTED,
-      data.title,
-      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.'
+      headerMessage,
+      BookingStatusLabel.REQUESTED
     );
+
     setLoading(false);
     reloadBookings();
     reloadBookingStatuses();
