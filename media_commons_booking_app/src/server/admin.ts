@@ -66,7 +66,6 @@ export const approveBooking = (id: string) => {
     //TODO: send email to user
     updateEventPrefix(id, BookingStatusLabel.PRE_APPROVED);
 
-    const subject = 'Second Approval Request';
     const contents = bookingContents(id);
     const recipient = getSecondApproverEmail(process.env.BRANCH_NAME);
     sendHTMLEmail(
@@ -78,6 +77,18 @@ export const approveBooking = (id: string) => {
       ''
     );
   }
+};
+
+export const bookingTitle = (id: string) =>
+  getActiveSheetValueById(TableNames.BOOKING, id, 16);
+
+export const sendConfirmationEmail = (id, status) => {
+  const email = getSecondApproverEmail(process.env.BRANCH_NAME);
+  const title = bookingTitle(id);
+  const contents = bookingContents(id);
+  contents.headerMessage = 'This is confirmation email.';
+  console.log('contents', contents);
+  sendHTMLEmail('booking_detail', contents, email, status, title, '');
 };
 
 export const approveEvent = (id: string) => {
@@ -93,6 +104,7 @@ export const approveEvent = (id: string) => {
     eventTitle,
     'Your reservation request for Media Commons is approved.'
   );
+  sendConfirmationEmail(id, BookingStatusLabel.APPROVED);
 
   updateEventPrefix(id, BookingStatusLabel.APPROVED);
   inviteUserToCalendarEvent(id, guestEmail);
@@ -142,6 +154,7 @@ export const cancel = (id: string) => {
     eventTitle,
     'Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
   );
+  sendConfirmationEmail(id, BookingStatusLabel.CANCELED);
   updateEventPrefix(id, BookingStatusLabel.CANCELED);
 };
 
@@ -188,6 +201,7 @@ export const noShow = (id: string) => {
     eventTitle,
     'You did not check-in for your Media Commons Reservation and have been marked as a no-show.'
   );
+  sendConfirmationEmail(id, BookingStatusLabel.NO_SHOW);
   updateEventPrefix(id, BookingStatusLabel.NO_SHOW);
 };
 
