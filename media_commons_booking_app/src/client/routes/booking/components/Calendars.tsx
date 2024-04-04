@@ -76,7 +76,10 @@ export const Calendars = ({
 
   const handleChange = (selectedDate: Date) => {
     allRooms.forEach((room) => {
-      room.calendarRef.current.getApi().gotoDate(selectedDate);
+      const roomApi = room.calendarRef.current.getApi();
+      roomApi.unselect();
+      setBookingTimeEvent(null);
+      roomApi.gotoDate(selectedDate);
     });
   };
 
