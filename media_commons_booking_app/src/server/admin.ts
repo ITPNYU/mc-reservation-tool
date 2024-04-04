@@ -63,7 +63,6 @@ export const approveBooking = (id: string) => {
   } else {
     firstApprove(id);
 
-    //TODO: send email to user
     updateEventPrefix(id, BookingStatusLabel.PRE_APPROVED);
 
     const contents = bookingContents(id);
@@ -84,9 +83,14 @@ export const bookingTitle = (id: string) =>
 
 export const sendConfirmationEmail = (id, status) => {
   const email = getSecondApproverEmail(process.env.BRANCH_NAME);
+  const headerMessage = 'This is confirmation email.';
+  sendBookingDetailEmail(id, email, headerMessage, status);
+};
+
+export const sendBookingDetailEmail = (id, email, headerMessage, status) => {
   const title = bookingTitle(id);
   const contents = bookingContents(id);
-  contents.headerMessage = 'This is confirmation email.';
+  contents.headerMessage = headerMessage;
   console.log('contents', contents);
   sendHTMLEmail('booking_detail', contents, email, status, title, '');
 };
@@ -97,12 +101,14 @@ export const approveEvent = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
-  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
-  sendTextEmail(
+
+  const headerMessage =
+    'Your reservation request for Media Commons is approved.';
+  sendBookingDetailEmail(
+    id,
     guestEmail,
-    BookingStatusLabel.APPROVED,
-    eventTitle,
-    'Your reservation request for Media Commons is approved.'
+    headerMessage,
+    BookingStatusLabel.APPROVED
   );
   sendConfirmationEmail(id, BookingStatusLabel.APPROVED);
 
@@ -123,13 +129,13 @@ export const reject = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
-  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
-
-  sendTextEmail(
+  const headerMessage =
+    'Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.';
+  sendBookingDetailEmail(
+    id,
     guestEmail,
-    BookingStatusLabel.REJECTED,
-    eventTitle,
-    'Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
+    headerMessage,
+    BookingStatusLabel.REJECTED
   );
   updateEventPrefix(id, BookingStatusLabel.REJECTED);
 };
@@ -146,13 +152,13 @@ export const cancel = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
-  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
-
-  sendTextEmail(
+  const headerMessage =
+    'Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.';
+  sendBookingDetailEmail(
+    id,
     guestEmail,
-    BookingStatusLabel.CANCELED,
-    eventTitle,
-    'Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.'
+    headerMessage,
+    BookingStatusLabel.CANCELED
   );
   sendConfirmationEmail(id, BookingStatusLabel.CANCELED);
   updateEventPrefix(id, BookingStatusLabel.CANCELED);
@@ -170,13 +176,14 @@ export const checkin = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
-  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
 
-  sendTextEmail(
+  const headerMessage =
+    'Your reservation request for Media Commons has been checked in. Thank you for choosing Media Commons.';
+  sendBookingDetailEmail(
+    id,
     guestEmail,
-    BookingStatusLabel.CHECKED_IN,
-    eventTitle,
-    'Your reservation request for Media Commons has been checked in. Thank you for choosing Media Commons.'
+    headerMessage,
+    BookingStatusLabel.CHECKED_IN
   );
   updateEventPrefix(id, BookingStatusLabel.CHECKED_IN);
 };
@@ -193,13 +200,14 @@ export const noShow = (id: string) => {
     id,
     ActiveSheetBookingStatusColumns.EMAIL
   );
-  const eventTitle = getActiveSheetValueById(TableNames.BOOKING, id, 16);
 
-  sendTextEmail(
+  const headerMessage =
+    'You did not check-in for your Media Commons Reservation and have been marked as a no-show.';
+  sendBookingDetailEmail(
+    id,
     guestEmail,
-    BookingStatusLabel.NO_SHOW,
-    eventTitle,
-    'You did not check-in for your Media Commons Reservation and have been marked as a no-show.'
+    headerMessage,
+    BookingStatusLabel.NO_SHOW
   );
   sendConfirmationEmail(id, BookingStatusLabel.NO_SHOW);
   updateEventPrefix(id, BookingStatusLabel.NO_SHOW);
