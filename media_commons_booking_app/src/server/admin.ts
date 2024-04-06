@@ -3,6 +3,7 @@ import {
   TableNames,
   getSecondApproverEmail,
 } from '../policy';
+import { BookingFormDetails, BookingStatusLabel } from '../types';
 import { approvalUrl, rejectUrl } from './ui';
 import {
   fetchById,
@@ -12,13 +13,11 @@ import {
   updateActiveSheetValueById,
 } from './db';
 import { inviteUserToCalendarEvent, updateEventPrefix } from './calendars';
-import { sendHTMLEmail, sendTextEmail } from './emails';
 
-import { BookingStatusLabel } from '../types';
+import { sendHTMLEmail } from './emails';
 
-export const bookingContents = (id: string) => {
+export const bookingContents = (id: string): BookingFormDetails => {
   const bookingObj = fetchById(TableNames.BOOKING, id);
-  bookingObj.calendarEventId = id;
   bookingObj.approvalUrl = approvalUrl(id);
   bookingObj.rejectedUrl = rejectUrl(id);
   return bookingObj;
@@ -78,21 +77,24 @@ export const approveBooking = (id: string) => {
   }
 };
 
-export const bookingTitle = (id: string) =>
-  getActiveSheetValueById(TableNames.BOOKING, id, 16);
-
-export const sendConfirmationEmail = (id, status) => {
+export const sendConfirmationEmail = (
+  calendarEventId: string,
+  status: BookingStatusLabel
+) => {
   const email = getSecondApproverEmail(process.env.BRANCH_NAME);
-  const headerMessage = 'This is confirmation email.';
-  sendBookingDetailEmail(id, email, headerMessage, status);
+  const headerMessage = 'This is a confirmation email.';
+  sendBookingDetailEmail(calendarEventId, email, headerMessage, status);
 };
 
-export const sendBookingDetailEmail = (id, email, headerMessage, status) => {
-  const title = bookingTitle(id);
-  const contents = bookingContents(id);
+export const sendBookingDetailEmail = (
+  calendarEventId: string,
+  email: string,
+  headerMessage: string,
+  status: BookingStatusLabel
+) => {
+  const contents = bookingContents(calendarEventId);
   contents.headerMessage = headerMessage;
-  console.log('contents', contents);
-  sendHTMLEmail('booking_detail', contents, email, status, title, '');
+  sendHTMLEmail('booking_detail', contents, email, status, contents.title, '');
 };
 
 export const approveEvent = (id: string) => {
@@ -104,6 +106,7 @@ export const approveEvent = (id: string) => {
 
   const headerMessage =
     'Your reservation request for Media Commons is approved.';
+  console.log('sending booking detail email...');
   sendBookingDetailEmail(
     id,
     guestEmail,

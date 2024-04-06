@@ -7,9 +7,9 @@ import { RoomSetting } from '../../../../types';
 import { formatDate } from '../../../utils/date';
 
 type CalendarProps = {
-  allRooms: any[];
+  allRooms: RoomSetting[];
   selectedRooms: RoomSetting[];
-  handleSetDate: any;
+  handleSetDate: (x: DateSelectArg) => void;
   refs?: any[];
 };
 
