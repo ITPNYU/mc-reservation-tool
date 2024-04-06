@@ -1,11 +1,16 @@
+import React, { useContext } from 'react';
+
 import Container from 'react-bootstrap/Container';
+import { DatabaseContext } from './Provider';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { NavLink } from 'react-router-dom';
 import Navbar from 'react-bootstrap/Navbar';
-import React from 'react';
+import { PagePermission } from '../../../types';
 
 export default function NavBar() {
+  const { pagePermission } = useContext(DatabaseContext);
+
   return (
     <Navbar expand="md" className="bg-body-tertiary z-10">
       <Container fluid>
@@ -24,20 +29,25 @@ export default function NavBar() {
                 My Bookings
               </NavLink>
             </Nav.Item>
-            <Nav.Item>
-              <NavLink
-                className="nav-link"
-                activeClassName="active"
-                to="/admin"
-              >
-                Admin
-              </NavLink>
-            </Nav.Item>
-            <Nav.Item>
-              <NavLink className="nav-link" activeClassName="active" to="/pa">
-                PA
-              </NavLink>
-            </Nav.Item>
+            {pagePermission === PagePermission.ADMIN && (
+              <Nav.Item>
+                <NavLink
+                  className="nav-link"
+                  activeClassName="active"
+                  to="/admin"
+                >
+                  Admin
+                </NavLink>
+              </Nav.Item>
+            )}
+            {(pagePermission === PagePermission.ADMIN ||
+              pagePermission === PagePermission.PA) && (
+              <Nav.Item>
+                <NavLink className="nav-link" activeClassName="active" to="/pa">
+                  PA
+                </NavLink>
+              </Nav.Item>
+            )}
             <NavDropdown title="Resources" id="basic-nav-dropdown" align="end">
               <NavDropdown.Item href="https://docs.google.com/presentation/d/1SwMhL65dR6x2BMqlcQ4GbyD1w2ydfrd3MG5XCJrsmAA/edit?authuser=0#slide=id.p">
                 Spaces Index
