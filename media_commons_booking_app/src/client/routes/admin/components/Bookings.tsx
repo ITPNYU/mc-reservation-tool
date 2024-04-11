@@ -7,6 +7,7 @@ import getBookingStatus from '../hooks/getBookingStatus';
 
 interface BookingsProps {
   showNnumber: boolean;
+  isPaView?: boolean;
   isUserView?: boolean;
 }
 
@@ -18,13 +19,23 @@ const TableHeader = (text: string) => (
 
 export const Bookings: React.FC<BookingsProps> = ({
   showNnumber = false,
+  isPaView = false,
   isUserView = false,
 }) => {
   const { bookings, bookingStatuses, userEmail } = useContext(DatabaseContext);
 
   const filteredBookings = useMemo(() => {
+    const paViewStatuses = [
+      BookingStatusLabel.APPROVED,
+      BookingStatusLabel.CHECKED_IN,
+      BookingStatusLabel.NO_SHOW,
+    ];
     if (isUserView)
       return bookings.filter((booking) => booking.email === userEmail);
+    if (isPaView)
+      return bookings.filter((booking) =>
+        paViewStatuses.includes(getBookingStatus(booking, bookingStatuses))
+      );
     return bookings;
   }, [isUserView, bookings]);
 
