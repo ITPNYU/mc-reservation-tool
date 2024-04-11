@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { Calendars } from './Calendars';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomSetting } from '../../../../types';
 import { SelectRooms } from './SelectRooms';
+import { BookingContext } from '../bookingProvider';
 
 interface Props {
   allRooms: RoomSetting[];
@@ -11,16 +12,24 @@ interface Props {
 }
 
 export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
+  const { selectedRooms } = useContext(BookingContext);
   const [calendarRefs, setCalendarRefs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkedRoomIds, setCheckedRoomIds] = useState<string[]>([]);
   const [checkedRooms, setCheckedRooms] = useState<RoomSetting[]>([]);
   const [showMotionCaptureModal, setShowMotionCaptureModal] = useState(false);
   const [hasModalBeenShown, setHasModalBeenShown] = useState(false);
+  console.log('multiple calendar selectedRooms', selectedRooms);
+  console.log('checkedRooms', checkedRooms);
 
   const allRoomWithCalendarRefs = allRooms.map((room, i) => {
     room.calendarRef = React.createRef();
   });
+  useEffect(() => {
+    if (selectedRooms) {
+      setCheckedRoomIds(selectedRooms.map((room) => room.roomId));
+    }
+  }, [selectedRooms]);
 
   useEffect(() => {
     const refs = allRoomWithCalendarRefs;
@@ -29,10 +38,12 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
   }, [allRooms]);
 
   useEffect(() => {
-    const checked = allRooms.filter((room) =>
-      checkedRoomIds.includes(room.roomId)
-    );
-    setCheckedRooms(checked);
+    if (checkedRoomIds.length > 0) {
+      const checked = allRooms.filter((room) =>
+        checkedRoomIds.includes(room.roomId)
+      );
+      setCheckedRooms(checked);
+    }
   }, [checkedRoomIds]);
 
   //if (loading) {
@@ -114,6 +125,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
         </div>
       )}
       <SelectRooms
+        checkedRoomIds={checkedRoomIds}
         allRooms={allRooms}
         handleCheckboxChange={handleCheckboxChange}
       />

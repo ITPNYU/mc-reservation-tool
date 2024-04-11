@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { CalendarDatePicker } from './CalendarDatePicker';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomCalendar } from './RoomCalendar';
 import { RoomSetting } from '../../../../types';
 import { formatDate } from '../../../utils/date';
+import { BookingContext } from '../bookingProvider';
 
 type CalendarProps = {
   allRooms: RoomSetting[];
@@ -21,6 +22,22 @@ export const Calendars = ({
   handleSetDate,
 }: CalendarProps) => {
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
+
+  const {
+    bookingCalendarInfo,
+    selectedRooms: rooms,
+    setSelectedRooms,
+  } = useContext(BookingContext);
+  console.log('rooms', rooms);
+
+  useEffect(() => {
+    if (bookingCalendarInfo) {
+      setBookingTimeEvent(bookingCalendarInfo);
+    }
+    if (rooms) {
+      setSelectedRooms(rooms);
+    }
+  }, [bookingCalendarInfo, rooms]);
 
   const isOverlap = (info) => {
     return selectedRooms.some((room, i) => {
