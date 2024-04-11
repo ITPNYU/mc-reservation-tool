@@ -55,12 +55,10 @@ export const RoomCalendar = ({
     const startTime = new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
     }).format(eventInfo.event.start);
     const endTime = new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
     }).format(eventInfo.event.end);
 
     let backgroundColor = '';
@@ -82,10 +80,7 @@ export const RoomCalendar = ({
           width: '100%',
         }}
       >
-        <b>
-          {startTime} - {endTime}
-          {': '} {title}
-        </b>
+        <b>{title}</b>
       </div>
     );
   }
