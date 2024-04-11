@@ -568,18 +568,17 @@ const FormInput = ({ handleParentSubmit }) => {
               (For 220-224) Using DMX lights in ceiling grid
             </label>
           )}
-          {roomNumber.includes('202') ||
-            (roomNumber.includes('1201') && (
-              <label key={'support'}>
-                <input
-                  type="checkbox"
-                  value="(For 202 and 1201) Contact Campus Media for technical and event support"
-                  {...register('mediaServices')}
-                />
-                (For 202 and 1201) Contact Campus Media for technical and event
-                support
-              </label>
-            ))}
+          {roomNumber.some((room) => [202, 1201].includes(Number(room))) && (
+            <label key={'support'}>
+              <input
+                type="checkbox"
+                value="(For 202 and 1201) Contact Campus Media for technical and event support"
+                {...register('mediaServices')}
+              />
+              (For 202 and 1201) Contact Campus Media for technical and event
+              support
+            </label>
+          )}
         </div>
       </div>
       {watch('mediaServices') !== undefined &&
