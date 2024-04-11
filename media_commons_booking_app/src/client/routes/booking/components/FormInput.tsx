@@ -518,14 +518,18 @@ const FormInput = ({ handleParentSubmit }) => {
           <ErrorMessage errors={errors.mediaServices.message} />
         )}
         <div className="flex flex-col mb-4">
-          <label key={'checkoutEquipment'}>
-            <input
-              type="checkbox"
-              value="Checkout equipment"
-              {...register('mediaServices')}
-            />
-            Checkout equipment
-          </label>
+          {roomNumber.some((room) =>
+            [103, 220, 221, 222, 223, 224, 230, 233, 260].includes(Number(room))
+          ) && (
+            <label key={'checkoutEquipment'}>
+              <input
+                type="checkbox"
+                value="Checkout equipment"
+                {...register('mediaServices')}
+              />
+              Checkout equipment
+            </label>
+          )}
           {roomNumber.includes('103') && (
             <label key={'103audioTechnician'}>
               <input
@@ -575,8 +579,8 @@ const FormInput = ({ handleParentSubmit }) => {
                 value="(For 202 and 1201) Contact Campus Media for technical and event support"
                 {...register('mediaServices')}
               />
-              (For 202 and 1201) Contact Campus Media for technical and event
-              support
+              (For 202 and 1201) Contact Campus Media if you need to check out
+              equipment or need technical and/or event support.
             </label>
           )}
         </div>
