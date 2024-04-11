@@ -1,6 +1,11 @@
 import React from 'react';
 
-export const SelectRooms = ({ allRooms, handleCheckboxChange }) => {
+export const SelectRooms = ({
+  allRooms,
+  checkedRoomIds,
+  handleCheckboxChange,
+}) => {
+  console.log('checkedRoomIds', checkedRoomIds);
   return (
     <div className="flex space-x-4">
       {allRooms.map((room, i) => {
@@ -13,6 +18,7 @@ export const SelectRooms = ({ allRooms, handleCheckboxChange }) => {
               id={`checkbox${i}`}
               type="checkbox"
               onChange={handleCheckboxChange}
+              checked={checkedRoomIds.includes(room.roomId)}
               value={room.roomId}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />

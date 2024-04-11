@@ -3,7 +3,7 @@ import {
   CalendarEvent,
   RoomSetting,
 } from '../../../../types';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { DateSelectArg } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
@@ -12,6 +12,7 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import { serverFunctions } from '../../../utils/serverFunctions';
 import timeGridPlugin from '@fullcalendar/timegrid'; // a plugin!
+import { BookingContext } from '../bookingProvider';
 
 const TITLE_TAG = '[Click to Delete]';
 
@@ -23,6 +24,17 @@ interface Props {
   selectedRooms: RoomSetting[];
   setBookingTimeEvent: (x: DateSelectArg) => void;
 }
+
+export const addEventToCalendar = (room, selectInfo) => {
+  let calendarApi = room.calendarRef.current.getApi();
+  calendarApi.addEvent({
+    id: Date.now(), // Generate a unique ID for the event
+    start: selectInfo.startStr,
+    end: selectInfo.endStr,
+    title: `${TITLE_TAG}`,
+    groupId: selectInfo.startStr,
+  });
+};
 
 export const RoomCalendar = ({
   room,
@@ -46,6 +58,14 @@ export const RoomCalendar = ({
         : room.calendarIdDev
     );
   }, []);
+
+  useEffect(() => {
+    selectedRooms.map((room) => {
+      if (!room.calendarRef.current) return;
+      if (!bookingTimeEvent) return;
+      addEventToCalendar(room, bookingTimeEvent);
+    });
+  }, [selectedRooms]);
 
   const fetchCalendarEvents = async (calendarId) => {
     serverFunctions.getCalendarEvents(calendarId).then((rows) => {
@@ -80,15 +100,10 @@ export const RoomCalendar = ({
     }
     allRooms.map((room) => {
       console.log('handle datae select room', room);
+      console.log('room.calendarRef.current)', room.calendarRef.current);
+      console.log('selectInfo', selectInfo);
       if (!room.calendarRef.current) return;
-      let calendarApi = room.calendarRef.current.getApi();
-      calendarApi.addEvent({
-        id: Date.now(), // Generate a unique ID for the event
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        title: `${TITLE_TAG}`,
-        groupId: selectInfo.startStr,
-      });
+      addEventToCalendar(room, selectInfo);
     });
     setBookingTimeEvent(selectInfo);
   };
