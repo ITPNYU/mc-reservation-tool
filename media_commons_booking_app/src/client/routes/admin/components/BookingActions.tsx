@@ -104,7 +104,7 @@ export default function BookingActions({
     status === BookingStatusLabel.CANCELED ||
     status === BookingStatusLabel.REJECTED
   ) {
-    return <p></p>;
+    return <td />;
   }
 
   return (

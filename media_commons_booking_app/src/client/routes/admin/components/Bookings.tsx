@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 
 import { BookingStatusLabel } from '../../../../types';
 import BookingTableRow from './BookingTableRow';
@@ -22,7 +22,18 @@ export const Bookings: React.FC<BookingsProps> = ({
   isPaView = false,
   isUserView = false,
 }) => {
-  const { bookings, bookingStatuses, userEmail } = useContext(DatabaseContext);
+  const {
+    bookings,
+    bookingStatuses,
+    userEmail,
+    reloadBookings,
+    reloadBookingStatuses,
+  } = useContext(DatabaseContext);
+
+  useEffect(() => {
+    reloadBookingStatuses();
+    reloadBookings();
+  }, []);
 
   const filteredBookings = useMemo(() => {
     const paViewStatuses = [
