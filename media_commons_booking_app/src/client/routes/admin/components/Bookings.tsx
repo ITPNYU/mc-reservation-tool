@@ -56,7 +56,7 @@ export const Bookings: React.FC<BookingsProps> = ({
         <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              {!isUserView && TableHeader('Action')}
+              {TableHeader('Action')}
               {TableHeader('Status')}
               {TableHeader('Room ID')}
               {TableHeader('Contact')}
