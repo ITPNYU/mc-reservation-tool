@@ -45,7 +45,7 @@ export function BookingProvider({ children }) {
   const [bookingCalendarInfo, setBookingCalendarInfo] =
     useState<DateSelectArg>();
   const [department, setDepartment] = useState<Department>();
-  const [isSafetyTrained, setIsSafetyTrained] = useState(true);
+  const [isSafetyTrained, setIsSafetyTrained] = useState(false);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
 
@@ -55,10 +55,6 @@ export function BookingProvider({ children }) {
       .map((bannedUser) => bannedUser.email)
       .includes(userEmail);
   }, [userEmail, bannedUsers]);
-
-  useEffect(() => {
-    fetchIsSafetyTrained();
-  }, []);
 
   const fetchIsSafetyTrained = useCallback(async () => {
     if (!userEmail) return;
@@ -73,6 +69,10 @@ export function BookingProvider({ children }) {
     }
     setIsSafetyTrained(isTrained);
   }, [userEmail, safetyTrainedUsers]);
+
+  useEffect(() => {
+    fetchIsSafetyTrained();
+  }, [fetchIsSafetyTrained]);
 
   return (
     <BookingContext.Provider
