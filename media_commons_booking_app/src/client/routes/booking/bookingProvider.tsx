@@ -45,7 +45,7 @@ export function BookingProvider({ children }) {
   const [bookingCalendarInfo, setBookingCalendarInfo] =
     useState<DateSelectArg>();
   const [department, setDepartment] = useState<Department>();
-  const [isSafetyTrained, setIsSafetyTrained] = useState(false);
+  const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
 
