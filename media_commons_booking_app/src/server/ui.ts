@@ -15,6 +15,28 @@ export const rejectUrl = (calendarEventId: string) => {
   return `${url}?action=reject&page=admin&calendarEventId=${calendarEventId}`;
 };
 
+export const getActiveUserName = (email: string) => {
+  var accountId = email.split('@')[0];
+  console.log('accountId', accountId);
+  // const api = 'https://www.googleapis.com/oauth2/v2/userinfo';
+  // var api =
+  //   'https://people.googleapis.com/v1/people:get?personFields=names&resourceName=people/' +
+  //   encodeURIComponent('email:' + email);
+  // var options = {
+  //   method: 'GET',
+  //   headers: {
+  //     Authorization: 'Bearer ' + ScriptApp.getOAuthToken(),
+  //   },
+  // };
+  // var response = UrlFetchApp.fetch(api, options);
+  const people = People.People.get('people/' + accountId, {
+    personFields: 'names,emailAddresses,nicknames,photos',
+  });
+
+  // var userInfo = JSON.parse(response.getContentText());
+  return people;
+};
+
 export const getActiveUserEmail = () => {
   const user = Session.getActiveUser();
   // user.getUsername() isn't a function
