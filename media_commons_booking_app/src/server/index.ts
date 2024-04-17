@@ -14,6 +14,7 @@ import {
   approvalUrl,
   doGet,
   getActiveUserEmail,
+  getActiveUserName,
   rejectUrl,
   scriptURL,
 } from './ui';
@@ -50,6 +51,7 @@ export {
   rejectUrl,
   doGet,
   getActiveUserEmail,
+  getActiveUserName,
 
   // email
   sendHTMLEmail,

@@ -9,7 +9,13 @@ import {
   RoomSetting,
   SafetyTraining,
 } from '../../../types';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { TableNames, getLiaisonTableName } from '../../../policy';
 
 import { serverFunctions } from '../../utils/serverFunctions';
@@ -109,6 +115,16 @@ export const DatabaseProvider = ({ children }) => {
       setUserEmail(response);
     });
   };
+
+  useEffect(() => {
+    if (!userEmail || userEmail.length === 0) return;
+    serverFunctions.getActiveUserName(userEmail).then((response) => {
+      console.log('user name:', response);
+    });
+  }, [userEmail]);
+  // const fetchActiveUserName = (() => {
+
+  // }, [userEmail]);
 
   const fetchBookings = async () => {
     console.log('CURRENT BRANCH:', process.env.BRANCH_NAME);
