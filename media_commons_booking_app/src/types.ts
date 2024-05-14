@@ -111,6 +111,8 @@ export enum PagePermission {
   PA,
 }
 
+export type ReservationType = string;
+
 export enum Role {
   STUDENT = 'Student',
   RESIDENT_FELLOW = 'Resident/Fellow',
@@ -130,4 +132,8 @@ export type RoomSetting = {
 export type SafetyTraining = {
   email: string;
   completedAt: string;
+};
+
+export type Settings = {
+  reservationTypes: ReservationType[];
 };
