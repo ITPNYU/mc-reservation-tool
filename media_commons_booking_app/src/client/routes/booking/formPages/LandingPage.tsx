@@ -1,3 +1,4 @@
+import Button from '@mui/material/Button';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,7 +37,7 @@ export default function LandingPage() {
             request within 48 hours, you can contact the Media Commons Team (
             <a
               href="mailto:mediacommons.reservations@nyu.edu"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
+              // className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
             >
               mediacommons.reservations@nyu.edu
             </a>
@@ -47,7 +48,7 @@ export default function LandingPage() {
             Media Commons Team(
             <a
               href="mailto:mediacommons.reservations@nyu.edu"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
+              // className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
             >
               mediacommons.reservations@nyu.edu
             </a>
@@ -56,28 +57,30 @@ export default function LandingPage() {
             <br />
             <a
               href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
+              // className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
               target="_blank"
             >
               Media Commons Policy
             </a>
             <a
               href="https://docs.google.com/document/d/1TIOl8f8-7o2BdjHxHYIYELSb4oc8QZMj1aSfaENWjR8/edit#heading=h.ns3jisyhutvq"
-              className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
+              // className="font-medium text-blue-600 underline dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:no-underline"
               target="_blank"
             >
               Pre-Event Checklist
             </a>
           </p>
           <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-            <button
-              data-modal-hide="staticModal"
-              type="button"
+            <Button
+              variant="contained"
+              // color="primary"
+              // data-modal-hide="staticModal"
+              // type="button"
               onClick={handleClick}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              // className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               I accept
-            </button>
+            </Button>
           </div>
         </div>
       </div>
