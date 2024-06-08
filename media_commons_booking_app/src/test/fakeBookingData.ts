@@ -1,6 +1,6 @@
-import { Booking, BookingStatus } from '../../types';
+import { Booking, BookingStatus } from '../types';
 
-import { formatDate } from './date';
+import { formatDate } from '../client/utils/date';
 
 function genFakeBookingRow(
   calendarEventId: string,
@@ -47,7 +47,8 @@ function genFakeBookingRow(
 
 function genFakeBookingStatusRow(
   calendarEventId: string,
-  email: string
+  email: string,
+  fakeData?: any
 ): BookingStatus {
   return {
     calendarEventId,
@@ -59,6 +60,7 @@ function genFakeBookingStatusRow(
     canceledAt: '',
     checkedInAt: '',
     noShowedAt: '',
+    ...fakeData,
   };
 }
 
@@ -70,7 +72,11 @@ function generateUUID() {
   });
 }
 
-export function addFakeBookingData(n: number, fakeData?: any) {
+export function addFakeBookingData(
+  n: number,
+  fakeData: any,
+  fakeBookingStatusData: any
+) {
   let calendarEventId;
   const email = 'media-commons-devs@itp.nyu.edu';
   const bookingRows = [];
@@ -79,7 +85,9 @@ export function addFakeBookingData(n: number, fakeData?: any) {
   for (let i = 0; i < n; i++) {
     calendarEventId = generateUUID();
     bookingRows.push(genFakeBookingRow(calendarEventId, email, fakeData));
-    bookingStatusRows.push(genFakeBookingStatusRow(calendarEventId, email));
+    bookingStatusRows.push(
+      genFakeBookingStatusRow(calendarEventId, email, fakeBookingStatusData)
+    );
   }
 
   return { bookingRows, bookingStatusRows };

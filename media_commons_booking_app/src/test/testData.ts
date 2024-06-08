@@ -1,6 +1,7 @@
 import { Options } from 'yargs';
 import { addFakeBookingData } from './fakeBookingData';
 import axios from 'axios';
+import { formatDate } from '../client/utils/date';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 
@@ -15,6 +16,7 @@ if (isNaN(n)) {
 }
 
 let fakeData = {};
+let fakeBookingStatusData = {};
 
 const options: Record<string, Options> = {
   calendarEventId: { type: 'string' },
@@ -49,24 +51,56 @@ const options: Record<string, Options> = {
   chartFieldForSecurity: { type: 'string' },
   chartFieldForRoomSetup: { type: 'string' },
   devBranch: { type: 'string' },
+  status: { type: 'string' },
 };
 
 const argv = yargs(hideBin(process.argv))
   .options(options)
   .parserConfiguration({ 'camel-case-expansion': false }).argv;
 
+const handleStatus = (status: string) => {
+  const date = formatDate(new Date());
+  switch (status) {
+    case 'secondApproved':
+      fakeBookingStatusData['secondApprovedAt'] = date;
+    case 'firstApproved':
+      fakeBookingStatusData['firstApprovedAt'] = date;
+      return;
+    case 'rejected':
+      fakeBookingStatusData['rejectedAt'] = date;
+      return;
+    case 'canceled':
+      fakeBookingStatusData['canceledAt'] = date;
+      return;
+    case 'checkedIn':
+      fakeBookingStatusData['checkedInAt'] = date;
+      return;
+    case 'noShow':
+      fakeBookingStatusData['noShowedAt'] = date;
+  }
+};
+
 Object.keys(argv).forEach((key) => {
-  if (key !== '_' && key !== '$0' && argv[key] !== undefined) {
+  if (key === 'status') {
+    handleStatus(argv[key] as string);
+  }
+  if (
+    key != 'status' &&
+    key !== '_' &&
+    key !== '$0' &&
+    argv[key] !== undefined
+  ) {
     fakeData[key] = argv[key];
   }
 });
 
-const data = addFakeBookingData(n, fakeData);
+const data = addFakeBookingData(n, fakeData, fakeBookingStatusData);
 axios
   .post(SERVER_URL, data)
   .then((response) => console.log(response.data))
   .catch((error) => console.error(error));
 
 // Usage:
-// start test server: cd test && npm run start
+// cd src/test
+// start test server: npm run start
 // npx tsx testData [number] [any args]
