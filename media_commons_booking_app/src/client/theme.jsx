@@ -9,6 +9,10 @@ const theme = createTheme({
     secondary: {
       main: deepPurple.A100,
     },
+    custom: {
+      gray: 'rgba(33, 33, 33, 0.08)',
+      border: 'rgba(0,0,0,0.12)',
+    },
   },
   components: {
     MuiCssBaseline: {

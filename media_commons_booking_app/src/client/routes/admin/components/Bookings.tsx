@@ -1,9 +1,17 @@
 import React, { useContext, useEffect, useMemo } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 
 import { BookingStatusLabel } from '../../../../types';
 import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../../components/Provider';
 import getBookingStatus from '../hooks/getBookingStatus';
+import { styled } from '@mui/system';
 
 interface BookingsProps {
   isAdminView?: boolean;
@@ -11,11 +19,13 @@ interface BookingsProps {
   isUserView?: boolean;
 }
 
-const TableHeader = (text: string) => (
-  <th scope="col" className="px-2 py-3 align-bottom">
-    {text}
-  </th>
-);
+const TableCustom = styled(Table)(({ theme }) => ({
+  border: `1px solid ${theme.palette.custom.border}`,
+}));
+
+const ShadedHeader = styled(TableHead)(({ theme }) => ({
+  backgroundColor: theme.palette.custom.gray,
+}));
 
 export const Bookings: React.FC<BookingsProps> = ({
   isAdminView = false,
@@ -51,49 +61,75 @@ export const Bookings: React.FC<BookingsProps> = ({
   }, [isUserView, bookings]);
 
   return (
-    <div className="m-10">
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              {TableHeader('Action')}
-              {TableHeader('Status')}
-              {TableHeader('Room ID')}
-              {TableHeader('Contact')}
-              {TableHeader('Booking Start')}
-              {TableHeader('Booking End')}
-              {TableHeader('Secondary Name')}
-              {isAdminView && TableHeader('N Number')}
-              {TableHeader('Net ID')}
-              {TableHeader('Department')}
-              {TableHeader('Role')}
-              {TableHeader('Sponsor Name')}
-              {TableHeader('Sponsor Email')}
-              {TableHeader('Title')}
-              {TableHeader('Description')}
-              {TableHeader('Type')}
-              {TableHeader('Expected Attendees')}
-              {TableHeader('Attendee Affiliation')}
-              {TableHeader('Setup')}
-              {TableHeader('Chartfield Info for Room Setup')}
-              {TableHeader('Media Service')}
-              {TableHeader('Catering')}
-              {TableHeader('Catering Service')}
-              {TableHeader('Chartfield Info for Catering')}
-              {TableHeader('Security')}
-              {TableHeader('Chartfield Info for Security')}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBookings.map((booking, index) => (
-              <BookingTableRow
-                key={index}
-                {...{ booking, isAdminView, isUserView }}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <TableCustom>
+      <ShadedHeader>
+        <TableRow>
+          <TableCell>Status</TableCell>
+          <TableCell>Room</TableCell>
+          <TableCell>Department/Role</TableCell>
+          <TableCell>ID</TableCell>
+          <TableCell>Contacts</TableCell>
+          <TableCell>Dates</TableCell>
+          <TableCell>Title</TableCell>
+          <TableCell>Other Info</TableCell>
+          <TableCell>Action</TableCell>
+        </TableRow>
+      </ShadedHeader>
+      <TableBody>
+        {filteredBookings.map((booking, index) => (
+          <BookingTableRow
+            key={index}
+            {...{ booking, isAdminView, isUserView }}
+          />
+        ))}
+      </TableBody>
+    </TableCustom>
   );
+
+  // return (
+  //   <div className="m-10">
+  //     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+  //       <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">
+  //         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+  //           <tr>
+  //             {TableHeader('Action')}
+  //             {TableHeader('Status')}
+  //             {TableHeader('Room ID')}
+  //             {TableHeader('Contact')}
+  //             {TableHeader('Booking Start')}
+  //             {TableHeader('Booking End')}
+  //             {TableHeader('Secondary Name')}
+  //             {isAdminView && TableHeader('N Number')}
+  //             {TableHeader('Net ID')}
+  //             {TableHeader('Department')}
+  //             {TableHeader('Role')}
+  //             {TableHeader('Sponsor Name')}
+  //             {TableHeader('Sponsor Email')}
+  //             {TableHeader('Title')}
+  //             {TableHeader('Description')}
+  //             {TableHeader('Type')}
+  //             {TableHeader('Expected Attendees')}
+  //             {TableHeader('Attendee Affiliation')}
+  //             {TableHeader('Setup')}
+  //             {TableHeader('Chartfield Info for Room Setup')}
+  //             {TableHeader('Media Service')}
+  //             {TableHeader('Catering')}
+  //             {TableHeader('Catering Service')}
+  //             {TableHeader('Chartfield Info for Catering')}
+  //             {TableHeader('Security')}
+  //             {TableHeader('Chartfield Info for Security')}
+  //           </tr>
+  //         </thead>
+  //         <tbody>
+  //           {filteredBookings.map((booking, index) => (
+  //             <BookingTableRow
+  //               key={index}
+  //               {...{ booking, isAdminView, isUserView }}
+  //             />
+  //           ))}
+  //         </tbody>
+  //       </table>
+  //     </div>
+  //   </div>
+  // );
 };
