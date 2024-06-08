@@ -15,6 +15,7 @@ import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { TableNames, getLiaisonTableName } from '../../../policy';
 
 import { serverFunctions } from '../../utils/serverFunctions';
+import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -87,6 +88,8 @@ export const DatabaseProvider = ({ children }) => {
     else return PagePermission.BOOKING;
   }, [userEmail, adminUsers, paUsers]);
 
+  useFakeDataLocalStorage(setBookings, setBookingStatuses);
+
   useEffect(() => {
     // fetch most important tables first - determine page permissions
     Promise.all([
@@ -105,7 +108,6 @@ export const DatabaseProvider = ({ children }) => {
 
     // refresh booking data every 10s;
     setInterval(() => {
-      console.log('UPDATING');
       fetchBookings();
       fetchBookingStatuses();
     }, 10000);
@@ -113,13 +115,11 @@ export const DatabaseProvider = ({ children }) => {
 
   const fetchActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail:', response);
       setUserEmail(response);
     });
   };
 
   const fetchBookings = async () => {
-    console.log('CURRENT BRANCH:', process.env.BRANCH_NAME);
     const bookingRows = await serverFunctions
       .getActiveBookingsFutureDates()
       .then((rows) => {
@@ -127,14 +127,26 @@ export const DatabaseProvider = ({ children }) => {
           return booking.devBranch === process.env.BRANCH_NAME;
         });
       });
-    setBookings(bookingRows);
+    setBookings((prev) => {
+      const existingIds = prev.map((row) => row.calendarEventId);
+      const toAdd = bookingRows.filter(
+        (row) => !existingIds.includes(row.calendarEventId)
+      );
+      return [...toAdd, ...prev];
+    });
   };
 
   const fetchBookingStatuses = async () => {
     const bookingStatusRows = await serverFunctions
       .getAllActiveSheetRows(TableNames.BOOKING_STATUS)
       .then((rows) => JSON.parse(rows) as BookingStatus[]);
-    setBookingStatuses(bookingStatusRows);
+    setBookingStatuses((prev) => {
+      const existingIds = prev.map((row) => row.calendarEventId);
+      const toAdd = bookingStatusRows.filter(
+        (row) => !existingIds.includes(row.calendarEventId)
+      );
+      return [...toAdd, ...prev];
+    });
   };
 
   const fetchAdminUsers = async () => {

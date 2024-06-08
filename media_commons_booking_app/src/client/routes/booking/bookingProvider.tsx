@@ -11,7 +11,6 @@ import React, {
 import { DatabaseContext } from '../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import { serverFunctions } from '../../utils/serverFunctions';
-import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
@@ -49,8 +48,6 @@ export function BookingProvider({ children }) {
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
-
-  useFakeDataLocalStorage();
 
   const isBanned = useMemo<boolean>(() => {
     console.log('userEmail', userEmail);

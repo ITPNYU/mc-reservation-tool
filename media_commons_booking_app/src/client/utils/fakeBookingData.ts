@@ -71,12 +71,13 @@ function generateUUID() {
 }
 
 export function addFakeBookingData(n: number, fakeData?: any) {
-  const calendarEventId = generateUUID();
+  let calendarEventId;
   const email = 'media-commons-devs@itp.nyu.edu';
   const bookingRows = [];
   const bookingStatusRows = [];
 
   for (let i = 0; i < n; i++) {
+    calendarEventId = generateUUID();
     bookingRows.push(genFakeBookingRow(calendarEventId, email, fakeData));
     bookingStatusRows.push(genFakeBookingStatusRow(calendarEventId, email));
   }
