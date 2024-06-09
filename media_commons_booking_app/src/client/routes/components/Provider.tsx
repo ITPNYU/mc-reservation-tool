@@ -17,6 +17,10 @@ import { TableNames, getLiaisonTableName } from '../../../policy';
 import { serverFunctions } from '../../utils/serverFunctions';
 import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 
+type WithId = {
+  calendarEventId: string;
+};
+
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
   bannedUsers: Ban[];
@@ -119,6 +123,29 @@ export const DatabaseProvider = ({ children }) => {
     });
   };
 
+  const updateOrAddRows = <T extends WithId>(state: T[], newRows: T[]): T[] => {
+    const updatedState = [...state];
+
+    newRows.forEach((newRow) => {
+      const existingRowIndex = updatedState.findIndex(
+        (row) => row.calendarEventId === newRow.calendarEventId
+      );
+
+      if (existingRowIndex !== -1) {
+        // If the row exists, update its content
+        updatedState[existingRowIndex] = {
+          ...updatedState[existingRowIndex],
+          ...newRow,
+        };
+      } else {
+        // Otherwise just add new row
+        updatedState.push(newRow);
+      }
+    });
+
+    return updatedState;
+  };
+
   const fetchBookings = async () => {
     const bookingRows = await serverFunctions
       .getActiveBookingsFutureDates()
@@ -127,26 +154,28 @@ export const DatabaseProvider = ({ children }) => {
           return booking.devBranch === process.env.BRANCH_NAME;
         });
       });
-    setBookings((prev) => {
-      const existingIds = prev.map((row) => row.calendarEventId);
-      const toAdd = bookingRows.filter(
-        (row) => !existingIds.includes(row.calendarEventId)
-      );
-      return [...toAdd, ...prev];
-    });
+    setBookings((prev) => updateOrAddRows(prev, bookingRows));
+    // setBookings((prev) => {
+    //   const existingIds = prev.map((row) => row.calendarEventId);
+    //   const toAdd = bookingRows.filter(
+    //     (row) => !existingIds.includes(row.calendarEventId)
+    //   );
+    //   return [...toAdd, ...prev];
+    // });
   };
 
   const fetchBookingStatuses = async () => {
     const bookingStatusRows = await serverFunctions
       .getAllActiveSheetRows(TableNames.BOOKING_STATUS)
       .then((rows) => JSON.parse(rows) as BookingStatus[]);
-    setBookingStatuses((prev) => {
-      const existingIds = prev.map((row) => row.calendarEventId);
-      const toAdd = bookingStatusRows.filter(
-        (row) => !existingIds.includes(row.calendarEventId)
-      );
-      return [...toAdd, ...prev];
-    });
+    setBookingStatuses((prev) => updateOrAddRows(prev, bookingStatusRows));
+    // setBookingStatuses((prev) => {
+    //   const existingIds = prev.map((row) => row.calendarEventId);
+    //   const toAdd = bookingStatusRows.filter(
+    //     (row) => !existingIds.includes(row.calendarEventId)
+    //   );
+    //   return [...toAdd, ...prev];
+    // });
   };
 
   const fetchAdminUsers = async () => {
