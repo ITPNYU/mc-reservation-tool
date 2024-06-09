@@ -15,6 +15,22 @@ interface Props {
   status: BookingStatusLabel;
 }
 
+enum Actions {
+  CANCEL = 'Cancel',
+  NO_SHOW = 'No Show',
+  CHECK_IN = 'Check In',
+  FIRST_APPROVE = '1st Approve',
+  SECOND_APPROVE = '2nd Approve',
+  REJECT = 'Reject',
+  PLACEHOLDER = '',
+}
+
+type ActionDefinition = {
+  action: () => Promise<void>;
+  optimisticNextStatus: BookingStatusLabel;
+  confirmation?: boolean;
+};
+
 export default function BookingActions({
   status,
   calendarEventId,
@@ -23,7 +39,9 @@ export default function BookingActions({
   setOptimisticStatus,
 }: Props) {
   const [uiLoading, setUiLoading] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(null);
+  const [selectedAction, setSelectedAction] = useState<Actions>(
+    Actions.PLACEHOLDER
+  );
   const { reloadBookings, reloadBookingStatuses } = useContext(DatabaseContext);
 
   const reload = async () => {
@@ -32,11 +50,11 @@ export default function BookingActions({
 
   const onError = () => alert('Failed to perform action on booking');
 
-  const doAction = async (
-    action: () => Promise<void>,
-    optimisticNextStatus: BookingStatusLabel,
-    confirmation?: boolean
-  ) => {
+  const doAction = async ({
+    action,
+    optimisticNextStatus,
+    confirmation,
+  }: ActionDefinition) => {
     if (confirmation) {
       const result = confirm(`Are you sure? This action can't be undone.`);
       if (!result) {
@@ -56,6 +74,7 @@ export default function BookingActions({
       console.error(ex);
       onError();
     } finally {
+      setSelectedAction(Actions.PLACEHOLDER);
       setUiLoading(false);
     }
   };
@@ -68,41 +87,55 @@ export default function BookingActions({
     );
   }
 
+  const actions: { [key in Actions]: ActionDefinition } = {
+    [Actions.CANCEL]: {
+      action: () => serverFunctions.cancel(calendarEventId),
+      optimisticNextStatus: BookingStatusLabel.CANCELED,
+      confirmation: true,
+    },
+    [Actions.NO_SHOW]: {
+      action: () => serverFunctions.noShow(calendarEventId),
+      optimisticNextStatus: BookingStatusLabel.NO_SHOW,
+    },
+    [Actions.CHECK_IN]: {
+      action: () => serverFunctions.checkin(calendarEventId),
+      optimisticNextStatus: BookingStatusLabel.CHECKED_IN,
+    },
+    [Actions.FIRST_APPROVE]: {
+      action: () => serverFunctions.approveBooking(calendarEventId),
+      optimisticNextStatus: BookingStatusLabel.PRE_APPROVED,
+    },
+    [Actions.SECOND_APPROVE]: {
+      action: () => serverFunctions.approveBooking(calendarEventId),
+      optimisticNextStatus: BookingStatusLabel.APPROVED,
+    },
+    [Actions.REJECT]: {
+      action: () => serverFunctions.reject(calendarEventId),
+      optimisticNextStatus: BookingStatusLabel.REJECTED,
+      confirmation: true,
+    },
+    // never used, just make typescript happy
+    [Actions.PLACEHOLDER]: {
+      action: async () => {},
+      optimisticNextStatus: BookingStatusLabel.UNKNOWN,
+    },
+  };
+
   const userOptions = useMemo(
-    () =>
-      status === BookingStatusLabel.CANCELED
-        ? []
-        : [
-            {
-              label: 'Cancel',
-              action: () => serverFunctions.cancel(calendarEventId),
-              optimisticNextStatus: BookingStatusLabel.CANCELED,
-              confirmation: true,
-            },
-          ],
+    () => (status === BookingStatusLabel.CANCELED ? [] : [Actions.CANCEL]),
     [status]
   );
 
   const paOptions = useMemo(() => {
     let options = [];
-    const checkIn = {
-      label: 'Check In',
-      action: () => serverFunctions.checkin(calendarEventId),
-      optimisticNextStatus: BookingStatusLabel.CHECKED_IN,
-    };
-    const noShow = {
-      label: 'No Show',
-      action: () => serverFunctions.noShow(calendarEventId),
-      optimisticNextStatus: BookingStatusLabel.NO_SHOW,
-    };
 
     if (status === BookingStatusLabel.APPROVED) {
-      options.push(checkIn);
-      options.push(noShow);
+      options.push(Actions.CHECK_IN);
+      options.push(Actions.NO_SHOW);
     } else if (status === BookingStatusLabel.CHECKED_IN) {
-      options.push(noShow);
+      options.push(Actions.NO_SHOW);
     } else if (status === BookingStatusLabel.NO_SHOW) {
-      options.push(checkIn);
+      options.push(Actions.CHECK_IN);
     }
     return options;
   }, [status]);
@@ -117,27 +150,13 @@ export default function BookingActions({
 
     let options = [];
     if (status === BookingStatusLabel.REQUESTED) {
-      options.push({
-        label: '1st Approve',
-        action: () => serverFunctions.approveBooking(calendarEventId),
-        optimisticNextStatus: BookingStatusLabel.PRE_APPROVED,
-      });
+      options.push(Actions.FIRST_APPROVE);
     } else if (status === BookingStatusLabel.PRE_APPROVED) {
-      options.push({
-        label: '2nd Approve',
-        action: () => serverFunctions.approveBooking(calendarEventId),
-        optimisticNextStatus: BookingStatusLabel.APPROVED,
-      });
+      options.push(Actions.SECOND_APPROVE);
     }
 
     options = options.concat(paOptions);
-    options.push({
-      label: 'Reject',
-      action: () => serverFunctions.reject(calendarEventId),
-      optimisticNextStatus: BookingStatusLabel.REJECTED,
-      confirmation: true,
-    });
-
+    options.push(Actions.REJECT);
     return options;
   }, [status, paOptions]);
 
@@ -146,6 +165,10 @@ export default function BookingActions({
     if (isAdminView) return adminOptions;
     return paOptions;
   };
+
+  if (options().length === 0) {
+    return <></>;
+  }
 
   return (
     <div
@@ -157,41 +180,36 @@ export default function BookingActions({
       }}
     >
       <Select
-        value={selectedValue}
+        value={selectedAction}
         size="small"
         displayEmpty
-        onChange={(e) => setSelectedValue(e.target.value)}
+        onChange={(e) => setSelectedAction(e.target.value as Actions)}
         renderValue={(selected) => {
-          if (selected === null) {
-            return (
-              <span style={{ color: 'gray' }}>
-                <em>Action</em>
-              </span>
-            );
+          if (selected === Actions.PLACEHOLDER) {
+            return <em style={{ color: 'gray' }}>Action</em>;
           }
-
           return selected;
         }}
         sx={{
           width: 125,
         }}
       >
-        <MenuItem value={null} sx={{ color: 'gray' }}>
+        <MenuItem value={Actions.PLACEHOLDER} sx={{ color: 'gray' }}>
           <em>Action</em>
         </MenuItem>
-        {options().map(({ label }) => (
-          <MenuItem value={label}>{label}</MenuItem>
+        {options().map((action) => (
+          <MenuItem value={action} key={action}>
+            {action}
+          </MenuItem>
         ))}
       </Select>
       <IconButton
-        disabled={selectedValue === null}
+        disabled={selectedAction === Actions.PLACEHOLDER}
+        color={'primary'}
         onClick={() => {
-          console.log(selectedValue);
-          // doAction(
-          //   selectedValue.action,
-          //   selectedValue.optimisticNextStatus,
-          //   selectedValue.confirmation
-          // )
+          console.log(selectedAction);
+          const actionDetails = actions[selectedAction];
+          doAction(actionDetails);
         }}
       >
         <Check />
