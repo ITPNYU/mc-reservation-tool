@@ -319,6 +319,9 @@ const devServer = {
   hot: true,
   port: PORT,
   server: 'https',
+  client: {
+    logging: 'warn',
+  },
 };
 
 if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
