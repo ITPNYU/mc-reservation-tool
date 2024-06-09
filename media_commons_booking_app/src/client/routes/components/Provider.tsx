@@ -155,13 +155,6 @@ export const DatabaseProvider = ({ children }) => {
         });
       });
     setBookings((prev) => updateOrAddRows(prev, bookingRows));
-    // setBookings((prev) => {
-    //   const existingIds = prev.map((row) => row.calendarEventId);
-    //   const toAdd = bookingRows.filter(
-    //     (row) => !existingIds.includes(row.calendarEventId)
-    //   );
-    //   return [...toAdd, ...prev];
-    // });
   };
 
   const fetchBookingStatuses = async () => {
@@ -169,13 +162,6 @@ export const DatabaseProvider = ({ children }) => {
       .getAllActiveSheetRows(TableNames.BOOKING_STATUS)
       .then((rows) => JSON.parse(rows) as BookingStatus[]);
     setBookingStatuses((prev) => updateOrAddRows(prev, bookingStatusRows));
-    // setBookingStatuses((prev) => {
-    //   const existingIds = prev.map((row) => row.calendarEventId);
-    //   const toAdd = bookingStatusRows.filter(
-    //     (row) => !existingIds.includes(row.calendarEventId)
-    //   );
-    //   return [...toAdd, ...prev];
-    // });
   };
 
   const fetchAdminUsers = async () => {
