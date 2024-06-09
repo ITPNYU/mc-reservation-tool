@@ -1,19 +1,22 @@
 import { Booking, BookingStatus } from '../types';
 
-import { formatDate } from '../client/utils/date';
-
 function genFakeBookingRow(
   calendarEventId: string,
   email: string,
   fakeData?: any
 ): Booking {
   const today = new Date();
+  today.setMinutes(0); // show a nice time
+  const endTime = new Date();
+  endTime.setHours(today.getHours() + 4);
+  endTime.setMinutes(0);
+
   return {
     calendarEventId,
     roomId: '224',
     email,
-    startDate: formatDate(today),
-    endDate: formatDate(new Date().setDate(today.getDate() + 1)),
+    startDate: today,
+    endDate: endTime,
     firstName: 'Grace',
     lastName: 'Hopper',
     secondaryName: '',
@@ -53,7 +56,7 @@ function genFakeBookingStatusRow(
   return {
     calendarEventId,
     email,
-    requestedAt: formatDate(new Date()),
+    requestedAt: new Date(),
     firstApprovedAt: '',
     secondApprovedAt: '',
     rejectedAt: '',

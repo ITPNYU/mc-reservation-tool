@@ -24,6 +24,10 @@ const theme = createTheme({
             textDecoration: 'underline',
           },
         },
+
+        table: {
+          border: '1px solid rgba(0,0,0,0.12)',
+        },
       },
     },
   },

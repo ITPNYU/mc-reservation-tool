@@ -1,7 +1,6 @@
 import { Options } from 'yargs';
 import { addFakeBookingData } from './fakeBookingData';
 import axios from 'axios';
-import { formatDate } from '../client/utils/date';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 
@@ -59,7 +58,7 @@ const argv = yargs(hideBin(process.argv))
   .parserConfiguration({ 'camel-case-expansion': false }).argv;
 
 const handleStatus = (status: string) => {
-  const date = formatDate(new Date());
+  const date = new Date();
   switch (status) {
     case 'secondApproved':
       fakeBookingStatusData['secondApprovedAt'] = date;

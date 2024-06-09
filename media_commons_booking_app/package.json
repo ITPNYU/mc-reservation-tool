@@ -47,6 +47,7 @@
     "@fullcalendar/react": "^6.1.8",
     "@fullcalendar/resource-timeline": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.8",
+    "@mui/icons-material": "^5.15.19",
     "@mui/material": "^5.15.19",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
