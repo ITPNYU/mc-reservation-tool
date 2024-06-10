@@ -1,16 +1,15 @@
+import { Booking, BookingStatusLabel } from '../../../../types';
 import {
   Box,
-  Modal,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { BookingStatusLabel } from '../../../../types';
+import BookingTableFilters from './BookingTableFilters';
 import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../../components/Provider';
 import MoreInfoModal from './MoreInfoModal';
@@ -45,29 +44,52 @@ export const Bookings: React.FC<BookingsProps> = ({
   } = useContext(DatabaseContext);
 
   const [modalData, setModalData] = useState(null);
+  const [statusFilters, setStatusFilters] = useState([]);
 
   useEffect(() => {
     reloadBookingStatuses();
     reloadBookings();
   }, []);
 
-  const filteredBookings = useMemo(() => {
+  const allowedStatuses: BookingStatusLabel[] = useMemo(() => {
     const paViewStatuses = [
       BookingStatusLabel.APPROVED,
       BookingStatusLabel.CHECKED_IN,
       BookingStatusLabel.NO_SHOW,
     ];
+    if (isPaView) {
+      return paViewStatuses;
+    } else {
+      return Object.values(BookingStatusLabel);
+    }
+  }, [isUserView, isPaView]);
+
+  const filteredBookings = useMemo(() => {
+    let filtered: Booking[];
     if (isUserView)
-      return bookings.filter((booking) => booking.email === userEmail);
-    if (isPaView)
-      return bookings.filter((booking) =>
-        paViewStatuses.includes(getBookingStatus(booking, bookingStatuses))
+      filtered = bookings.filter((booking) => booking.email === userEmail);
+    else if (isPaView)
+      filtered = bookings.filter((booking) =>
+        allowedStatuses.includes(getBookingStatus(booking, bookingStatuses))
       );
-    return bookings;
-  }, [isUserView, bookings]);
+    else filtered = bookings;
+
+    // if no status filters are selected, view all
+    if (statusFilters.length === 0) {
+      return filtered;
+    }
+    return filtered.filter((booking) =>
+      statusFilters.includes(getBookingStatus(booking, bookingStatuses))
+    );
+  }, [isUserView, isPaView, bookings, allowedStatuses, statusFilters]);
 
   return (
-    <>
+    <Box sx={{ marginTop: 4 }}>
+      <BookingTableFilters
+        allowedStatuses={allowedStatuses}
+        selected={statusFilters}
+        setSelected={setStatusFilters}
+      />
       <TableCustom size="small">
         <ShadedHeader>
           <TableRow>
@@ -102,6 +124,6 @@ export const Bookings: React.FC<BookingsProps> = ({
           closeModal={() => setModalData(null)}
         />
       )}
-    </>
+    </Box>
   );
 };

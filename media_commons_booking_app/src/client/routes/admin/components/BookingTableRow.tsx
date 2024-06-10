@@ -1,6 +1,12 @@
 import { Booking, BookingStatusLabel } from '../../../../types';
-import { IconButton, TableCell, TableRow } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import {
+  IconButton,
+  TableCell,
+  TableRow,
+  Tooltip,
+  tooltipClasses,
+} from '@mui/material';
+import React, { useContext, useMemo, useRef, useState } from 'react';
 import { formatDateTable, formatTimeTable } from '../../../utils/date';
 
 import BookingActions from './BookingActions';
@@ -25,9 +31,15 @@ export default function BookingTableRow({
 }: Props) {
   const { bookingStatuses } = useContext(DatabaseContext);
   const status = getBookingStatus(booking, bookingStatuses);
+  const titleRef = useRef();
 
   const [optimisticStatus, setOptimisticStatus] =
     useState<BookingStatusLabel>();
+
+  const titleOverflows = useMemo(() => {
+    console.log(titleRef.current);
+    // if (titleRef.current.clientWidth)
+  }, [booking.title]);
 
   return (
     <TableRow>
@@ -53,16 +65,35 @@ export default function BookingTableRow({
           booking.endDate
         )}`}
       />
-      <TableCell
-        sx={{
-          maxWidth: '200px',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+      <Tooltip
+        title={booking.title}
+        placement="bottom"
+        slotProps={{
+          popper: {
+            sx: {
+              [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
+                {
+                  marginTop: '-12px',
+                },
+              [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]:
+                {
+                  marginBottom: '-12px',
+                },
+            },
+          },
         }}
       >
-        {booking.title}
-      </TableCell>
+        <TableCell
+          sx={{
+            maxWidth: '200px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          <p ref={titleRef}>{booking.title}</p>
+        </TableCell>
+      </Tooltip>
       <TableCell>
         <IconButton onClick={() => setModalData(booking)}>
           <MoreHoriz />

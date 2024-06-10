@@ -10,7 +10,7 @@ export default function useFakeDataLocalStorage(
 ) {
   const { lastMessage } = useWebSocket(
     'ws://localhost:3001',
-    { shouldReconnect: (closeEvent) => true },
+    { shouldReconnect: (closeEvent) => false },
     process.env.BRANCH_NAME === 'development'
   );
   const hasUpdated = useRef(false);

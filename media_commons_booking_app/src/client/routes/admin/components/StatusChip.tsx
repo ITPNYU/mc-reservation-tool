@@ -5,6 +5,7 @@ import Chip from '@mui/material/Chip';
 import { styled } from '@mui/material';
 
 interface Props {
+  disabled?: boolean;
   status: BookingStatusLabel;
 }
 
@@ -17,8 +18,11 @@ const RectangleChip = styled(Chip)({
   },
 });
 
-export default function StatusChip({ status }: Props) {
+export default function StatusChip({ status, disabled = false }: Props) {
   const color = useMemo(() => {
+    if (disabled) {
+      return 'rgba(0, 0, 0, 0.38)';
+    }
     switch (status) {
       case BookingStatusLabel.APPROVED:
         return 'rgba(72, 196, 77, 1)';
@@ -37,9 +41,12 @@ export default function StatusChip({ status }: Props) {
       case BookingStatusLabel.UNKNOWN:
         return 'rgba(85,94,97,1)';
     }
-  }, [status]);
+  }, [status, disabled]);
 
   const bgcolor = useMemo(() => {
+    if (disabled) {
+      return 'rgba(33, 33, 33, 0.08)';
+    }
     switch (status) {
       case BookingStatusLabel.APPROVED:
         return 'rgba(72, 196, 77, 0.11)';
@@ -58,7 +65,7 @@ export default function StatusChip({ status }: Props) {
       case BookingStatusLabel.UNKNOWN:
         return 'rgba(47,47,46,0.11)';
     }
-  }, [status]);
+  }, [status, disabled]);
 
   return (
     <RectangleChip
@@ -66,6 +73,7 @@ export default function StatusChip({ status }: Props) {
       sx={{
         bgcolor,
         color,
+        transition: 'background-color 150ms, color 150ms',
       }}
     />
   );

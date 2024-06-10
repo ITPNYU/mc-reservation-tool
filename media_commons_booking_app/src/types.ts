@@ -36,14 +36,15 @@ export type BookingStatus = {
   noShowedAt: string;
 };
 
+// the order here is the order these are displayed as table filters
 export enum BookingStatusLabel {
+  REQUESTED = 'Requested',
+  PRE_APPROVED = 'Pre-Approved',
   APPROVED = 'Approved',
-  CANCELED = 'Canceled',
+  REJECTED = 'Declined',
   CHECKED_IN = 'Checked In',
   NO_SHOW = 'No Show',
-  PRE_APPROVED = 'Pre-Approved',
-  REJECTED = 'Declined',
-  REQUESTED = 'Requested',
+  CANCELED = 'Canceled',
   UNKNOWN = 'Unknown',
 }
 
