@@ -7,11 +7,10 @@ env_variables:
 
 handlers:
   - url: /static
-    static_dir: dist/static
+    static_dir: client/dist/static
 
   - url: /.*
     script: auto
 
 # Specify the entrypoint for the server
-entrypoint: npm start --prefix server
-
+entrypoint: npm start
