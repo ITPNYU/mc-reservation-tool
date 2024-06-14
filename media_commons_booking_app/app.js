@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, './client/dist')));
 
 // API Routes
 app.get('/api/example', (req, res) => {
@@ -16,7 +16,7 @@ app.get('/api/example', (req, res) => {
 
 // Catch-all route to serve the React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+  res.sendFile(path.join(__dirname, './client/dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
