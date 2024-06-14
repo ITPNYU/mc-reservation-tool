@@ -1,0 +1,17 @@
+runtime: nodejs18
+
+instance_class: F2
+
+env_variables:
+  NODE_ENV: 'production'
+
+handlers:
+  - url: /static
+    static_dir: dist/static
+
+  - url: /.*
+    script: auto
+
+# Specify the entrypoint for the server
+entrypoint: npm start --prefix server
+
