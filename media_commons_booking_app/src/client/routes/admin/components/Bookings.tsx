@@ -1,25 +1,21 @@
 import { Booking, BookingStatusLabel } from '../../../../types';
 import {
   Box,
-  Button,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  useTheme,
 } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { Add } from '@mui/icons-material';
+import BookMoreButton from './BookMoreButton';
 import BookingTableFilters from './BookingTableFilters';
 import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../../components/Provider';
 import MoreInfoModal from './MoreInfoModal';
-import { alpha } from '@mui/material/styles';
 import getBookingStatus from '../hooks/getBookingStatus';
 import { styled } from '@mui/system';
-import { useNavigate } from 'react-router';
 
 interface BookingsProps {
   isAdminView?: boolean;
@@ -49,12 +45,6 @@ const TopRow = styled(Table)`
   }
 `;
 
-const BottomRow = styled(TopRow)(({ theme }) => ({
-  borderTop: 'none',
-  borderBottom: `1px solid ${theme.palette.custom.border}`,
-  borderRadius: '0px 0px 4px 4px',
-}));
-
 const Empty = styled(Box)`
   color: rgba(0, 0, 0, 0.38);
   display: flex;
@@ -78,9 +68,6 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const [modalData, setModalData] = useState(null);
   const [statusFilters, setStatusFilters] = useState([]);
-
-  const navigate = useNavigate();
-  const theme = useTheme();
 
   useEffect(() => {
     reloadBookingStatuses();
@@ -123,7 +110,13 @@ export const Bookings: React.FC<BookingsProps> = ({
     if (isUserView) {
       return (
         <TopRow>
-          <TableCell sx={{ color: 'rgba(0,0,0,0.6)' }}>Your Bookings</TableCell>
+          <TableBody>
+            <TableRow>
+              <TableCell sx={{ color: 'rgba(0,0,0,0.6)' }}>
+                Your Bookings
+              </TableCell>
+            </TableRow>
+          </TableBody>
         </TopRow>
       );
     }
@@ -169,22 +162,7 @@ export const Bookings: React.FC<BookingsProps> = ({
           ))}
         </TableBody>
       </TableCustom>
-      {isUserView && (
-        <BottomRow>
-          <Button
-            onClick={() => navigate('/book')}
-            variant="text"
-            sx={{
-              background: theme.palette.primary[50],
-              color: theme.palette.primary.main,
-              width: '100%',
-              margin: '4px',
-            }}
-          >
-            <Add /> Book More
-          </Button>
-        </BottomRow>
-      )}
+      {isUserView && <BookMoreButton />}
       {bookings.length === 0 && (
         <Empty>
           {isUserView
