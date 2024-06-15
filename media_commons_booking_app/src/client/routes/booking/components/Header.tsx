@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 
 import { BookingContext } from '../bookingProvider';
+import BookingFormStepper from './Stepper';
 import { DatabaseContext } from '../../components/Provider';
 import { useLocation } from 'react-router-dom';
 
@@ -10,13 +11,13 @@ export const Header = () => {
 
   const location = useLocation();
 
-  if (location.pathname === '/') {
+  if (location.pathname === '/book') {
     return null;
   }
 
   return (
-    <div className="px-3 absolute top-20 right-0 text-right">
-      <p className="dark:text-white">
+    <div>
+      {/* <p className="dark:text-white">
         Email:{' '}
         {userEmail ? `${userEmail}` : `Unable to retrieve the email address.`}
       </p>
@@ -27,7 +28,8 @@ export const Header = () => {
           </p>
         )}
         {isBanned && <p className="text-red-500 text-bold  ">You're banned </p>}
-      </div>
+      </div> */}
+      <BookingFormStepper />
     </div>
   );
 };
