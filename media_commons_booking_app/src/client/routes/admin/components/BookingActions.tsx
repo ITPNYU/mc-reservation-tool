@@ -175,7 +175,7 @@ export default function BookingActions({
       style={{
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'center',
       }}
     >

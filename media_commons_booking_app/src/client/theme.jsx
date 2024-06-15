@@ -5,6 +5,7 @@ const theme = createTheme({
   palette: {
     primary: {
       main: deepPurple.A700,
+      50: '#F2E7FE',
     },
     secondary: {
       main: deepPurple.A100,

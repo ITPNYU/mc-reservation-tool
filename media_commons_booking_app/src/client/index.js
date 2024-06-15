@@ -28,11 +28,11 @@ const router = createMemoryRouter([
         element: <PAPage />,
       },
       {
-        path: '/my-bookings',
+        path: '/',
         element: <MyBookingsPage />,
       },
       {
-        path: '/',
+        path: '/book',
         element: <BookingForm />,
         children: [
           {
@@ -48,7 +48,7 @@ const router = createMemoryRouter([
             element: <UserSectionPage />,
           },
           {
-            path: '/',
+            path: '/book',
             element: <LandingPage />,
           },
         ],

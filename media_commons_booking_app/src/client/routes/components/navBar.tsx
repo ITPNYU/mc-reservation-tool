@@ -1,4 +1,11 @@
-import { Box, MenuItem, Select, Toolbar, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { DatabaseContext } from './Provider';
@@ -79,6 +86,28 @@ export default function NavBar() {
     );
   }, [pagePermission, selectedView]);
 
+  const button = useMemo(() => {
+    if (selectedView === PagePermission.BOOKING) {
+      return (
+        <Button
+          onClick={() => navigate('/book')}
+          variant="outlined"
+          sx={{ height: '40px', marginRight: 2 }}
+        >
+          Book
+        </Button>
+      );
+    }
+
+    if (pagePermission !== PagePermission.BOOKING) {
+      return (
+        <Button variant="outlined" sx={{ height: '40px', marginRight: 2 }}>
+          Walk In
+        </Button>
+      );
+    }
+  }, [pagePermission, selectedView]);
+
   return (
     <Nav>
       <Box flex={1}>
@@ -87,35 +116,13 @@ export default function NavBar() {
         </Title>
       </Box>
       <Box display="flex" alignItems="center">
+        {button}
         {dropdown}
         <Divider />
-        <p>{netId}</p>
+        <Typography component="p" color="rgba(0,0,0,0.6)">
+          {netId}
+        </Typography>
       </Box>
     </Nav>
   );
 }
-// <Navbar expand="md" className="bg-body-tertiary z-10">
-//   <Container fluid>
-//     <Navbar.Brand>
-//       <NavLink to="/">
-//
-//       </NavLink>
-//     </Navbar.Brand>
-//     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-//     <Navbar.Collapse id="basic-navbar-nav">
-//       <Nav className="ms-auto">
-//         <Nav.Item>
-//           <NavLink
-//             className="nav-link"
-//             activeClassName="active"
-//             to="/my-bookings"
-//           >
-//             My Bookings
-//           </NavLink>
-//         </Nav.Item>
-//         {pagePermission === PagePermission.ADMIN && (
-//
-//       </Nav>
-//     </Navbar.Collapse>
-//   </Container>
-// </Navbar>

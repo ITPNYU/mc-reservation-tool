@@ -46,25 +46,31 @@ export default function BookingTableRow({
       <TableCell>
         <StatusChip status={optimisticStatus ?? status} />
       </TableCell>
-      <TableCell>{booking.roomId}</TableCell>
-      <StackedTableCell
-        topText={booking.department}
-        bottomText={booking.role}
-      />
-      <StackedTableCell
-        topText={`${booking.firstName} ${booking.lastName}`}
-        bottomText={booking.netId}
-      />
-      <StackedTableCell
-        topText={booking.email}
-        bottomText={booking.phoneNumber}
-      />
       <StackedTableCell
         topText={formatDateTable(booking.startDate)}
         bottomText={`${formatTimeTable(booking.startDate)} - ${formatTimeTable(
           booking.endDate
         )}`}
       />
+      <TableCell>{booking.roomId}</TableCell>
+      {!isUserView && (
+        <StackedTableCell
+          topText={booking.department}
+          bottomText={booking.role}
+        />
+      )}
+      {!isUserView && (
+        <StackedTableCell
+          topText={`${booking.firstName} ${booking.lastName}`}
+          bottomText={booking.netId}
+        />
+      )}
+      {!isUserView && (
+        <StackedTableCell
+          topText={booking.email}
+          bottomText={booking.phoneNumber}
+        />
+      )}
       <Tooltip
         title={booking.title}
         placement="bottom"
@@ -94,12 +100,14 @@ export default function BookingTableRow({
           <p ref={titleRef}>{booking.title}</p>
         </TableCell>
       </Tooltip>
-      <TableCell>
-        <IconButton onClick={() => setModalData(booking)}>
-          <MoreHoriz />
-        </IconButton>
-      </TableCell>
-      <TableCell>
+      {!isUserView && (
+        <TableCell>
+          <IconButton onClick={() => setModalData(booking)}>
+            <MoreHoriz />
+          </IconButton>
+        </TableCell>
+      )}
+      <TableCell width={100}>
         <BookingActions
           status={optimisticStatus ?? status}
           calendarEventId={booking.calendarEventId}

@@ -1,20 +1,25 @@
 import { Booking, BookingStatusLabel } from '../../../../types';
 import {
   Box,
+  Button,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  useTheme,
 } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
+import { Add } from '@mui/icons-material';
 import BookingTableFilters from './BookingTableFilters';
 import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../../components/Provider';
 import MoreInfoModal from './MoreInfoModal';
+import { alpha } from '@mui/material/styles';
 import getBookingStatus from '../hooks/getBookingStatus';
 import { styled } from '@mui/system';
+import { useNavigate } from 'react-router';
 
 interface BookingsProps {
   isAdminView?: boolean;
@@ -29,6 +34,34 @@ const TableCustom = styled(Table)(({ theme }) => ({
 const ShadedHeader = styled(TableHead)(({ theme }) => ({
   backgroundColor: theme.palette.custom.gray,
 }));
+
+const TopRow = styled(Table)`
+  height: 48px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: none;
+  border-radius: 4px 4px 0px 0px;
+
+  th,
+  td {
+    border: none;
+  }
+`;
+
+const BottomRow = styled(TopRow)(({ theme }) => ({
+  borderTop: 'none',
+  borderBottom: `1px solid ${theme.palette.custom.border}`,
+  borderRadius: '0px 0px 4px 4px',
+}));
+
+const Empty = styled(Box)`
+  color: rgba(0, 0, 0, 0.38);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 25vh;
+`;
 
 export const Bookings: React.FC<BookingsProps> = ({
   isAdminView = false,
@@ -45,6 +78,9 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const [modalData, setModalData] = useState(null);
   const [statusFilters, setStatusFilters] = useState([]);
+
+  const navigate = useNavigate();
+  const theme = useTheme();
 
   useEffect(() => {
     reloadBookingStatuses();
@@ -83,24 +119,39 @@ export const Bookings: React.FC<BookingsProps> = ({
     );
   }, [isUserView, isPaView, bookings, allowedStatuses, statusFilters]);
 
+  const topRow = useMemo(() => {
+    if (isUserView) {
+      return (
+        <TopRow>
+          <TableCell sx={{ color: 'rgba(0,0,0,0.6)' }}>Your Bookings</TableCell>
+        </TopRow>
+      );
+    }
+    return (
+      <TopRow>
+        <BookingTableFilters
+          allowedStatuses={allowedStatuses}
+          selected={statusFilters}
+          setSelected={setStatusFilters}
+        />
+      </TopRow>
+    );
+  }, [isUserView]);
+
   return (
     <Box sx={{ marginTop: 4 }}>
-      <BookingTableFilters
-        allowedStatuses={allowedStatuses}
-        selected={statusFilters}
-        setSelected={setStatusFilters}
-      />
+      {topRow}
       <TableCustom size="small">
         <ShadedHeader>
           <TableRow>
             <TableCell>Status</TableCell>
-            <TableCell>Room</TableCell>
-            <TableCell>Department/Role</TableCell>
-            <TableCell>ID</TableCell>
-            <TableCell>Contacts</TableCell>
             <TableCell>Dates</TableCell>
+            <TableCell>Room</TableCell>
+            {!isUserView && <TableCell>Department/Role</TableCell>}
+            {!isUserView && <TableCell>ID</TableCell>}
+            {!isUserView && <TableCell>Contacts</TableCell>}
             <TableCell>Title</TableCell>
-            <TableCell>Other Info</TableCell>
+            {!isUserView && <TableCell>Other Info</TableCell>}
             <TableCell>Action</TableCell>
           </TableRow>
         </ShadedHeader>
@@ -118,6 +169,29 @@ export const Bookings: React.FC<BookingsProps> = ({
           ))}
         </TableBody>
       </TableCustom>
+      {isUserView && (
+        <BottomRow>
+          <Button
+            onClick={() => navigate('/book')}
+            variant="text"
+            sx={{
+              background: theme.palette.primary[50],
+              color: theme.palette.primary.main,
+              width: '100%',
+              margin: '4px',
+            }}
+          >
+            <Add /> Book More
+          </Button>
+        </BottomRow>
+      )}
+      {bookings.length === 0 && (
+        <Empty>
+          {isUserView
+            ? "You don't have any reservations"
+            : 'No active reservations found'}
+        </Empty>
+      )}
       {modalData != null && (
         <MoreInfoModal
           booking={modalData}
