@@ -45,8 +45,6 @@ export default function UserRolePage() {
     navigate('/book/selectRoom');
   };
 
-  console.log(department);
-
   const dropdown = <T extends React.ReactNode>({
     value,
     updateValue,
@@ -55,15 +53,15 @@ export default function UserRolePage() {
   }: DropdownProps<T>) => (
     <Select
       size="small"
-      value={value}
+      value={value != null ? value : ''}
       onChange={(e) => updateValue(e.target.value as T)}
       renderValue={(selected) => {
-        if (selected === undefined) {
+        if (selected === '') {
           return <p style={{ color: 'gray' }}>{placeholder}</p>;
         }
         return selected;
       }}
-      sx={{ marginTop: 2 }}
+      sx={{ marginTop: 4 }}
       displayEmpty
       fullWidth
     >
@@ -95,7 +93,7 @@ export default function UserRolePage() {
           onClick={handleNextClick}
           variant="contained"
           color="primary"
-          sx={{ marginTop: 4 }}
+          sx={{ marginTop: 6 }}
         >
           Next
         </Button>
