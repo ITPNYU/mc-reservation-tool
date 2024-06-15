@@ -108,9 +108,9 @@ export type PaUser = {
 };
 
 export enum PagePermission {
-  ADMIN,
-  BOOKING,
-  PA,
+  ADMIN = 'Admin',
+  BOOKING = 'User',
+  PA = 'PA',
 }
 
 export type ReservationType = {
