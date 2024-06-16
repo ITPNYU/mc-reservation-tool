@@ -129,7 +129,7 @@ export const Bookings: React.FC<BookingsProps> = ({
         />
       </TopRow>
     );
-  }, [isUserView]);
+  }, [isUserView, statusFilters, allowedStatuses]);
 
   return (
     <Box sx={{ marginTop: 4 }}>

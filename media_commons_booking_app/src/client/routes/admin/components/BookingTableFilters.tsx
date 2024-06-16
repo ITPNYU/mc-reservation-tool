@@ -17,7 +17,7 @@ export default function BookingTableFilters({
   setSelected,
 }: Props) {
   const handleChipClick = (status: BookingStatusLabel) => {
-    setSelected((prev) => {
+    setSelected((prev: BookingStatusLabel[]) => {
       if (prev.includes(status)) {
         return prev.filter((x) => x !== status);
       }
