@@ -38,14 +38,14 @@ export type BookingStatus = {
 
 // the order here is the order these are displayed as table filters
 export enum BookingStatusLabel {
-  REQUESTED = 'Requested',
-  PRE_APPROVED = 'Pre-Approved',
-  APPROVED = 'Approved',
-  REJECTED = 'Declined',
-  CHECKED_IN = 'Checked In',
-  NO_SHOW = 'No Show',
-  CANCELED = 'Canceled',
-  UNKNOWN = 'Unknown',
+  APPROVED = 'APPROVED',
+  CANCELED = 'CANCELED',
+  CHECKED_IN = 'CHECKED-IN',
+  NO_SHOW = 'NO-SHOW',
+  PRE_APPROVED = 'PRE-APPROVED',
+  REJECTED = 'DECLINED',
+  REQUESTED = 'REQUESTED',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export type CalendarEvent = {

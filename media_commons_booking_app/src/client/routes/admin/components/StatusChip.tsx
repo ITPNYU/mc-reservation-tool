@@ -67,9 +67,30 @@ export default function StatusChip({ status, disabled = false }: Props) {
     }
   }, [status, disabled]);
 
+  const text = useMemo(() => {
+    switch (status) {
+      case BookingStatusLabel.APPROVED:
+        return 'Approved';
+      case BookingStatusLabel.CANCELED:
+        return 'Canceled';
+      case BookingStatusLabel.CHECKED_IN:
+        return 'Checked In';
+      case BookingStatusLabel.NO_SHOW:
+        return 'No Show';
+      case BookingStatusLabel.PRE_APPROVED:
+        return 'Pre-Approved';
+      case BookingStatusLabel.REJECTED:
+        return 'Declined';
+      case BookingStatusLabel.REQUESTED:
+        return 'Requested';
+      case BookingStatusLabel.UNKNOWN:
+        return 'Unknown';
+    }
+  }, [status]);
+
   return (
     <RectangleChip
-      label={status}
+      label={text}
       sx={{
         bgcolor,
         color,
