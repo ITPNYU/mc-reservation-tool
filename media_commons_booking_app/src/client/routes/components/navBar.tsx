@@ -119,7 +119,12 @@ export default function NavBar() {
         {button}
         {dropdown}
         <Divider />
-        <Typography component="p" color="rgba(0,0,0,0.6)">
+        <Typography
+          component="p"
+          color="rgba(0,0,0,0.6)"
+          minWidth="50px"
+          textAlign="right"
+        >
           {netId}
         </Typography>
       </Box>

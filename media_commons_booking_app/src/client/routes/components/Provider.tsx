@@ -25,6 +25,7 @@ export interface DatabaseContextType {
   adminUsers: AdminUser[];
   bannedUsers: Ban[];
   bookings: Booking[];
+  bookingsLoading: boolean;
   bookingStatuses: BookingStatus[];
   liaisonUsers: LiaisonType[];
   pagePermission: PagePermission;
@@ -48,6 +49,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   adminUsers: [],
   bannedUsers: [],
   bookings: [],
+  bookingsLoading: true,
   bookingStatuses: [],
   liaisonUsers: [],
   pagePermission: PagePermission.BOOKING,
@@ -70,6 +72,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
 export const DatabaseProvider = ({ children }) => {
   const [bannedUsers, setBannedUsers] = useState<Ban[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState<boolean>(true);
   const [bookingStatuses, setBookingStatuses] = useState<BookingStatus[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
@@ -95,27 +98,35 @@ export const DatabaseProvider = ({ children }) => {
   useFakeDataLocalStorage(setBookings, setBookingStatuses);
 
   useEffect(() => {
-    // fetch most important tables first - determine page permissions
-    Promise.all([
-      fetchActiveUserEmail(),
-      fetchAdminUsers(),
-      fetchPaUsers(),
-    ]).then(() => {
-      fetchBookings();
-      fetchBookingStatuses();
+    const fetchInitialData = async () => {
+      // fetch most important tables first - determine page permissions
+      await Promise.all([
+        fetchActiveUserEmail(),
+        fetchAdminUsers(),
+        fetchPaUsers(),
+      ]);
+      await Promise.all([fetchBookings(), fetchBookingStatuses()]);
+      setBookingsLoading(false);
+    };
+
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    if (!bookingsLoading) {
       fetchSafetyTrainedUsers();
       fetchBannedUsers();
       fetchLiaisonUsers();
       fetchRoomSettings();
       fetchSettings();
-    });
-
+    }
     // refresh booking data every 10s;
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       fetchBookings();
       fetchBookingStatuses();
     }, 10000);
-  }, []);
+    return () => clearInterval(intervalId);
+  }, [bookingsLoading]);
 
   const fetchActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
@@ -228,6 +239,7 @@ export const DatabaseProvider = ({ children }) => {
         adminUsers,
         bannedUsers,
         bookings,
+        bookingsLoading,
         bookingStatuses,
         liaisonUsers,
         paUsers,

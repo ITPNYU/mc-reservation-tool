@@ -13,6 +13,7 @@ import BookMoreButton from './BookMoreButton';
 import BookingTableFilters from './BookingTableFilters';
 import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../../components/Provider';
+import Loading from '../../../utils/Loading';
 import MoreInfoModal from './MoreInfoModal';
 import getBookingStatus from '../hooks/getBookingStatus';
 import { styled } from '@mui/system';
@@ -60,6 +61,7 @@ export const Bookings: React.FC<BookingsProps> = ({
 }) => {
   const {
     bookings,
+    bookingsLoading,
     bookingStatuses,
     userEmail,
     reloadBookings,
@@ -131,6 +133,25 @@ export const Bookings: React.FC<BookingsProps> = ({
     );
   }, [isUserView, statusFilters, allowedStatuses]);
 
+  const bottomSection = useMemo(() => {
+    if (bookingsLoading && bookings.length === 0) {
+      return (
+        <Empty>
+          <Loading />
+        </Empty>
+      );
+    }
+    if (bookings.length === 0) {
+      return (
+        <Empty>
+          {isUserView
+            ? "You don't have any reservations"
+            : 'No active reservations found'}
+        </Empty>
+      );
+    }
+  }, [isUserView, bookingsLoading, bookings]);
+
   return (
     <Box sx={{ marginTop: 4 }}>
       {topRow}
@@ -163,13 +184,7 @@ export const Bookings: React.FC<BookingsProps> = ({
         </TableBody>
       </TableCustom>
       {isUserView && <BookMoreButton />}
-      {bookings.length === 0 && (
-        <Empty>
-          {isUserView
-            ? "You don't have any reservations"
-            : 'No active reservations found'}
-        </Empty>
-      )}
+      {bottomSection}
       {modalData != null && (
         <MoreInfoModal
           booking={modalData}
