@@ -35,9 +35,9 @@ export default function LandingPage() {
       <Title as="h1">370🅙 Media Commons Reservation Form</Title>
       <p>Thank you for your interest in booking with the Media Commons</p>
       <Modal padding={4}>
-        <Link>
+        <Typography fontWeight={500}>
           Please read our Policy for using the 370 Jay Street Shared Spaces
-        </Link>
+        </Typography>
         <Typography fontWeight={700} marginTop={3}>
           Booking Confirmation
         </Typography>
