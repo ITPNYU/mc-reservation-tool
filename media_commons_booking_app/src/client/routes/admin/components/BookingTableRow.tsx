@@ -36,11 +36,6 @@ export default function BookingTableRow({
   const [optimisticStatus, setOptimisticStatus] =
     useState<BookingStatusLabel>();
 
-  const titleOverflows = useMemo(() => {
-    console.log(titleRef.current);
-    // if (titleRef.current.clientWidth)
-  }, [booking.title]);
-
   return (
     <TableRow>
       <TableCell>

@@ -1,8 +1,10 @@
 import { IconButton, MenuItem, Select } from '@mui/material';
 import React, { useContext, useMemo, useState } from 'react';
 
+import AlertToast from '../../components/AlertToast';
 import { BookingStatusLabel } from '../../../../types';
 import Check from '@mui/icons-material/Check';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import { DatabaseContext } from '../../components/Provider';
 import Loading from '../../../utils/Loading';
 import { serverFunctions } from '../../../utils/serverFunctions';
@@ -43,24 +45,27 @@ export default function BookingActions({
     Actions.PLACEHOLDER
   );
   const { reloadBookings, reloadBookingStatuses } = useContext(DatabaseContext);
+  const [showError, setShowError] = useState(false);
 
   const reload = async () => {
     await Promise.all([reloadBookings(), reloadBookingStatuses()]);
   };
 
-  const onError = () => alert('Failed to perform action on booking');
+  const onError = () => {
+    setShowError(true);
+  };
+
+  const handleDialogChoice = (result: boolean) => {
+    if (result) {
+      const actionDetails = actions[selectedAction];
+      doAction(actionDetails);
+    }
+  };
 
   const doAction = async ({
     action,
     optimisticNextStatus,
-    confirmation,
   }: ActionDefinition) => {
-    if (confirmation) {
-      const result = confirm(`Are you sure? This action can't be undone.`);
-      if (!result) {
-        return;
-      }
-    }
     setUiLoading(true);
     setOptimisticStatus(optimisticNextStatus);
     try {
@@ -203,17 +208,35 @@ export default function BookingActions({
           </MenuItem>
         ))}
       </Select>
-      <IconButton
-        disabled={selectedAction === Actions.PLACEHOLDER}
-        color={'primary'}
-        onClick={() => {
-          console.log(selectedAction);
-          const actionDetails = actions[selectedAction];
-          doAction(actionDetails);
-        }}
-      >
-        <Check />
-      </IconButton>
+      {actions[selectedAction].confirmation === true ? (
+        <ConfirmDialog
+          message="Are you sure? This action can't be undone."
+          callback={handleDialogChoice}
+        >
+          <IconButton
+            disabled={selectedAction === Actions.PLACEHOLDER}
+            color={'primary'}
+          >
+            <Check />
+          </IconButton>
+        </ConfirmDialog>
+      ) : (
+        <IconButton
+          disabled={selectedAction === Actions.PLACEHOLDER}
+          color={'primary'}
+          onClick={() => {
+            handleDialogChoice(true);
+          }}
+        >
+          <Check />
+        </IconButton>
+      )}
+      <AlertToast
+        message="Failed to perform action on booking"
+        severity="error"
+        open={showError}
+        handleClose={() => setShowError(false)}
+      />
     </div>
   );
 }
