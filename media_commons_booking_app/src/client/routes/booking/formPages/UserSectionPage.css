@@ -1,0 +1,7 @@
+.fixed-button-container {
+    position: fixed;
+    top: 8px; /* Adjust this value as needed */
+    right: 600px; /* Adjust this value as needed */
+    z-index: 1000;
+  }
+  

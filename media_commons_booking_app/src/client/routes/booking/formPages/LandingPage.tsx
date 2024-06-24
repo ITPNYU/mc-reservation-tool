@@ -20,7 +20,7 @@ export default function LandingPage() {
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              370🅙 Media Commons Reservation Form
+              370🅙 St Media Commons Reservation Form
             </h3>
           </div>
           <p className="p-6 space-y-6">

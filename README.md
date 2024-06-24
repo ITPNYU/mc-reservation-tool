@@ -30,13 +30,14 @@ Before setting up the project, ensure you have the following:
 
 When developing locally, please follow the flow below.
 
-1. **Clone the Repository**:
+1. **Clone the Repository & cd to media_commons_booking_app**:
 2. **Configure `.clasprc.json`**:
    Set up the `.clasprc.json` file with the necessary credentials.
-3. **Install Packages**:
+3. **Install Packages **:
    ```bash
    npm install
    ```
+   
 4. **Upload Local Code to Google App Script**:
 
    ```bash
@@ -48,7 +49,7 @@ When developing locally, please follow the flow below.
 5. **Create a New Version of Google App Script**:
    Deploy using clasp, targeting your `deploymentId`:
    ```bash
-   clasp deploy --deploymentId ${deploymentID} -d DEV_YOURNAME
+   clasp deploy --deploymentId AKfycbyxLFN63gcm1dhFEm8rFP9eZnIu_JYEgxjth7WwR0u4rXq_cdtd2wo6WfRMRk5MsvuGkg -d DEV_KAI
    ```
 6. **Access the Application**:
    You can now access the app at `https://script.google.com/a/macros/nyu.edu/s/${deploymentId}/exec`.

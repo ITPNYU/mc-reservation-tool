@@ -68,9 +68,9 @@ export function BookingProvider({ children }) {
     console.log('isTrained from tool', isTrained);
     // if not on active list, check old list
     if (!isTrained) {
-      isTrained = await serverFunctions
-        .getOldSafetyTrainingEmails()
-        .then((rows) => rows.map((row) => row[0]).includes(userEmail));
+       isTrained = await serverFunctions
+         .getOldSafetyTrainingEmails()
+         .then((rows) => rows.map((row) => row[0]).includes(userEmail));
     }
     console.log('isTrained from googlesheets', isTrained);
     setIsSafetyTrained(isTrained);
