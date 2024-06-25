@@ -3,7 +3,7 @@ name: Deploy DEV_REFACTOR_UI to Google Apps Script
 on:
   push:
     branches:
-      - refactorUi/**
+      - refactorUi
 
 jobs:
   deploy:
