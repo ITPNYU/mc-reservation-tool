@@ -89,7 +89,7 @@ export const SAFETY_TRAINING_REQUIRED_ROOM = [
 
 export const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224', '233'];
 
-export const HIDING_STATUS = [
+export const CALENDAR_HIDE_STATUS = [
   BookingStatusLabel.NO_SHOW,
   BookingStatusLabel.CANCELED,
   BookingStatusLabel.REJECTED,

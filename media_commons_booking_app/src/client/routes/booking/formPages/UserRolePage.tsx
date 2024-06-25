@@ -16,7 +16,7 @@ const Center = styled(Box)`
 `;
 
 const Container = styled(Box)(({ theme }) => ({
-  width: '60%',
+  width: '50%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
