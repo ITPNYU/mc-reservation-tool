@@ -127,10 +127,10 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
           </div>
         </div>
       )}
-      <SelectRooms
+      {/* <SelectRooms
         allRooms={allRooms}
         handleCheckboxChange={handleCheckboxChange}
-      />
+      /> */}
 
       {calendarRefs.length > 0 && (
         <div className="mt-5 ml-20 flex justify-center">

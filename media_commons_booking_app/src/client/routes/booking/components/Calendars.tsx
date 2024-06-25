@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
+import { CALENDAR_HIDE_STATUS } from '../../../../policy';
 import { CalendarDatePicker } from './CalendarDatePicker';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomCalendar } from './RoomCalendar';
 import { RoomSetting } from '../../../../types';
 import { formatDate } from '../../../utils/date';
-import { HIDING_STATUS } from '../../../../policy';
 
 type CalendarProps = {
   allRooms: RoomSetting[];
@@ -30,7 +30,7 @@ export const Calendars = ({
       const allEvents = calendarApi.getEvents();
       return allEvents.some((event) => {
         if (event.title.includes(TITLE_TAG)) return false;
-        if (HIDING_STATUS.some((status) => event.title.includes(status)))
+        if (CALENDAR_HIDE_STATUS.some((status) => event.title.includes(status)))
           return false;
 
         return (

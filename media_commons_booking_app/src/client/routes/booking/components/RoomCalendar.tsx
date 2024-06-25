@@ -5,6 +5,7 @@ import {
 } from '../../../../types';
 import React, { useEffect, useState } from 'react';
 
+import { CALENDAR_HIDE_STATUS } from '../../../../policy';
 import { DateSelectArg } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -12,7 +13,6 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import { serverFunctions } from '../../../utils/serverFunctions';
 import timeGridPlugin from '@fullcalendar/timegrid'; // a plugin!
-import { HIDING_STATUS } from '../../../../policy';
 
 const TITLE_TAG = '[Click to Delete]';
 
@@ -41,11 +41,11 @@ export const RoomCalendar = ({
       process.env.CALENDAR_ENV,
       'calendars'
     );
-    fetchCalendarEvents(
-      process.env.CALENDAR_ENV === 'production'
-        ? room.calendarIdProd
-        : room.calendarIdDev
-    );
+    // fetchCalendarEvents(
+    //   process.env.CALENDAR_ENV === 'production'
+    //     ? room.calendarIdProd
+    //     : room.calendarIdDev
+    // );
   }, []);
 
   function renderEventContent(eventInfo) {
@@ -85,14 +85,16 @@ export const RoomCalendar = ({
     );
   }
 
-  const fetchCalendarEvents = async (calendarId) => {
-    serverFunctions.getCalendarEvents(calendarId).then((rows) => {
-      const filteredEvents = rows.filter((row) => {
-        return !HIDING_STATUS.some((status) => row.title.includes(status));
-      });
-      setEvents(filteredEvents);
-    });
-  };
+  // const fetchCalendarEvents = async (calendarId) => {
+  //   serverFunctions.getCalendarEvents(calendarId).then((rows) => {
+  //     const filteredEvents = rows.filter((row) => {
+  //       return !CALENDAR_HIDE_STATUS.some((status) =>
+  //         row.title.includes(status)
+  //       );
+  //     });
+  //     setEvents(filteredEvents);
+  //   });
+  // };
 
   const handleEventClick = (info) => {
     if (!editableEvent(info.event)) return;
