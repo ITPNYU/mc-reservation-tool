@@ -28,7 +28,7 @@ export default function UserRolePage() {
   const { role, department, setDepartment, setRole } =
     useContext(BookingContext);
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleNextClick = () => {
     if (!role || !department) {

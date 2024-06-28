@@ -28,7 +28,7 @@ const Title = styled(Typography)`
 `;
 
 export default function LandingPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <Center sx={{ width: '100vw', height: '90vh' }}>
