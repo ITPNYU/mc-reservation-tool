@@ -1,21 +1,21 @@
-import { Department, Role } from '../../../../types';
-import React, { useContext } from 'react';
+"use client";
+import { Department, Role } from "../../../../types";
+import React, { useContext } from "react";
 
-import { BookingContext } from '../bookingProvider';
-import { useNavigate } from 'react-router-dom';
+import { BookingContext } from "../bookingProvider";
+import { useRouter } from "next/navigation";
 
 export default function UserRolePage() {
   const { role, department, setDepartment, setRole } =
     useContext(BookingContext);
-
   const router = useRouter();
 
   const handleNextClick = () => {
     if (!role || !department) {
-      alert('Please make sure all fields are selected.');
+      alert("Please make sure all fields are selected.");
       return;
     }
-    navigate('/book/selectRoom');
+    router.push("/book/selectRoom");
   };
 
   return (

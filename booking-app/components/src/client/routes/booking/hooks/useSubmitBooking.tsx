@@ -4,14 +4,13 @@ import {
   BookingStatusLabel,
   Inputs,
   RoomSetting,
-} from '../../../../types';
-import { INSTANT_APPROVAL_ROOMS, TableNames } from '../../../../policy';
-import { useContext, useMemo, useState } from 'react';
+} from "../../../../types";
+import { INSTANT_APPROVAL_ROOMS, TableNames } from "../../../../policy";
+import { useContext, useMemo, useState } from "react";
 
-import { BookingContext } from '../bookingProvider';
-import { DatabaseContext } from '../../components/Provider';
-import { serverFunctions } from '../../../utils/serverFunctions';
-import { useNavigate } from 'react-router';
+import { BookingContext } from "../bookingProvider";
+import { DatabaseContext } from "../../components/Provider";
+import { serverFunctions } from "../../../utils/serverFunctions";
 
 export default function useSubmitBooking(): [
   (x: Inputs) => Promise<void>,
@@ -23,7 +22,6 @@ export default function useSubmitBooking(): [
     useContext(BookingContext);
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const firstApprovers = useMemo(
     () =>
@@ -34,19 +32,19 @@ export default function useSubmitBooking(): [
   );
 
   if (!department || !role) {
-    console.error('Missing info for submitting booking');
+    console.error("Missing info for submitting booking");
     return [
       (_) =>
         new Promise((resolve, reject) =>
-          reject('Missing info for submitting booking')
+          reject("Missing info for submitting booking")
         ),
       false,
     ];
   }
 
   const roomCalendarId = (room: RoomSetting) => {
-    console.log('ENVIRONMENT:', process.env.CALENDAR_ENV);
-    if (process.env.CALENDAR_ENV === 'production') {
+    console.log("ENVIRONMENT:", process.env.CALENDAR_ENV);
+    if (process.env.CALENDAR_ENV === "production") {
       return room.calendarIdProd;
     } else {
       return room.calendarIdDev;
@@ -59,12 +57,12 @@ export default function useSubmitBooking(): [
   ) => {
     recipients.forEach((recipient) =>
       serverFunctions.sendHTMLEmail(
-        'approval_email',
+        "approval_email",
         contents,
         recipient,
         BookingStatusLabel.REQUESTED,
         contents.title,
-        ''
+        ""
       )
     );
   };
@@ -88,7 +86,7 @@ export default function useSubmitBooking(): [
 
     let calendarId = roomCalendarId(room);
     if (calendarId == null) {
-      console.error('ROOM CALENDAR ID NOT FOUND');
+      console.error("ROOM CALENDAR ID NOT FOUND");
       return;
     }
 
@@ -96,9 +94,9 @@ export default function useSubmitBooking(): [
     const calendarEventId = await serverFunctions.addEventToCalendar(
       calendarId,
       `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(
-        ', '
+        ", "
       )} ${department} ${data.title}`,
-      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.',
+      "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.",
       bookingCalendarInfo.startStr,
       bookingCalendarInfo.endStr,
       otherRoomIds
@@ -111,7 +109,7 @@ export default function useSubmitBooking(): [
 
     serverFunctions.appendRowActive(TableNames.BOOKING, [
       calendarEventId,
-      selectedRoomIds.join(', '),
+      selectedRoomIds.join(", "),
       email,
       bookingCalendarInfo.startStr,
       bookingCalendarInfo.endStr,
@@ -137,10 +135,10 @@ export default function useSubmitBooking(): [
       return (
         duration <= 3.6e6 * 4 && // <= 4 hours
         selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
-        data['catering'] === 'no' &&
-        data['hireSecurity'] === 'no' &&
-        data['mediaServices'].length === 0 &&
-        data['roomSetup'] === 'no'
+        data["catering"] === "no" &&
+        data["hireSecurity"] === "no" &&
+        data["mediaServices"].length === 0 &&
+        data["roomSetup"] === "no"
       );
     };
 
@@ -161,7 +159,7 @@ export default function useSubmitBooking(): [
             approvalUrl: values[0],
             rejectedUrl: values[1],
             bookingToolUrl: values[2],
-            headerMessage: 'This is a request email for first approval.',
+            headerMessage: "This is a request email for first approval.",
             ...data,
           };
           sendApprovalEmail(firstApprovers, userEventInputs);
@@ -169,11 +167,11 @@ export default function useSubmitBooking(): [
       );
     }
 
-    alert('Your request has been sent.');
-    navigate('/');
+    alert("Your request has been sent.");
+    navigate("/");
 
     const headerMessage =
-      'Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.';
+      "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.";
     serverFunctions.sendBookingDetailEmail(
       calendarEventId,
       email,
@@ -190,30 +188,30 @@ export default function useSubmitBooking(): [
 }
 
 const order: (keyof Inputs)[] = [
-  'firstName',
-  'lastName',
-  'secondaryName',
-  'nNumber',
-  'netId',
-  'phoneNumber',
-  'department',
-  'role',
-  'sponsorFirstName',
-  'sponsorLastName',
-  'sponsorEmail',
-  'title',
-  'description',
-  'reservationType',
-  'expectedAttendance',
-  'attendeeAffiliation',
-  'roomSetup',
-  'setupDetails',
-  'mediaServices',
-  'mediaServicesDetails',
-  'catering',
-  'cateringService',
-  'hireSecurity',
-  'chartFieldForCatering',
-  'chartFieldForSecurity',
-  'chartFieldForRoomSetup',
+  "firstName",
+  "lastName",
+  "secondaryName",
+  "nNumber",
+  "netId",
+  "phoneNumber",
+  "department",
+  "role",
+  "sponsorFirstName",
+  "sponsorLastName",
+  "sponsorEmail",
+  "title",
+  "description",
+  "reservationType",
+  "expectedAttendance",
+  "attendeeAffiliation",
+  "roomSetup",
+  "setupDetails",
+  "mediaServices",
+  "mediaServicesDetails",
+  "catering",
+  "cateringService",
+  "hireSecurity",
+  "chartFieldForCatering",
+  "chartFieldForSecurity",
+  "chartFieldForRoomSetup",
 ];

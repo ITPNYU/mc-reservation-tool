@@ -1,11 +1,11 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+"use client";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function LandingPage() {
   const router = useRouter();
-
   const handleClick = () => {
-    navigate('/book/role');
+    router.push("/book/role");
   };
 
   return (
