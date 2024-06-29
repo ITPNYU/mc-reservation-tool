@@ -10,11 +10,10 @@ import {
   RoomSetting,
   SafetyTraining,
   Settings,
-} from '../../../types';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
-import { TableNames, getLiaisonTableName } from '../../../policy';
+} from "../../../types";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 
-import { serverFunctions } from '../../utils/serverFunctions';
+import axios from "axios";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -62,7 +61,11 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   setUserEmail: (x: string) => {},
 });
 
-export const DatabaseProvider = ({ children }) => {
+export const DatabaseProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [bannedUsers, setBannedUsers] = useState<Ban[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingStatuses, setBookingStatuses] = useState<BookingStatus[]>([]);
@@ -105,89 +108,64 @@ export const DatabaseProvider = ({ children }) => {
 
     // refresh booking data every 10s;
     setInterval(() => {
-      console.log('UPDATING');
+      console.log("UPDATING");
       fetchBookings();
       fetchBookingStatuses();
     }, 10000);
   }, []);
 
   const fetchActiveUserEmail = () => {
-    serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail:', response);
-      setUserEmail(response);
-    });
+    //TODO: Use firebase auth to get user email
+    setUserEmail("rh3555@nyu.edu");
   };
 
   const fetchBookings = async () => {
-    console.log('CURRENT BRANCH:', process.env.BRANCH_NAME);
-    const bookingRows = await serverFunctions
-      .getActiveBookingsFutureDates()
-      .then((rows) => {
-        return (JSON.parse(rows) as Booking[]).filter((booking) => {
-          return booking.devBranch === process.env.BRANCH_NAME;
-        });
-      });
-    setBookings(bookingRows);
+    const response = await axios.get<Booking[]>("/api/bookings");
+    setBookings(response.data);
   };
 
   const fetchBookingStatuses = async () => {
-    const bookingStatusRows = await serverFunctions
-      .getAllActiveSheetRows(TableNames.BOOKING_STATUS)
-      .then((rows) => JSON.parse(rows) as BookingStatus[]);
-    setBookingStatuses(bookingStatusRows);
+    const response = await axios.get<BookingStatus[]>("/api/bookingStatuses");
+    setBookingStatuses(response.data);
   };
 
   const fetchAdminUsers = async () => {
-    const admins = await serverFunctions
-      .getAllActiveSheetRows(TableNames.ADMINS)
-      .then((rows) => JSON.parse(rows) as AdminUser[]);
-    setAdminUsers(admins);
+    const response = await axios.get<AdminUser[]>("/api/admins");
+    setAdminUsers(response.data);
   };
 
   const fetchPaUsers = async () => {
-    const pas = await serverFunctions
-      .getAllActiveSheetRows(TableNames.PAS)
-      .then((rows) => JSON.parse(rows) as PaUser[]);
-    setPaUsers(pas);
+    const response = await axios.get<PaUser[]>("/api/pas");
+    setPaUsers(response.data);
   };
 
   const fetchSafetyTrainedUsers = async () => {
-    const trained = await serverFunctions
-      .getAllActiveSheetRows(TableNames.SAFETY_TRAINING)
-      .then((rows) => JSON.parse(rows) as SafetyTraining[]);
-    setSafetyTrainedUsers(trained);
+    const response = await axios.get<SafetyTraining[]>("/api/safetyTrainings");
+    setSafetyTrainedUsers(response.data);
   };
 
   const fetchBannedUsers = async () => {
-    const banned = await serverFunctions
-      .getAllActiveSheetRows(TableNames.BANNED)
-      .then((rows) => JSON.parse(rows) as Ban[]);
-    setBannedUsers(banned);
+    const response = await axios.get<Ban[]>("/api/bannedUsers");
+    setBannedUsers(response.data);
   };
 
   const fetchLiaisonUsers = async () => {
-    const liaisons = await serverFunctions
-      .getAllActiveSheetRows(getLiaisonTableName())
-      .then((rows) => JSON.parse(rows) as LiaisonType[]);
-    setLiaisonUsers(liaisons);
+    const response = await axios.get<LiaisonType[]>("/api/liaisons");
+    setLiaisonUsers(response.data);
   };
 
   const fetchRoomSettings = async () => {
-    const settings = await serverFunctions
-      .getAllActiveSheetRows(TableNames.ROOMS)
-      .then((rows) => {
-        return JSON.parse(rows) as RoomSetting[];
-      });
-    setRoomSettings(settings);
+    const response = await axios.get<RoomSetting[]>("/api/rooms");
+    setRoomSettings(response.data);
   };
 
   const fetchBookingReservationTypes = async () => {
-    const reservationTypes: ReservationType[] = await serverFunctions
-      .getAllActiveSheetRows(TableNames.RESERVATION_TYPES)
-      .then((rows) => JSON.parse(rows));
+    const response = await axios.get<ReservationType[]>(
+      "/api/reservationTypes"
+    );
     setSettings((prev) => ({
       ...prev,
-      reservationTypes,
+      ...response.data,
     }));
   };
 

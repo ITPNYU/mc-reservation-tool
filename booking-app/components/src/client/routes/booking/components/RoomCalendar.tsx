@@ -2,19 +2,19 @@ import {
   BookingStatusLabel,
   CalendarEvent,
   RoomSetting,
-} from '../../../../types';
-import React, { useEffect, useState } from 'react';
+} from "../../../../types";
+import React, { useEffect, useState } from "react";
 
-import { DateSelectArg } from '@fullcalendar/core';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import googleCalendarPlugin from '@fullcalendar/google-calendar';
-import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import { serverFunctions } from '../../../utils/serverFunctions';
-import timeGridPlugin from '@fullcalendar/timegrid'; // a plugin!
-import { HIDING_STATUS } from '../../../../policy';
+import { DateSelectArg } from "@fullcalendar/core";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import googleCalendarPlugin from "@fullcalendar/google-calendar";
+import interactionPlugin from "@fullcalendar/interaction"; // for selectable
+import { serverFunctions } from "../../../utils/serverFunctions";
+import timeGridPlugin from "@fullcalendar/timegrid"; // a plugin!
+import { HIDING_STATUS } from "../../../../policy";
 
-const TITLE_TAG = '[Click to Delete]';
+const TITLE_TAG = "[Click to Delete]";
 
 interface Props {
   allRooms: RoomSetting[];
@@ -37,12 +37,12 @@ export const RoomCalendar = ({
 
   useEffect(() => {
     console.log(
-      'Fetching calendar events from:',
+      "Fetching calendar events from:",
       process.env.CALENDAR_ENV,
-      'calendars'
+      "calendars"
     );
     fetchCalendarEvents(
-      process.env.CALENDAR_ENV === 'production'
+      process.env.CALENDAR_ENV === "production"
         ? room.calendarIdProd
         : room.calendarIdDev
     );
@@ -52,32 +52,32 @@ export const RoomCalendar = ({
     const match = eventInfo.event.title.match(/\[(.*?)\]/);
     const title = match ? match[1] : eventInfo.event.title;
 
-    const startTime = new Intl.DateTimeFormat('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
+    const startTime = new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(eventInfo.event.start);
-    const endTime = new Intl.DateTimeFormat('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
+    const endTime = new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(eventInfo.event.end);
 
-    let backgroundColor = '';
+    let backgroundColor = "";
     // Change the background color of the event depending on its title
     if (eventInfo.event.title.includes(BookingStatusLabel.REQUESTED)) {
-      backgroundColor = '#d60000';
+      backgroundColor = "#d60000";
     } else if (
       eventInfo.event.title.includes(BookingStatusLabel.PRE_APPROVED)
     ) {
-      backgroundColor = '#f6c026';
+      backgroundColor = "#f6c026";
     } else if (eventInfo.event.title.includes(BookingStatusLabel.APPROVED)) {
-      backgroundColor = '#33b679';
+      backgroundColor = "#33b679";
     }
     return (
       <div
         style={{
           backgroundColor: backgroundColor,
-          height: '100%',
-          width: '100%',
+          height: "100%",
+          width: "100%",
         }}
       >
         <b>{title}</b>
@@ -97,7 +97,7 @@ export const RoomCalendar = ({
   const handleEventClick = (info) => {
     if (!editableEvent(info.event)) return;
     const targetGroupId = info.event.groupId;
-    const isConfirmed = window.confirm('Do you want to delete this event?');
+    const isConfirmed = window.confirm("Do you want to delete this event?");
 
     if (isConfirmed) {
       allRooms.map((room) => {
@@ -116,11 +116,11 @@ export const RoomCalendar = ({
   };
   const handleDateSelect = (selectInfo) => {
     if (bookingTimeEvent) {
-      alert('You can only book one time slot per reservation');
+      alert("You can only book one time slot per reservation");
       return;
     }
     allRooms.map((room) => {
-      console.log('handle datae select room', room);
+      console.log("handle datae select room", room);
       if (!room.calendarRef.current) return;
       let calendarApi = room.calendarRef.current.getApi();
       calendarApi.addEvent({
@@ -134,7 +134,7 @@ export const RoomCalendar = ({
     setBookingTimeEvent(selectInfo);
   };
   const handleSelectAllow = (selectInfo) => {
-    console.log('isOverlap', !isOverlap(selectInfo));
+    console.log("isOverlap", !isOverlap(selectInfo));
     return !isOverlap(selectInfo);
   };
 
@@ -161,8 +161,8 @@ export const RoomCalendar = ({
   return (
     <div
       className={`mx-5 h-[1000px] ${
-        selectedRooms.length === 1 && 'w-[1000px]'
-      } ${!selectedRooms.includes(room) && 'hidden'}`}
+        selectedRooms.length === 1 && "w-[1000px]"
+      } ${!selectedRooms.includes(room) && "hidden"}`}
     >
       {selectedRooms.includes(room)}
       {room.roomId} {room.name}
@@ -178,14 +178,14 @@ export const RoomCalendar = ({
           dayGridPlugin,
         ]}
         headerToolbar={{
-          left: '',
-          center: 'title',
-          right: '',
+          left: "",
+          center: "title",
+          right: "",
         }}
         themeSystem="bootstrap5"
         eventContent={renderEventContent}
         editable={true}
-        initialView={selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridDay'}
+        initialView={selectedRooms.length > 1 ? "timeGridDay" : "timeGridDay"}
         navLinks={true}
         select={function (info) {
           handleDateSelect(info);

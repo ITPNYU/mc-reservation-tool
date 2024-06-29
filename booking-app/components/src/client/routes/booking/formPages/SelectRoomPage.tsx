@@ -36,7 +36,7 @@ export default function SelectRoomPage() {
       return;
     }
 
-    navigate("/book/form");
+    router.push("/book/form");
   };
 
   return (
