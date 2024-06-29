@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { Calendars } from './Calendars';
-import { DateSelectArg } from '@fullcalendar/core';
-import { RoomSetting } from '../../../../types';
-import { SelectRooms } from './SelectRooms';
+import { Calendars } from "./Calendars";
+import { DateSelectArg } from "@fullcalendar/core";
+import { RoomSetting } from "../../../../types";
+import { SelectRooms } from "./SelectRooms";
 
 interface Props {
   allRooms: RoomSetting[];
@@ -42,11 +42,11 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
 
-    const valuesArray = value.split(',');
+    const valuesArray = value.split(",");
 
     if (
       !hasModalBeenShown &&
-      (valuesArray.includes('221') || valuesArray.includes('222'))
+      (valuesArray.includes("221") || valuesArray.includes("222"))
     ) {
       setShowMotionCaptureModal(true);
       setHasModalBeenShown(true);

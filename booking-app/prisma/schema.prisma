@@ -18,7 +18,7 @@ model Room {
   id    Int     @id @default(autoincrement())
   roomId Int @unique
   name  String
-  capacity String 
+  capacity Int
   calendarIdDev String
   calendarIdProd String
 }

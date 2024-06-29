@@ -1,4 +1,5 @@
 // components/Layout.tsx
+
 import NavBar from "@/components/src/client/routes/booking/components/ NavBar";
 import { DatabaseProvider } from "@/components/src/client/routes/components/Provider";
 import React from "react";

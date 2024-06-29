@@ -33,20 +33,7 @@ const callServerFunction = async (
   functionName: ServerFunctionNames,
   parameters: any[]
 ) => {
-  const response = await fetch("/api/mockFunctions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ functionName, parameters }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  const data = await response.json();
-  return data;
+  return [{ name: "hoge" }];
 };
 
 export const serverFunctions: ServerFunctions = {} as ServerFunctions;
