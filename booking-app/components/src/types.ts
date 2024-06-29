@@ -37,14 +37,14 @@ export type BookingStatus = {
 };
 
 export enum BookingStatusLabel {
-  APPROVED = 'APPROVED',
-  CANCELED = 'CANCELED',
-  CHECKED_IN = 'CHECKED-IN',
-  NO_SHOW = 'NO-SHOW',
-  PRE_APPROVED = 'PRE-APPROVED',
-  REJECTED = 'REJECTED',
-  REQUESTED = 'REQUESTED',
-  UNKNOWN = 'UNKNOWN',
+  APPROVED = "APPROVED",
+  CANCELED = "CANCELED",
+  CHECKED_IN = "CHECKED-IN",
+  NO_SHOW = "NO-SHOW",
+  PRE_APPROVED = "PRE-APPROVED",
+  REJECTED = "REJECTED",
+  REQUESTED = "REQUESTED",
+  UNKNOWN = "UNKNOWN",
 }
 
 export type CalendarEvent = {
@@ -54,16 +54,16 @@ export type CalendarEvent = {
 };
 
 export enum Department {
-  ALT = 'ALT',
-  GAMES = 'Game Center',
-  IDM = 'IDM',
-  ITP = 'ITP / IMA / Low Res',
-  MARL = 'MARL',
-  MUSIC_TECH = 'Music Tech',
-  RECORDED_MUSIC = 'Recorded Music',
+  ALT = "ALT",
+  GAMES = "Game Center",
+  IDM = "IDM",
+  ITP = "ITP / IMA / Low Res",
+  MARL = "MARL",
+  MUSIC_TECH = "Music Tech",
+  RECORDED_MUSIC = "Recorded Music",
 }
 
-export type DevBranch = 'development' | 'staging' | 'production' | '';
+export type DevBranch = "development" | "staging" | "production" | "";
 
 export type Inputs = {
   firstName: string;
@@ -118,16 +118,16 @@ export type ReservationType = {
 };
 
 export enum Role {
-  STUDENT = 'Student',
-  RESIDENT_FELLOW = 'Resident/Fellow',
-  FACULTY = 'Faculty',
-  ADMIN_STAFF = 'Admin/Staff',
+  STUDENT = "Student",
+  RESIDENT_FELLOW = "Resident/Fellow",
+  FACULTY = "Faculty",
+  ADMIN_STAFF = "Admin/Staff",
 }
 
 export type RoomSetting = {
   roomId: string;
   name: string;
-  capacity: string;
+  capacity: number;
   calendarIdDev: string;
   calendarIdProd: string;
   calendarRef?: any;

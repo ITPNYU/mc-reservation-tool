@@ -6,8 +6,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "ESNext", // "ESNext"に設定
+    "moduleResolution": "node", // "node"に変更
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -26,7 +26,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "prisma/**/*.ts"
+    "prisma/**/*.ts",
+    "prisma/seed.mjs"
   ],
   "exclude": ["node_modules"]
 }
