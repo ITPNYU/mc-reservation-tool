@@ -12,6 +12,8 @@ const theme = createTheme({
     },
     custom: {
       gray: 'rgba(33, 33, 33, 0.08)',
+      gray2: 'rgba(0,0,0,0.6)',
+      gray3: 'rgba(0,0,0,0.3)',
       border: 'rgba(0,0,0,0.12)',
     },
   },
