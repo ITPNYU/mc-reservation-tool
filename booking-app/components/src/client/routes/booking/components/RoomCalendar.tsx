@@ -13,6 +13,7 @@ import interactionPlugin from "@fullcalendar/interaction"; // for selectable
 import { serverFunctions } from "../../../utils/serverFunctions";
 import timeGridPlugin from "@fullcalendar/timegrid"; // a plugin!
 import { HIDING_STATUS } from "../../../../policy";
+import axios from "axios";
 
 const TITLE_TAG = "[Click to Delete]";
 
@@ -85,13 +86,14 @@ export const RoomCalendar = ({
     );
   }
 
-  const fetchCalendarEvents = async (calendarId) => {
-    serverFunctions.getCalendarEvents(calendarId).then((rows) => {
-      const filteredEvents = rows.filter((row) => {
-        return !HIDING_STATUS.some((status) => row.title.includes(status));
-      });
-      setEvents(filteredEvents);
+  const fetchCalendarEvents = async (calendarId: string) => {
+    const response = await axios.get("/api/calendarEvents", {
+      params: { calendarId: calendarId },
     });
+    const filteredEvents = response.data.filter((row: any) => {
+      return !HIDING_STATUS.some((status) => row.title.includes(status));
+    });
+    setEvents(filteredEvents);
   };
 
   const handleEventClick = (info) => {

@@ -30,8 +30,9 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
 
   useEffect(() => {
     const checked = allRooms.filter((room) =>
-      checkedRoomIds.includes(room.roomId)
+      checkedRoomIds.includes(room.roomId.toString())
     );
+    console.log("checked", checked, checkedRoomIds, allRooms);
     setCheckedRooms(checked);
   }, [checkedRoomIds]);
 
