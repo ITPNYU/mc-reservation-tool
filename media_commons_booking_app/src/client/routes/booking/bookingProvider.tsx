@@ -1,4 +1,4 @@
-import { Department, Role, RoomSetting } from '../../../types';
+import { CalendarEvent, Department, Role, RoomSetting } from '../../../types';
 import React, {
   createContext,
   useCallback,
@@ -10,6 +10,7 @@ import React, {
 
 import { DatabaseContext } from '../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
+import fetchCalendarEvents from './hooks/fetchCalendarEvents';
 import { serverFunctions } from '../../utils/serverFunctions';
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -23,6 +24,7 @@ import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
   department: Department | undefined;
+  existingEvents: CalendarEvent[];
   isBanned: boolean;
   isSafetyTrained: boolean;
   needsSafetyTraining: boolean;
@@ -38,6 +40,7 @@ export interface BookingContextType {
 export const BookingContext = createContext<BookingContextType>({
   bookingCalendarInfo: undefined,
   department: undefined,
+  existingEvents: [],
   isBanned: false,
   needsSafetyTraining: false,
   isSafetyTrained: true,
@@ -51,7 +54,7 @@ export const BookingContext = createContext<BookingContextType>({
 });
 
 export function BookingProvider({ children }) {
-  const { bannedUsers, safetyTrainedUsers, userEmail } =
+  const { bannedUsers, roomSettings, safetyTrainedUsers, userEmail } =
     useContext(DatabaseContext);
 
   const [bookingCalendarInfo, setBookingCalendarInfo] =
@@ -61,6 +64,7 @@ export function BookingProvider({ children }) {
   const [role, setRole] = useState<Role>();
   const [needsSafetyTraining, setNeedsSafetyTraining] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
+  const existingEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
     console.log('userEmail', userEmail);
@@ -95,6 +99,7 @@ export function BookingProvider({ children }) {
       value={{
         bookingCalendarInfo,
         department,
+        existingEvents,
         isBanned,
         isSafetyTrained,
         needsSafetyTraining,

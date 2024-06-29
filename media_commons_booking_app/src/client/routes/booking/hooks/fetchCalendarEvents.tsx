@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CALENDAR_HIDE_STATUS } from '../../../../policy';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
-export default function fetchCalendarEvents(rooms: RoomSetting[]) {
+export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
@@ -13,14 +13,13 @@ export default function fetchCalendarEvents(rooms: RoomSetting[]) {
       process.env.CALENDAR_ENV,
       'calendars'
     );
-    rooms.forEach((room) => {
-      fetchCalendarEvents(room).then((events) => {
-        setEvents((prev) => [...prev, ...events]);
-      });
-    });
-  }, []);
 
-  const fetchCalendarEvents = async (room: RoomSetting) => {
+    Promise.all(allRooms.map(fetchRoomCalendarEvents)).then((results) =>
+      setEvents(results.flat())
+    );
+  }, [allRooms]);
+
+  const fetchRoomCalendarEvents = async (room: RoomSetting) => {
     const calendarId =
       process.env.CALENDAR_ENV === 'production'
         ? room.calendarIdProd

@@ -9,17 +9,13 @@ const theme = createTheme({
     },
     secondary: {
       main: deepPurple.A100,
-      light: deepPurple[50],
     },
     custom: {
       gray: 'rgba(33, 33, 33, 0.08)',
       gray2: 'rgba(0,0,0,0.6)',
       gray3: 'rgba(0,0,0,0.3)',
-      border: '#e3e3e3',
+      border: 'rgba(0,0,0,0.12)',
     },
-    success: { main: 'rgb(0 255 0)' },
-    warning: { main: 'rgb(255 167 0)' },
-    error: { main: 'rgba(255, 26, 26, 1)' },
   },
   components: {
     MuiCssBaseline: {
@@ -33,7 +29,7 @@ const theme = createTheme({
         },
 
         table: {
-          border: '1px solid #e3e3e3',
+          border: '1px solid rgba(0,0,0,0.12)',
         },
       },
     },

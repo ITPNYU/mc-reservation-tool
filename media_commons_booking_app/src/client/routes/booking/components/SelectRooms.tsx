@@ -5,21 +5,23 @@ import { RoomSetting } from '../../../../types';
 
 interface Props {
   allRooms: RoomSetting[];
-  selected: string[];
+  selected: RoomSetting[];
   setSelected: any;
 }
 
 export const SelectRooms = ({ allRooms, selected, setSelected }: Props) => {
   const handleCheckChange = (e: any, room: RoomSetting) => {
     const newVal: boolean = e.target.checked;
-    setSelected((prev) => {
+    setSelected((prev: RoomSetting[]) => {
       if (newVal) {
-        return [...prev, room.roomId];
+        return [...prev, room];
       } else {
-        return prev.filter((x) => x !== room.roomId);
+        return prev.filter((x: RoomSetting) => x.roomId != room.roomId);
       }
     });
   };
+
+  const selectedIds = selected.map((room) => room.roomId);
 
   return (
     <FormGroup>
@@ -27,9 +29,9 @@ export const SelectRooms = ({ allRooms, selected, setSelected }: Props) => {
         <FormControlLabel
           control={
             <Checkbox
-              defaultChecked
-              value={selected.includes(room.roomId)}
+              checked={selectedIds.includes(room.roomId)}
               onChange={(e) => handleCheckChange(e, room)}
+              inputProps={{ 'aria-label': 'controlled' }}
             />
           }
           label={`${room.roomId} ${room.name}`}
