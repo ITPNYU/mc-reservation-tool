@@ -27,7 +27,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "prisma/**/*.ts",
-    "prisma/seed.mjs"
+    "prisma/seed.mjs",
+    "scripts/getToken.js"
   ],
   "exclude": ["node_modules"]
 }

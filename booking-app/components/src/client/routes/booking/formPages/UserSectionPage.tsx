@@ -33,7 +33,7 @@ export default function UserSectionPage() {
         key="backToCalendar"
         disabled={!bookingCalendarInfo}
         onClick={() => {
-          navigate("/book/selectRoom");
+          router.push("/book/selectRoom");
         }}
         className={`px-4 py-2 text-white rounded-md focus:outline-none ${
           bookingCalendarInfo
