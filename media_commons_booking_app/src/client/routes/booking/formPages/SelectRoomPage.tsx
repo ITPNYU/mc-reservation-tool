@@ -61,11 +61,7 @@ export default function SelectRoomPage() {
           </Stack>
         </Grid>
         <Grid paddingRight={2} flex={1}>
-          <CalendarVerticalResource
-            allRooms={roomSettings}
-            rooms={selectedRooms}
-            dateView={date}
-          />
+          <CalendarVerticalResource rooms={selectedRooms} dateView={date} />
         </Grid>
       </Grid>
     </Box>

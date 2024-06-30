@@ -1,7 +1,7 @@
-import { CalendarEvent, RoomSetting } from '../../../../types';
+import { Booking, CalendarEvent, RoomSetting } from '../../../../types';
+import { CALENDAR_HIDE_STATUS, STORAGE_KEY_BOOKING } from '../../../../policy';
 import { useEffect, useState } from 'react';
 
-import { CALENDAR_HIDE_STATUS } from '../../../../policy';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
 export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
@@ -14,8 +14,10 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
       'calendars'
     );
 
+    const fakeEvents = getFakeEvents();
+
     Promise.all(allRooms.map(fetchRoomCalendarEvents)).then((results) =>
-      setEvents(results.flat())
+      setEvents([...fakeEvents, ...results.flat()])
     );
   }, [allRooms]);
 
@@ -29,11 +31,27 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
       ...row,
       id: room.roomId,
       resourceId: room.roomId,
+      // overlap: false,
     }));
     const filteredEvents = rowsWithResourceIds.filter((row) => {
       return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
     });
     return filteredEvents;
+  };
+
+  const getFakeEvents: () => CalendarEvent[] = () => {
+    const existingFakeData = localStorage.getItem(STORAGE_KEY_BOOKING);
+    if (existingFakeData != null && process.env.BRANCH_NAME === 'development') {
+      const json = JSON.parse(existingFakeData);
+      return json.bookingRows.map((booking: Booking) => ({
+        title: booking.title,
+        start: booking.startDate,
+        end: booking.endDate,
+        id: booking.roomId,
+        resourceId: booking.roomId,
+      }));
+    }
+    return [];
   };
 
   return events;
