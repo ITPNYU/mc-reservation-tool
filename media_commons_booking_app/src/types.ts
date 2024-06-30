@@ -54,6 +54,8 @@ export type CalendarEvent = {
   end: string;
   id: string;
   resourceId: string;
+  display?: string;
+  overlap?: boolean;
 };
 
 export enum Department {
