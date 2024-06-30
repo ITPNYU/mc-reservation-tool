@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
+import { STORAGE_KEY_BOOKING } from '../../policy';
 import useWebSocket from 'react-use-websocket';
-
-export const STORAGE_KEY_BOOKING = 'mediaCommonsDevBooking';
 
 export default function useFakeDataLocalStorage(
   setBookings,

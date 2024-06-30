@@ -94,3 +94,5 @@ export const CALENDAR_HIDE_STATUS = [
   BookingStatusLabel.CANCELED,
   BookingStatusLabel.REJECTED,
 ];
+
+export const STORAGE_KEY_BOOKING = 'mediaCommonsDevBooking';
