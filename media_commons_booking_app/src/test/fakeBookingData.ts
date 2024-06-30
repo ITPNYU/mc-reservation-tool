@@ -7,9 +7,13 @@ function genFakeBookingRow(
 ): Booking {
   const today = new Date();
   today.setMinutes(0); // show a nice time
+  today.setSeconds(0);
+  today.setMilliseconds(0);
   const endTime = new Date();
   endTime.setHours(today.getHours() + 4);
   endTime.setMinutes(0);
+  endTime.setSeconds(0);
+  endTime.setMilliseconds(0);
 
   return {
     calendarEventId,
