@@ -39,8 +39,13 @@ export default function CalendarEventBlock(eventInfo: EventContentArg) {
   const title = match ? match[1] : eventInfo.event.title;
 
   const isNew = eventInfo.event.title === NEW_TITLE_TAG;
-  const index = Number(eventInfo.event.url); // hack
-  const isLast = index === -1;
+
+  // super mega hack to get data in here to render user selected events as one long block spanning whole grid
+  const params = eventInfo.event.url.split(':');
+  const index = Number(params[0]);
+  const maxIndex = Number(params[1]);
+  const isLast = index === maxIndex;
+  const isOneColumn = index === 0 && isLast;
 
   const backgroundColor = () => {
     if (isNew) {
@@ -60,7 +65,7 @@ export default function CalendarEventBlock(eventInfo: EventContentArg) {
 
   return (
     <Block bgcolor={backgroundColor()} isNew={isNew} isLast={isLast}>
-      <b>{isNew && index !== 0 ? '' : title}</b>
+      <b>{isNew && index !== 0 && !isOneColumn ? '' : title}</b>
       {isNew && isLast && (
         <CloseButton>
           <Close />
