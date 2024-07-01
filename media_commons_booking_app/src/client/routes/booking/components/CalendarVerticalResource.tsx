@@ -92,7 +92,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       resourceId: room.roomId,
       title: NEW_TITLE_TAG,
       overlap: true,
-      url: index === rooms.length - 1 ? '-1' : String(index), // some hackiness to let us render multiple events visually as one big block
+      url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
     }));
     setNewEvents(newRoomEvents);
   }, [bookingCalendarInfo, rooms]);
@@ -100,22 +100,22 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
   // these are visually hidden blocks on the cal to prevent user from
   // dragging on a resource column when other resources are booked at that time
   const bgEvents = useMemo(() => {
-    const bg: CalendarEvent[] = existingEvents
-      .map((event) =>
-        rooms
-          .filter((room) => room.roomId !== event.resourceId)
-          .map((room) => ({
-            id: room.roomId,
+    const selectedRoomIds = rooms.map((room) => room.roomId);
+    const bg: CalendarEvent[] = rooms
+      .map((room) =>
+        existingEvents
+          .filter((event) => selectedRoomIds.includes(event.resourceId))
+          .map((event) => ({
+            ...event,
             resourceId: room.roomId,
+            id: room.roomId,
             title: '',
-            start: event.start,
-            end: event.end,
             display: 'none',
           }))
       )
       .flat();
     return bg;
-  }, [existingEvents, resources]);
+  }, [existingEvents, rooms]);
 
   const handleEventSelect = (selectInfo: DateSelectArg) => {
     setBookingCalendarInfo(selectInfo);
