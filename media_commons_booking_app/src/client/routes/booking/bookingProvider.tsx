@@ -16,7 +16,7 @@ import { serverFunctions } from '../../utils/serverFunctions';
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
   department: Department | undefined;
-  existingEvents: CalendarEvent[];
+  existingCalendarEvents: CalendarEvent[];
   isBanned: boolean;
   isSafetyTrained: boolean;
   role: Role | undefined;
@@ -30,7 +30,7 @@ export interface BookingContextType {
 export const BookingContext = createContext<BookingContextType>({
   bookingCalendarInfo: undefined,
   department: undefined,
-  existingEvents: [],
+  existingCalendarEvents: [],
   isBanned: false,
   isSafetyTrained: true,
   role: undefined,
@@ -51,7 +51,7 @@ export function BookingProvider({ children }) {
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
-  const existingEvents = fetchCalendarEvents(roomSettings);
+  const existingCalendarEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
     console.log('userEmail', userEmail);
@@ -86,7 +86,7 @@ export function BookingProvider({ children }) {
       value={{
         bookingCalendarInfo,
         department,
-        existingEvents,
+        existingCalendarEvents,
         isBanned,
         isSafetyTrained,
         role,

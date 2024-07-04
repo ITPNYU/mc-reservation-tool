@@ -14,7 +14,9 @@ export const SelectRooms = ({ allRooms, selected, setSelected }: Props) => {
     const newVal: boolean = e.target.checked;
     setSelected((prev: RoomSetting[]) => {
       if (newVal) {
-        return [...prev, room];
+        return [...prev, room].sort(
+          (a, b) => Number(a.roomId) - Number(b.roomId)
+        );
       } else {
         return prev.filter((x: RoomSetting) => x.roomId != room.roomId);
       }

@@ -2,6 +2,7 @@ import { Booking, CalendarEvent, RoomSetting } from '../../../../types';
 import { CALENDAR_HIDE_STATUS, STORAGE_KEY_BOOKING } from '../../../../policy';
 import { useEffect, useState } from 'react';
 
+import getBookingStatus from '../../admin/hooks/getBookingStatus';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
 export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
@@ -17,7 +18,12 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
     const fakeEvents = getFakeEvents();
 
     Promise.all(allRooms.map(fetchRoomCalendarEvents)).then((results) =>
-      setEvents([...fakeEvents, ...results.flat()])
+      setEvents(
+        [...fakeEvents, ...results.flat()].filter(
+          (event) =>
+            !CALENDAR_HIDE_STATUS.some((status) => event.title.includes(status))
+        )
+      )
     );
   }, [allRooms]);
 
@@ -31,12 +37,12 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
       ...row,
       id: room.roomId,
       resourceId: room.roomId,
-      // overlap: false,
     }));
-    const filteredEvents = rowsWithResourceIds.filter((row) => {
-      return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
-    });
-    return filteredEvents;
+    return rowsWithResourceIds;
+    // const filteredEvents = rowsWithResourceIds.filter((row) => {
+    //   return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
+    // });
+    // return filteredEvents;
   };
 
   const getFakeEvents: () => CalendarEvent[] = () => {
@@ -44,7 +50,9 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
     if (existingFakeData != null && process.env.BRANCH_NAME === 'development') {
       const json = JSON.parse(existingFakeData);
       return json.bookingRows.map((booking: Booking) => ({
-        title: booking.title,
+        title: `[${getBookingStatus(booking, json.bookingStatusRows)}] ${
+          booking.title
+        }`,
         start: booking.startDate,
         end: booking.endDate,
         id: booking.roomId,

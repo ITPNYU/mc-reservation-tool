@@ -10,22 +10,28 @@ export const NEW_TITLE_TAG = 'Your Reservation';
 
 interface Props {
   bgcolor: string;
+  isFirst: boolean;
   isLast: boolean;
   isNew: boolean;
 }
 
-const Block = styled(Box)<Props>(({ theme, bgcolor, isLast, isNew }) => ({
-  backgroundColor: bgcolor ?? theme.palette.primary.main,
-  border: `2px solid ${bgcolor ?? theme.palette.primary.main}`,
-  borderRadius: '4px',
-  outline: 'none',
-  height: '100%',
-  width: isNew && !isLast ? '105%' : '100%',
-  overflowX: 'hidden',
-  cursor: bgcolor ? 'unset' : 'pointer',
-  padding: '2px 4px',
-  position: 'relative',
-}));
+const Block = styled(Box)<Props>(
+  ({ theme, bgcolor, isFirst, isLast, isNew }) => ({
+    backgroundColor: bgcolor ?? theme.palette.primary.main,
+    border: `2px solid ${bgcolor ?? theme.palette.primary.main}`,
+    borderRadius: '4px',
+    outline: 'none',
+    height: '100%',
+    width: isNew && !isLast ? '105%' : '100%',
+    overflowX: 'hidden',
+    cursor: bgcolor ? 'unset' : 'pointer',
+    padding: '2px 4px',
+    position: 'relative',
+    zIndex: isNew ? 99 : 2,
+    borderTopLeftRadius: isNew && !isFirst ? 0 : 4,
+    borderBottomLeftRadius: isNew && !isFirst ? 0 : 4,
+  })
+);
 
 const CloseButton = styled(IconButton)`
   position: absolute;
@@ -64,7 +70,12 @@ export default function CalendarEventBlock(eventInfo: EventContentArg) {
   };
 
   return (
-    <Block bgcolor={backgroundColor()} isNew={isNew} isLast={isLast}>
+    <Block
+      bgcolor={backgroundColor()}
+      isNew={isNew}
+      isLast={isLast}
+      isFirst={index === 0}
+    >
       <b>{isNew && index !== 0 && !isOneColumn ? '' : title}</b>
       {isNew && isLast && (
         <CloseButton>

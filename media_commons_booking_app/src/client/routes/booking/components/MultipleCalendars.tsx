@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Calendars } from './Calendars';
+// import { Calendars } from './Calendars';
 import { DateSelectArg } from '@fullcalendar/core';
 import { RoomSetting } from '../../../../types';
 import { SelectRooms } from './SelectRooms';
@@ -118,7 +118,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
         handleCheckboxChange={handleCheckboxChange}
       /> */}
 
-      {calendarRefs.length > 0 && (
+      {/* {calendarRefs.length > 0 && (
         <div className="mt-5 ml-20 flex justify-center">
           <Calendars
             allRooms={allRooms}
@@ -126,7 +126,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
             handleSetDate={handleSubmit}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

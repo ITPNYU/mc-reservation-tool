@@ -45,6 +45,10 @@ const FullCalendarWrapper = styled(Box)({
   '.fc-event:focus::after': {
     background: 'none',
   },
+
+  '.fc-timegrid-event-harness': {
+    left: '0% !important',
+  },
 });
 
 const Empty = styled(Box)(({ theme }) => ({
@@ -57,8 +61,11 @@ const Empty = styled(Box)(({ theme }) => ({
 
 export default function CalendarVerticalResource({ rooms, dateView }: Props) {
   const [newEvents, setNewEvents] = useState<CalendarEvent[]>([]);
-  const { bookingCalendarInfo, existingEvents, setBookingCalendarInfo } =
-    useContext(BookingContext);
+  const {
+    bookingCalendarInfo,
+    existingCalendarEvents,
+    setBookingCalendarInfo,
+  } = useContext(BookingContext);
   const ref = useRef(null);
 
   const resources = useMemo(
@@ -91,31 +98,11 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       id: Date.now().toString(),
       resourceId: room.roomId,
       title: NEW_TITLE_TAG,
-      overlap: true,
+      overlap: false,
       url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
     }));
     setNewEvents(newRoomEvents);
   }, [bookingCalendarInfo, rooms]);
-
-  // these are visually hidden blocks on the cal to prevent user from
-  // dragging on a resource column when other resources are booked at that time
-  const bgEvents = useMemo(() => {
-    const selectedRoomIds = rooms.map((room) => room.roomId);
-    const bg: CalendarEvent[] = rooms
-      .map((room) =>
-        existingEvents
-          .filter((event) => selectedRoomIds.includes(event.resourceId))
-          .map((event) => ({
-            ...event,
-            resourceId: room.roomId,
-            id: room.roomId,
-            title: '',
-            display: 'none',
-          }))
-      )
-      .flat();
-    return bg;
-  }, [existingEvents, rooms]);
 
   const handleEventSelect = (selectInfo: DateSelectArg) => {
     setBookingCalendarInfo(selectInfo);
@@ -129,10 +116,6 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
     api.unselect();
     setBookingCalendarInfo(selectInfo);
     return true;
-  };
-
-  const handleSelectOverlap = (el) => {
-    return el.overlap;
   };
 
   const handleEventClick = (info: EventClickArg) => {
@@ -162,13 +145,11 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
           interactionPlugin,
         ]}
         selectable={true}
-        selectOverlap={handleSelectOverlap}
-        eventOverlap={false}
         select={handleEventSelect}
         selectAllow={handleEventSelecting}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         resources={resources}
-        events={[...bgEvents, ...existingEvents, ...newEvents]}
+        events={[...existingCalendarEvents, ...newEvents]}
         eventContent={CalendarEventBlock}
         eventClick={function (info) {
           info.jsEvent.preventDefault();
