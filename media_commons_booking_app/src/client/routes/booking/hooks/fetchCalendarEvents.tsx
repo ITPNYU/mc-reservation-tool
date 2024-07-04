@@ -1,7 +1,8 @@
-import { CalendarEvent, RoomSetting } from '../../../../types';
+import { Booking, CalendarEvent, RoomSetting } from '../../../../types';
+import { CALENDAR_HIDE_STATUS, STORAGE_KEY_BOOKING } from '../../../../policy';
 import { useEffect, useState } from 'react';
 
-import { CALENDAR_HIDE_STATUS } from '../../../../policy';
+import getBookingStatus from '../../admin/hooks/getBookingStatus';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
 export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
@@ -14,8 +15,15 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
       'calendars'
     );
 
+    const fakeEvents = getFakeEvents();
+
     Promise.all(allRooms.map(fetchRoomCalendarEvents)).then((results) =>
-      setEvents(results.flat())
+      setEvents(
+        [...fakeEvents, ...results.flat()].filter(
+          (event) =>
+            !CALENDAR_HIDE_STATUS.some((status) => event.title.includes(status))
+        )
+      )
     );
   }, [allRooms]);
 
@@ -30,10 +38,28 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
       id: room.roomId,
       resourceId: room.roomId,
     }));
-    const filteredEvents = rowsWithResourceIds.filter((row) => {
-      return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
-    });
-    return filteredEvents;
+    return rowsWithResourceIds;
+    // const filteredEvents = rowsWithResourceIds.filter((row) => {
+    //   return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
+    // });
+    // return filteredEvents;
+  };
+
+  const getFakeEvents: () => CalendarEvent[] = () => {
+    const existingFakeData = localStorage.getItem(STORAGE_KEY_BOOKING);
+    if (existingFakeData != null && process.env.BRANCH_NAME === 'development') {
+      const json = JSON.parse(existingFakeData);
+      return json.bookingRows.map((booking: Booking) => ({
+        title: `[${getBookingStatus(booking, json.bookingStatusRows)}] ${
+          booking.title
+        }`,
+        start: booking.startDate,
+        end: booking.endDate,
+        id: booking.roomId,
+        resourceId: booking.roomId,
+      }));
+    }
+    return [];
   };
 
   return events;

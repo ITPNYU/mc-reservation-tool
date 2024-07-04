@@ -24,7 +24,7 @@ import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
   department: Department | undefined;
-  existingEvents: CalendarEvent[];
+  existingCalendarEvents: CalendarEvent[];
   isBanned: boolean;
   isSafetyTrained: boolean;
   needsSafetyTraining: boolean;
@@ -40,7 +40,7 @@ export interface BookingContextType {
 export const BookingContext = createContext<BookingContextType>({
   bookingCalendarInfo: undefined,
   department: undefined,
-  existingEvents: [],
+  existingCalendarEvents: [],
   isBanned: false,
   needsSafetyTraining: false,
   isSafetyTrained: true,
@@ -64,7 +64,7 @@ export function BookingProvider({ children }) {
   const [role, setRole] = useState<Role>();
   const [needsSafetyTraining, setNeedsSafetyTraining] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
-  const existingEvents = fetchCalendarEvents(roomSettings);
+  const existingCalendarEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
     console.log('userEmail', userEmail);
@@ -99,7 +99,7 @@ export function BookingProvider({ children }) {
       value={{
         bookingCalendarInfo,
         department,
-        existingEvents,
+        existingCalendarEvents,
         isBanned,
         isSafetyTrained,
         needsSafetyTraining,

@@ -1,29 +1,34 @@
 import { Box, Typography } from '@mui/material';
 import { CalendarApi, DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import { CalendarEvent, RoomSetting } from '../../../../types';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import CalendarEventBlock, { NEW_TITLE_TAG } from './CalendarEventBlock';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
-import CalendarEventBlock from './CalendarEventBlock';
 import FullCalendar from '@fullcalendar/react';
-import fetchCalendarEvents from '../hooks/fetchCalendarEvents';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import { styled } from '@mui/system';
 
 interface Props {
-  allRooms: RoomSetting[];
   rooms: RoomSetting[];
   dateView: Date;
 }
 
 const FullCalendarWrapper = styled(Box)({
   marginTop: 12,
+  '.fc-day-today': {
+    background: 'white !important',
+  },
 
   '.fc-col-header-cell-cushion': {
     fontSize: 'small',
     lineHeight: 'normal',
+  },
+
+  '.fc-timegrid-col-events': {
+    margin: 0,
   },
 
   '.fc-v-event': {
@@ -40,6 +45,10 @@ const FullCalendarWrapper = styled(Box)({
   '.fc-event:focus::after': {
     background: 'none',
   },
+
+  '.fc-timegrid-event-harness': {
+    left: '0% !important',
+  },
 });
 
 const Empty = styled(Box)(({ theme }) => ({
@@ -50,17 +59,23 @@ const Empty = styled(Box)(({ theme }) => ({
   color: theme.palette.custom.gray3,
 }));
 
-const TITLE_TAG = 'Click to Delete';
-
-export default function CalendarVerticalResource({
-  allRooms,
-  rooms,
-  dateView,
-}: Props) {
+export default function CalendarVerticalResource({ rooms, dateView }: Props) {
   const [newEvents, setNewEvents] = useState<CalendarEvent[]>([]);
-  const { bookingCalendarInfo, existingEvents, setBookingCalendarInfo } =
-    useContext(BookingContext);
+  const {
+    bookingCalendarInfo,
+    existingCalendarEvents,
+    setBookingCalendarInfo,
+  } = useContext(BookingContext);
   const ref = useRef(null);
+
+  const resources = useMemo(
+    () =>
+      rooms.map((room) => ({
+        id: room.roomId,
+        title: `${room.roomId} ${room.name}`,
+      })),
+    [rooms]
+  );
 
   // update calendar day view based on mini calendar date picker
   useEffect(() => {
@@ -77,27 +92,34 @@ export default function CalendarVerticalResource({
       return;
     }
 
-    const newRoomEvents = rooms.map((room) => ({
+    const newRoomEvents = rooms.map((room, index) => ({
       start: bookingCalendarInfo.startStr,
       end: bookingCalendarInfo.endStr,
       id: Date.now().toString(),
       resourceId: room.roomId,
-      title: TITLE_TAG,
+      title: NEW_TITLE_TAG,
+      overlap: false,
+      url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
     }));
     setNewEvents(newRoomEvents);
   }, [bookingCalendarInfo, rooms]);
-
-  const resources = rooms.map((room) => ({
-    id: room.roomId,
-    title: `${room.roomId} ${room.name}`,
-  }));
 
   const handleEventSelect = (selectInfo: DateSelectArg) => {
     setBookingCalendarInfo(selectInfo);
   };
 
+  const handleEventSelecting = (selectInfo: DateSelectArg) => {
+    if (ref.current == null || ref.current.getApi() == null) {
+      return true;
+    }
+    const api: CalendarApi = ref.current.getApi();
+    api.unselect();
+    setBookingCalendarInfo(selectInfo);
+    return true;
+  };
+
   const handleEventClick = (info: EventClickArg) => {
-    if (info.event.title.includes(TITLE_TAG)) {
+    if (info.event.title.includes(NEW_TITLE_TAG)) {
       setBookingCalendarInfo(null);
     }
   };
@@ -123,11 +145,11 @@ export default function CalendarVerticalResource({
           interactionPlugin,
         ]}
         selectable={true}
-        selectOverlap={false}
         select={handleEventSelect}
+        selectAllow={handleEventSelecting}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         resources={resources}
-        events={[...existingEvents, ...newEvents]}
+        events={[...existingCalendarEvents, ...newEvents]}
         eventContent={CalendarEventBlock}
         eventClick={function (info) {
           info.jsEvent.preventDefault();
