@@ -1,4 +1,4 @@
-import { Alert, Box, Button } from '@mui/material';
+import { Alert, Box, Button, Tooltip } from '@mui/material';
 import { Check, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import React, { useContext, useMemo } from 'react';
 
@@ -21,10 +21,23 @@ export default function BookingStatusBar(props: Props) {
 
   const message = useMemo(() => {
     if (isOverlap)
-      return 'Your selection conflicts with at least one existing reservation. Please make another selection.';
+      return (
+        <p>
+          Your selection conflicts with at least one existing reservation.
+          Please make another selection.
+        </p>
+      );
     if (isAutoApproval)
-      return 'Yay! This request is eligible for automatic approval';
-    else return 'This request will require approval';
+      return <p>Yay! This request is eligible for automatic approval</p>;
+    else
+      return (
+        <p>
+          This request will require approval.{' '}
+          <Tooltip title={errorMessage}>
+            <a>Why?</a>
+          </Tooltip>
+        </p>
+      );
   }, [isAutoApproval, isOverlap]);
 
   const color = useMemo(() => {
