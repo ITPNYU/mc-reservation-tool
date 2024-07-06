@@ -3,6 +3,12 @@ export type AdminUser = {
   createdAt: string;
 };
 
+export enum AttendeeAffiliation {
+  NYU = 'NYU Members with an active NYU ID',
+  NON_NYU = 'Non-NYU guests',
+  BOTH = 'All of the above',
+}
+
 export type Ban = {
   email: string;
   bannedAt: string;
@@ -106,6 +112,15 @@ export type LiaisonType = {
   department: string;
   createdAt: string;
 };
+
+export enum MediaServices {
+  AUDIO_TECH_103 = '(Garage 103) Request an audio technician',
+  AUDIO_TECH_230 = '(Audio Lab 230) Request an audio technician',
+  CAMPUS_MEDIA_SERVICES = '(Rooms 202 and 1201) Contact Campus Media to check out equipment or for technical/event support',
+  CHECKOUT_EQUIPMENT = 'Checkout Equipment',
+  LIGHTING_TECH_103 = '(Garage 103) Request a lighting technician',
+  LIGHTING_DMX = '(Rooms 220-224) Using DMX lights in ceiling grid',
+}
 
 export type PaUser = {
   email: string;
