@@ -15,20 +15,11 @@ import { useNavigate } from 'react-router-dom';
 export default function SelectRoomPage() {
   const navigate = useNavigate();
   const { roomSettings, userEmail } = useContext(DatabaseContext);
-  const {
-    isBanned,
-    isSafetyTrained,
-    selectedRooms,
-    setBookingCalendarInfo,
-    setSelectedRooms,
-  } = useContext(BookingContext);
+  const { isBanned, isSafetyTrained, selectedRooms, setSelectedRooms } =
+    useContext(BookingContext);
   const [date, setDate] = useState<Date>(new Date());
 
   const handleSetDate = (info: DateSelectArg, rooms: RoomSetting[]) => {
-    // console.log('handle set date', info, rooms, selectedRooms);
-
-    setBookingCalendarInfo(info);
-    // setSelectedRooms(rooms);
     const requiresSafetyTraining = rooms.some((room) =>
       SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
     );
@@ -40,8 +31,6 @@ export default function SelectRoomPage() {
       alert('You are banned');
       return;
     }
-
-    navigate('/book/form');
   };
 
   return (

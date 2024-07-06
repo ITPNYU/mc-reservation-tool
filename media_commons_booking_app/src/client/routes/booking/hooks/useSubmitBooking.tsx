@@ -137,10 +137,10 @@ export default function useSubmitBooking(): [
       return (
         duration <= 3.6e6 * 4 && // <= 4 hours
         selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
-        data['catering'] === 'no' &&
-        data['hireSecurity'] === 'no' &&
+        data['catering'].toLowerCase() === 'no' &&
+        data['hireSecurity'].toLowerCase() === 'no' &&
         data['mediaServices'].length === 0 &&
-        data['roomSetup'] === 'no'
+        data['roomSetup'].toLowerCase() === 'no'
       );
     };
 

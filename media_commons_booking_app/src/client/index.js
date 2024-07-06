@@ -2,6 +2,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 
 import AdminPage from './routes/admin/adminPage';
 import BookingForm from './routes/booking/BookingForm';
+import BookingFormDetailsPage from './routes/booking/formPages/BookingFormDetailsPage';
 import ErrorPage from './errorPage';
 import LandingPage from './routes/booking/formPages/LandingPage';
 import MyBookingsPage from './routes/myBookings/myBookingsPage';
@@ -10,7 +11,6 @@ import React from 'react';
 import Root from './routes/root';
 import SelectRoomPage from './routes/booking/formPages/SelectRoomPage';
 import UserRolePage from './routes/booking/formPages/UserRolePage';
-import UserSectionPage from './routes/booking/formPages/UserSectionPage';
 import { createRoot } from 'react-dom/client';
 
 const router = createMemoryRouter([
@@ -45,7 +45,7 @@ const router = createMemoryRouter([
           },
           {
             path: '/book/form',
-            element: <UserSectionPage />,
+            element: <BookingFormDetailsPage />,
           },
           {
             path: '/book',
