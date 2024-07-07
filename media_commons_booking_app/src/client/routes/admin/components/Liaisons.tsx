@@ -1,6 +1,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 
 import { DatabaseContext } from '../../components/Provider';
+import { Department } from '../../../../types';
 import EmailListTable from '../../components/EmailListTable';
 import Loading from '../../../utils/Loading';
 import { formatDate } from '../../../utils/date';
@@ -65,23 +66,16 @@ const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
         </div>
         <div className="mr-6">
           <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[200px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            onChange={(e) => {
-              setDepartment(e.target.value);
-            }}
             value={department}
+            onChange={(e) => setDepartment(e.target.value as Department)}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
-            <option value="" disabled>
-              Select option
-            </option>
-            <option value="ALT">ALT</option>
-            <option value="GameCenter">Game Center</option>
-            <option value="IDM">IDM</option>
-            <option value="ITP / IMA / Low Res">ITP / IMA / Low Res</option>
-            <option value="MARL">MARL</option>
-            <option value="Music Tech">Music Tech</option>
-            <option value="Recorded Music">Recorded Music</option>
-            <option value="others">Other Group</option>
+            <option value="">Choose a Department</option>
+            {Object.values(Department).map((label, index) => (
+              <option key={index} value={label}>
+                {label}
+              </option>
+            ))}
           </select>
         </div>
         {loading ? (

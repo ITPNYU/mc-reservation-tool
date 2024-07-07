@@ -8,22 +8,16 @@ import { DatabaseContext } from '../../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import Grid from '@mui/material/Unstable_Grid2';
 import { RoomSetting } from '../../../../types';
-import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../../policy';
 import { SelectRooms } from '../components/SelectRooms';
-import { useNavigate } from 'react-router-dom';
 
 export default function SelectRoomPage() {
-  const navigate = useNavigate();
   const { roomSettings, userEmail } = useContext(DatabaseContext);
-  const { isBanned, isSafetyTrained, selectedRooms, setSelectedRooms } =
+  const { isBanned, selectedRooms, setSelectedRooms, needsSafetyTraining } =
     useContext(BookingContext);
   const [date, setDate] = useState<Date>(new Date());
 
   const handleSetDate = (info: DateSelectArg, rooms: RoomSetting[]) => {
-    const requiresSafetyTraining = rooms.some((room) =>
-      SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
-    );
-    if (userEmail && !isSafetyTrained && requiresSafetyTraining) {
+    if (needsSafetyTraining) {
       alert('You have to take safety training before booking!');
       return;
     }

@@ -10,6 +10,7 @@ import React, {
 
 import { DatabaseContext } from '../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
+import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../policy';
 import fetchCalendarEvents from './hooks/fetchCalendarEvents';
 import { serverFunctions } from '../../utils/serverFunctions';
 
@@ -19,6 +20,7 @@ export interface BookingContextType {
   existingCalendarEvents: CalendarEvent[];
   isBanned: boolean;
   isSafetyTrained: boolean;
+  needsSafetyTraining: boolean;
   role: Role | undefined;
   selectedRooms: RoomSetting[];
   setBookingCalendarInfo: (x: DateSelectArg) => void;
@@ -33,6 +35,7 @@ export const BookingContext = createContext<BookingContextType>({
   existingCalendarEvents: [],
   isBanned: false,
   isSafetyTrained: true,
+  needsSafetyTraining: false,
   role: undefined,
   selectedRooms: [],
   setBookingCalendarInfo: (x: DateSelectArg) => {},
@@ -60,6 +63,15 @@ export function BookingProvider({ children }) {
       .map((bannedUser) => bannedUser.email)
       .includes(userEmail);
   }, [userEmail, bannedUsers]);
+
+  // block progressing in the form is safety training requirement isn't met
+  const needsSafetyTraining = useMemo(() => {
+    const isStudent = role === Role.STUDENT;
+    const roomRequiresSafetyTraining = selectedRooms.some((room) =>
+      SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
+    );
+    return isStudent && roomRequiresSafetyTraining && !isSafetyTrained;
+  }, [selectedRooms, role, isSafetyTrained]);
 
   const fetchIsSafetyTrained = useCallback(async () => {
     if (!userEmail) return;
@@ -89,6 +101,7 @@ export function BookingProvider({ children }) {
         existingCalendarEvents,
         isBanned,
         isSafetyTrained,
+        needsSafetyTraining,
         role,
         selectedRooms,
         setBookingCalendarInfo,
