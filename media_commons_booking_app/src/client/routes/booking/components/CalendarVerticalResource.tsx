@@ -73,6 +73,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       rooms.map((room) => ({
         id: room.roomId,
         title: `${room.roomId} ${room.name}`,
+        index: Number(room.roomId),
       })),
     [rooms]
   );
@@ -149,6 +150,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
         selectAllow={handleEventSelecting}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         resources={resources}
+        resourceOrder={'index'}
         events={[...existingCalendarEvents, ...newEvents]}
         eventContent={CalendarEventBlock}
         eventClick={function (info) {
