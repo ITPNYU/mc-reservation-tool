@@ -77,25 +77,24 @@ export function BookingProvider({ children }) {
     return isStudent && roomRequiresSafetyTraining && !isSafetyTrained;
   }, [selectedRooms, role, isSafetyTrained]);
 
-  const fetchIsSafetyTrained = useCallback(async () => {
-    if (!userEmail) return;
-    let isTrained = safetyTrainedUsers
-      .map((user) => user.email)
-      .includes(userEmail);
-    console.log('isTrained from tool', isTrained);
-    // if not on active list, check old list
-    if (!isTrained) {
-      isTrained = await serverFunctions
-        .getOldSafetyTrainingEmails()
-        .then((rows) => rows.map((row) => row[0]).includes(userEmail));
-    }
-    console.log('isTrained from googlesheets', isTrained);
-    setIsSafetyTrained(isTrained);
-  }, [userEmail, safetyTrainedUsers]);
-
   useEffect(() => {
+    const fetchIsSafetyTrained = async () => {
+      if (!userEmail) return;
+      let isTrained = safetyTrainedUsers
+        .map((user) => user.email)
+        .includes(userEmail);
+      console.log('isTrained from tool', isTrained);
+      // if not on active list, check old list
+      if (!isTrained) {
+        isTrained = await serverFunctions
+          .getOldSafetyTrainingEmails()
+          .then((rows) => rows.map((row) => row[0]).includes(userEmail));
+      }
+      console.log('isTrained from googlesheets', isTrained);
+      setIsSafetyTrained(isTrained);
+    };
     fetchIsSafetyTrained();
-  }, [fetchIsSafetyTrained]);
+  }, [userEmail, safetyTrainedUsers]);
 
   return (
     <BookingContext.Provider
