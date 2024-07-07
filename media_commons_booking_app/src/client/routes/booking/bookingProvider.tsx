@@ -18,6 +18,7 @@ export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
   department: Department | undefined;
   existingCalendarEvents: CalendarEvent[];
+  hasShownMocapModal: boolean;
   isBanned: boolean;
   isSafetyTrained: boolean;
   needsSafetyTraining: boolean;
@@ -25,6 +26,7 @@ export interface BookingContextType {
   selectedRooms: RoomSetting[];
   setBookingCalendarInfo: (x: DateSelectArg) => void;
   setDepartment: (x: Department) => void;
+  setHasShownMocapModal: (x: boolean) => void;
   setRole: (x: Role) => void;
   setSelectedRooms: (x: RoomSetting[]) => void;
 }
@@ -33,6 +35,7 @@ export const BookingContext = createContext<BookingContextType>({
   bookingCalendarInfo: undefined,
   department: undefined,
   existingCalendarEvents: [],
+  hasShownMocapModal: false,
   isBanned: false,
   isSafetyTrained: true,
   needsSafetyTraining: false,
@@ -40,6 +43,7 @@ export const BookingContext = createContext<BookingContextType>({
   selectedRooms: [],
   setBookingCalendarInfo: (x: DateSelectArg) => {},
   setDepartment: (x: Department) => {},
+  setHasShownMocapModal: (x: boolean) => {},
   setRole: (x: Role) => {},
   setSelectedRooms: (x: RoomSetting[]) => {},
 });
@@ -51,13 +55,13 @@ export function BookingProvider({ children }) {
   const [bookingCalendarInfo, setBookingCalendarInfo] =
     useState<DateSelectArg>();
   const [department, setDepartment] = useState<Department>();
+  const [hasShownMocapModal, setHasShownMocapModal] = useState(false);
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
   const existingCalendarEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
-    console.log('userEmail', userEmail);
     if (!userEmail) return false;
     return bannedUsers
       .map((bannedUser) => bannedUser.email)
@@ -99,6 +103,7 @@ export function BookingProvider({ children }) {
         bookingCalendarInfo,
         department,
         existingCalendarEvents,
+        hasShownMocapModal,
         isBanned,
         isSafetyTrained,
         needsSafetyTraining,
@@ -106,6 +111,7 @@ export function BookingProvider({ children }) {
         selectedRooms,
         setBookingCalendarInfo,
         setDepartment,
+        setHasShownMocapModal,
         setRole,
         setSelectedRooms,
       }}
