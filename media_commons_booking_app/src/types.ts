@@ -66,7 +66,6 @@ export enum Department {
   MUSIC_TECH = 'Music Tech',
   OTHER = 'Other',
 }
-
 export type DevBranch = 'development' | 'staging' | 'production' | '';
 
 export type Inputs = {
