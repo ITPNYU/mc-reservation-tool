@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from "react";
 
-import { BookingStatusLabel } from '../../../../types';
-import { DatabaseContext } from '../../components/Provider';
-import Loading from '../../../utils/Loading';
-import { serverFunctions } from '../../../utils/serverFunctions';
+import { BookingStatusLabel } from "../../../../types";
+import { DatabaseContext } from "../../components/Provider";
+import Loading from "../../../utils/Loading";
+import { serverFunctions } from "../../../utils/serverFunctions";
 
 interface Props {
   calendarEventId: string;
@@ -27,7 +27,7 @@ export default function BookingActions({
     await Promise.all([reloadBookings(), reloadBookingStatuses()]);
   };
 
-  const onError = () => alert('Failed to perform action on booking');
+  const onError = () => alert("Failed to perform action on booking");
 
   const ActionButton = (
     text: string,
@@ -50,9 +50,13 @@ export default function BookingActions({
           action()
             .catch(() => {
               onError();
-              setOptimisticStatus(undefined);
+              setOptimisticStatus(BookingStatusLabel.UNKNOWN);
             })
-            .finally(() => reload().then(() => setOptimisticStatus(undefined)));
+            .finally(() =>
+              reload().then(() =>
+                setOptimisticStatus(BookingStatusLabel.UNKNOWN)
+              )
+            );
         } catch (ex) {
           console.error(ex);
           onError();
@@ -81,8 +85,10 @@ export default function BookingActions({
       <td className="px-2 py-4 w-28">
         <div className="flex flex-col items-start">
           {ActionButton(
-            'Cancel',
-            () => serverFunctions.cancel(calendarEventId),
+            "Cancel",
+            async () => {
+              await serverFunctions.cancel(calendarEventId);
+            },
             BookingStatusLabel.CANCELED,
             true
           )}
@@ -93,13 +99,17 @@ export default function BookingActions({
 
   const paBtns = () => {
     const checkInBtn = ActionButton(
-      'Check In',
-      () => serverFunctions.checkin(calendarEventId),
+      "Check In",
+      async () => {
+        await serverFunctions.checkin(calendarEventId);
+      },
       BookingStatusLabel.CHECKED_IN
     );
     const noShowBtn = ActionButton(
-      'No Show',
-      () => serverFunctions.noShow(calendarEventId),
+      "No Show",
+      async () => {
+        await serverFunctions.noShow(calendarEventId);
+      },
       BookingStatusLabel.NO_SHOW
     );
 
@@ -137,19 +147,25 @@ export default function BookingActions({
       <div className="flex flex-col items-start">
         {status === BookingStatusLabel.PRE_APPROVED &&
           ActionButton(
-            '2nd Approve',
-            () => serverFunctions.approveBooking(calendarEventId),
+            "2nd Approve",
+            async () => {
+              await serverFunctions.approveBooking(calendarEventId);
+            },
             BookingStatusLabel.APPROVED
           )}
         {status === BookingStatusLabel.REQUESTED &&
           ActionButton(
-            '1st Approve',
-            () => serverFunctions.approveBooking(calendarEventId),
+            "1st Approve",
+            async () => {
+              await serverFunctions.approveBooking(calendarEventId);
+            },
             BookingStatusLabel.PRE_APPROVED
           )}
         {ActionButton(
-          'Reject',
-          () => serverFunctions.reject(calendarEventId),
+          "Reject",
+          async () => {
+            await serverFunctions.reject(calendarEventId);
+          },
           BookingStatusLabel.REJECTED,
           true
         )}

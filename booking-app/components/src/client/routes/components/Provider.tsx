@@ -14,6 +14,9 @@ import {
 import React, { createContext, useEffect, useMemo, useState } from "react";
 
 import axios from "axios";
+import { fetchAllDataFromCollection } from "@/lib/firebase/saveData";
+import { TableNames } from "@/components/src/policy";
+import { Tab, Table } from "react-bootstrap";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -83,6 +86,10 @@ export const DatabaseProvider = ({
   const pagePermission = useMemo<PagePermission>(() => {
     if (!userEmail) return PagePermission.BOOKING;
 
+    console.log(
+      "admin",
+      adminUsers.map((admin) => admin)
+    );
     if (adminUsers.map((admin) => admin.email).includes(userEmail))
       return PagePermission.ADMIN;
     else if (paUsers.map((pa) => pa.email).includes(userEmail))
@@ -105,13 +112,6 @@ export const DatabaseProvider = ({
       fetchRoomSettings();
       fetchSettings();
     });
-
-    // refresh booking data every 10s;
-    setInterval(() => {
-      console.log("UPDATING");
-      fetchBookings();
-      fetchBookingStatuses();
-    }, 10000);
   }, []);
 
   const fetchActiveUserEmail = () => {
@@ -120,53 +120,169 @@ export const DatabaseProvider = ({
   };
 
   const fetchBookings = async () => {
-    const response = await axios.get<Booking[]>("/api/bookings");
-    setBookings(response.data);
+    fetchAllDataFromCollection(TableNames.BOOKING)
+      .then((fetchedData) => {
+        const bookings = fetchedData.map((item: any) => ({
+          id: item.id,
+          calendarEventId: item.calendarEventId,
+          email: item.email,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          roomId: item.roomId,
+          user: item.user,
+          room: item.room,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          status: item.status,
+          firstName: item.firstName,
+          lastName: item.lastName,
+          secondaryName: item.secondaryName,
+          nNumber: item.nNumber,
+          netId: item.netId,
+          phoneNumber: item.phoneNumber,
+          department: item.department,
+          role: item.role,
+          sponsorFirstName: item.sponsorFirstName,
+          sponsorLastName: item.sponsorLastName,
+          sponsorEmail: item.sponsorEmail,
+          title: item.title,
+          description: item.description,
+          reservationType: item.reservationType,
+          attendeeAffiliation: item.attendeeAffiliation,
+          roomSetup: item.roomSetup,
+          setupDetails: item.setupDetails,
+          mediaServices: item.mediaServices,
+          mediaServicesDetails: item.mediaServicesDetails,
+          catering: item.catering,
+          hireSecurity: item.hireSecurity,
+          expectedAttendance: item.expectedAttendance,
+          cateringService: item.cateringService,
+          missingEmail: item?.missingEmail,
+          chartFieldForCatering: item.chartFieldForCatering,
+          chartFieldForSecurity: item.chartFieldForSecurity,
+          chartFieldForRoomSetup: item.chartFieldForRoomSetup,
+        }));
+        setBookings(bookings);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchBookingStatuses = async () => {
-    const response = await axios.get<BookingStatus[]>("/api/bookingStatuses");
-    setBookingStatuses(response.data);
+    fetchAllDataFromCollection(TableNames.BOOKING_STATUS)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          calendarEventId: item.calendarEventId,
+          email: item.email,
+          requestedAt: item.requestedAt,
+          firstApprovedAt: item.firstApprovedAt,
+          secondApprovedAt: item.secondApprovedAt,
+          rejectedAt: item.rejectedAt,
+          canceledAt: item.canceledAt,
+          checkedInAt: item.checkedInAt,
+          noShowedAt: item.checkedInAt,
+        }));
+        setBookingStatuses(filtered);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchAdminUsers = async () => {
-    const response = await axios.get<AdminUser[]>("/api/admins");
-    setAdminUsers(response.data);
+    fetchAllDataFromCollection(TableNames.ADMINS)
+      .then((fetchedData) => {
+        console.log("fetchedData", fetchedData);
+        const adminUsers = fetchedData.map((item: any) => ({
+          id: item.id,
+          email: item.email,
+          createdAt: item.createdAt,
+        }));
+        setAdminUsers(adminUsers);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchPaUsers = async () => {
-    const response = await axios.get<PaUser[]>("/api/pas");
-    setPaUsers(response.data);
+    fetchAllDataFromCollection(TableNames.PAS)
+      .then((fetchedData) => {
+        const paUsers = fetchedData.map((item: any) => ({
+          id: item.id,
+          email: item.email,
+          createdAt: item.createdAt,
+        }));
+        setPaUsers(paUsers);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchSafetyTrainedUsers = async () => {
-    const response = await axios.get<SafetyTraining[]>("/api/safetyTrainings");
-    setSafetyTrainedUsers(response.data);
+    fetchAllDataFromCollection(TableNames.SAFETY_TRAINING)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          email: item.email,
+          completedAt: item.completedAt,
+        }));
+        setSafetyTrainedUsers(filtered);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchBannedUsers = async () => {
-    const response = await axios.get<Ban[]>("/api/bannedUsers");
-    setBannedUsers(response.data);
+    fetchAllDataFromCollection(TableNames.BANNED)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          email: item.email,
+          bannedAt: item.bannedAt,
+        }));
+        setBannedUsers(filtered);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchLiaisonUsers = async () => {
-    const response = await axios.get<LiaisonType[]>("/api/liaisons");
-    setLiaisonUsers(response.data);
+    fetchAllDataFromCollection(TableNames.LIAISONS_PROD)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          email: item.email,
+          department: item.department,
+          createdAt: item.createdAt,
+        }));
+        setLiaisonUsers(filtered);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchRoomSettings = async () => {
-    const response = await axios.get<RoomSetting[]>("/api/rooms");
-    setRoomSettings(response.data);
+    fetchAllDataFromCollection(TableNames.ROOMS)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          roomId: item.roomId,
+          name: item.name,
+          capacity: item.capacity,
+          calendarRef: item.calendarRef,
+        }));
+        setRoomSettings(filtered);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchBookingReservationTypes = async () => {
-    const response = await axios.get<ReservationType[]>(
-      "/api/reservationTypes"
-    );
-    setSettings((prev) => ({
-      ...prev,
-      ...response.data,
-    }));
+    fetchAllDataFromCollection(TableNames.RESERVATION_TYPES)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          reservationType: item.reservationType,
+          dateAdded: item.dateAdded,
+        }));
+        setSettings((prev) => ({
+          ...prev,
+          ...filtered,
+        }));
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchSettings = async () => {

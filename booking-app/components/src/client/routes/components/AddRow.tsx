@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from "react";
 
-import Loading from '../../utils/Loading';
-import { TableNames } from '../../../policy';
-import { serverFunctions } from '../../utils/serverFunctions';
+import Loading from "../../utils/Loading";
+import { TableNames } from "../../../policy";
+import { serverFunctions } from "../../utils/serverFunctions";
+import { saveDataToFirestore } from "@/lib/firebase/saveData";
+import { Timestamp } from "@firebase/firestore";
 
 interface Props {
   addDuplicateErrorMessage?: string;
@@ -18,7 +20,7 @@ interface Props {
 
 export default function AddRow(props: Props) {
   const { tableName, rows, rowsRefresh } = props;
-  const [valueToAdd, setValueToAdd] = useState<string>('');
+  const [valueToAdd, setValueToAdd] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const uniqueValues = useMemo<string[]>(
@@ -31,27 +33,26 @@ export default function AddRow(props: Props) {
 
     if (uniqueValues.includes(valueToAdd)) {
       alert(
-        props.addDuplicateErrorMessage ?? 'This value has already been added'
+        props.addDuplicateErrorMessage ?? "This value has already been added"
       );
       return;
     }
 
     setLoading(true);
     try {
-      await serverFunctions.appendRowActive(tableName, [
-        valueToAdd,
-        new Date().toString(),
-      ]);
+      await saveDataToFirestore(tableName, {
+        [props.columnNameToAddValue]: valueToAdd,
+        createdAt: Timestamp.now(),
+      });
       await rowsRefresh();
     } catch (ex) {
       console.error(ex);
-      alert(props.addFailedErrorMessage ?? 'Failed to add value');
+      alert(props.addFailedErrorMessage ?? "Failed to add value");
     } finally {
       setLoading(false);
-      setValueToAdd('');
+      setValueToAdd("");
     }
   };
-
   return (
     <div className="mt-10 mr-10 ml-10">
       <form className="flex items-center">
@@ -69,7 +70,7 @@ export default function AddRow(props: Props) {
             }}
             value={valueToAdd}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder={props.inputPlaceholder ?? ''}
+            placeholder={props.inputPlaceholder ?? ""}
             required
           />
         </div>
@@ -81,7 +82,7 @@ export default function AddRow(props: Props) {
             onClick={addValue}
             className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
-            {props.buttonText ?? 'Add'}
+            {props.buttonText ?? "Add"}
           </button>
         )}
       </form>

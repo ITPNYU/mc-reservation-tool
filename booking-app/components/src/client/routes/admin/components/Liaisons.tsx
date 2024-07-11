@@ -1,26 +1,33 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from "react";
 
-import { DatabaseContext } from '../../components/Provider';
-import EmailListTable from '../../components/EmailListTable';
-import Loading from '../../../utils/Loading';
-import { formatDate } from '../../../utils/date';
-import { getLiaisonTableName } from '../../../../policy';
+import { DatabaseContext } from "../../components/Provider";
+import EmailListTable from "../../components/EmailListTable";
+import Loading from "../../../utils/Loading";
+import { formatDate } from "../../../utils/date";
+import { getLiaisonTableName } from "../../../../policy";
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from '../../../utils/serverFunctions';
+import { serverFunctions } from "../../../utils/serverFunctions";
 
-const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
-  const [email, setEmail] = useState('');
-  const [department, setDepartment] = useState('');
-  const [loading, setLoading] = useState(false);
+interface AddLiaisonFormProps {
+  liaisonEmails: string[];
+  reloadLiaisonEmails: () => void;
+}
 
+const AddLiaisonForm: React.FC<AddLiaisonFormProps> = ({
+  liaisonEmails,
+  reloadLiaisonEmails,
+}) => {
+  const [email, setEmail] = useState<string>("");
+  const [department, setDepartment] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const addLiaisonUser = async () => {
-    if (email === '' || department === '') {
-      alert('Please fill in all the fields');
+    if (email === "" || department === "") {
+      alert("Please fill in all the fields");
       return;
     }
 
     if (liaisonEmails.includes(email)) {
-      alert('This user is already registered');
+      alert("This user is already registered");
       return;
     }
 
@@ -34,10 +41,10 @@ const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
       await reloadLiaisonEmails();
     } catch (ex) {
       console.error(ex);
-      alert('Failed to add user');
+      alert("Failed to add user");
     } finally {
       setLoading(false);
-      setEmail('');
+      setEmail("");
     }
   };
 

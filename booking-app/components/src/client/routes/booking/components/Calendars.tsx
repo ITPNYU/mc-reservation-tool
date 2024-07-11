@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { CalendarDatePicker } from './CalendarDatePicker';
-import { DateSelectArg } from '@fullcalendar/core';
-import { RoomCalendar } from './RoomCalendar';
-import { RoomSetting } from '../../../../types';
-import { formatDate } from '../../../utils/date';
-import { HIDING_STATUS } from '../../../../policy';
+import { CalendarDatePicker } from "./CalendarDatePicker";
+import { DateSelectArg } from "@fullcalendar/core";
+import { RoomCalendar } from "./RoomCalendar";
+import { RoomSetting } from "../../../../types";
+import { formatDate } from "../../../utils/date";
+import { HIDING_STATUS } from "../../../../policy";
 
 type CalendarProps = {
   allRooms: RoomSetting[];
@@ -14,7 +14,7 @@ type CalendarProps = {
   refs?: any[];
 };
 
-const TITLE_TAG = '[Click to Delete]';
+const TITLE_TAG = "[Click to Delete]";
 
 export const Calendars = ({
   allRooms,
@@ -54,7 +54,7 @@ export const Calendars = ({
     }
 
     if (overlap) {
-      alert('The new event overlaps with an existing event on the same day!');
+      alert("The new event overlaps with an existing event on the same day!");
       return;
     }
     if (bookingTimeEvent) {
@@ -70,7 +70,7 @@ export const Calendars = ({
   };
 
   useEffect(() => {
-    const view = selectedRooms.length > 1 ? 'timeGridDay' : 'timeGridDay';
+    const view = selectedRooms.length > 1 ? "timeGridDay" : "timeGridDay";
     allRooms.map((room) => {
       const calendarApi = room.calendarRef.current.getApi();
       calendarApi.changeView(view);
@@ -103,8 +103,8 @@ export const Calendars = ({
             }}
             className={`px-4 py-2 text-white rounded-md focus:outline-none ${
               bookingTimeEvent
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-gray-300 pointer-events-none'
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-gray-300 pointer-events-none"
             }`}
           >
             Next
