@@ -41,26 +41,24 @@ const NavBar: React.FC = () => {
             </Nav.Item>
             {pagePermission === PagePermission.ADMIN && (
               <Nav.Item>
-                <Link href="/admin">
-                  <a
-                    className={
-                      isActive("/admin") ? "active nav-link" : "nav-link"
-                    }
-                  >
-                    Admin
-                  </a>
+                <Link
+                  href="/admin"
+                  className={
+                    isActive("/admin") ? "active nav-link" : "nav-link"
+                  }
+                >
+                  Admin
                 </Link>
               </Nav.Item>
             )}
             {(pagePermission === PagePermission.ADMIN ||
               pagePermission === PagePermission.PA) && (
               <Nav.Item>
-                <Link href="/pa">
-                  <a
-                    className={isActive("/pa") ? "active nav-link" : "nav-link"}
-                  >
-                    PA
-                  </a>
+                <Link
+                  href="/pa"
+                  className={isActive("/pa") ? "active nav-link" : "nav-link"}
+                >
+                  PA
                 </Link>
               </Nav.Item>
             )}

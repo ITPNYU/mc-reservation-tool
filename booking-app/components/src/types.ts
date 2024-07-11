@@ -1,3 +1,5 @@
+import { Timestamp } from "@firebase/firestore";
+
 export type AdminUser = {
   email: string;
   createdAt: string;
@@ -9,12 +11,12 @@ export type Ban = {
 };
 
 export type Booking = Inputs & {
+  id?: string;
   calendarEventId: string;
   email: string;
   startDate: string;
   endDate: string;
   roomId: string;
-  devBranch: string;
 };
 
 export type BookingFormDetails = Booking & {
@@ -103,7 +105,7 @@ export type LiaisonType = {
 
 export type PaUser = {
   email: string;
-  createdAt: string;
+  createdAt: Timestamp;
 };
 
 export enum PagePermission {
@@ -128,8 +130,6 @@ export type RoomSetting = {
   roomId: string;
   name: string;
   capacity: number;
-  calendarIdDev: string;
-  calendarIdProd: string;
   calendarRef?: any;
 };
 
