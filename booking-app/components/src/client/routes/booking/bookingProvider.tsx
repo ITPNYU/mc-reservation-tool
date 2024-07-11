@@ -67,7 +67,10 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     if (!isTrained) {
       isTrained = await serverFunctions
         .getOldSafetyTrainingEmails()
-        .then((rows) => rows.map((row) => row[0]).includes(userEmail));
+        .then((rows) =>
+          //TODO: Fix it after connecting with API
+          ["rh3555@nyu.edu"].map((row) => row[0]).includes(userEmail)
+        );
     }
     console.log("isTrained from googlesheets", isTrained);
     setIsSafetyTrained(isTrained);

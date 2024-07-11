@@ -1,28 +1,34 @@
-import React, { useState } from 'react';
-import Datepicker from 'tailwind-datepicker-react';
+import React, { useState } from "react";
+import Datepicker from "tailwind-datepicker-react";
 
-export const CalendarDatePicker = ({ handleChange }) => {
+interface CalendarDatePickerProps {
+  handleChange: (date: Date) => void;
+}
+
+export const CalendarDatePicker = ({
+  handleChange,
+}: CalendarDatePickerProps) => {
   const options = {
-    title: 'Date',
+    title: "Date",
     autoHide: true,
     todayBtn: true,
     clearBtn: false,
-    maxDate: new Date('2030-01-01'),
-    minDate: new Date('1950-01-01'),
+    maxDate: new Date("2030-01-01"),
+    minDate: new Date("1950-01-01"),
     theme: {
-      background: '',
-      todayBtn: '',
-      clearBtn: '',
-      icons: '',
-      text: 'text-sm',
-      disabledText: '',
-      input: '',
-      inputIcon: '',
-      selected: '',
+      background: "",
+      todayBtn: "",
+      clearBtn: "",
+      icons: "",
+      text: "text-sm",
+      disabledText: "",
+      input: "",
+      inputIcon: "",
+      selected: "",
     },
-    datepickerClassNames: 'top-12',
+    datepickerClassNames: "top-12",
     defaultDate: new Date(),
-    language: 'en',
+    language: "en",
   };
 
   const [show, setShow] = useState(false);

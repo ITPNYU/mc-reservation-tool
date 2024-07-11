@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
 
-import ListTableRow from './ListTableRow';
-import { TableNames } from '../../../policy';
-import { serverFunctions } from '../../utils/serverFunctions';
+import ListTableRow from "./ListTableRow";
+import { TableNames } from "../../../policy";
+import { serverFunctions } from "../../utils/serverFunctions";
+import { deleteDataFromFirestore } from "@/lib/firebase/saveData";
 
 interface Props {
   columnFormatters?: { [key: string]: (value: string) => string };
@@ -48,12 +49,10 @@ export default function ListTable(props: Props) {
             {props.rows.map((row, index: number) => (
               <ListTableRow
                 key={index}
-                removeRow={() =>
-                  serverFunctions.removeFromListByValue(
-                    props.tableName,
-                    row[props.columnNameToRemoveBy]
-                  )
-                }
+                removeRow={async () => {
+                  deleteDataFromFirestore(props.tableName, row.id);
+                  refresh();
+                }}
                 {...{ columnNames, columnFormatters, index, row, refresh }}
               />
             ))}
@@ -71,7 +70,7 @@ function formatColumnName(columnName: string): string {
   // Capitalize the first letter of each word and join with spaces
   const formattedName = parts
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
+    .join(" ");
 
   return formattedName;
 }
