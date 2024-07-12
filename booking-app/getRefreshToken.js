@@ -1,0 +1,43 @@
+const { google } = require("googleapis");
+const readline = require("readline");
+
+const CLIENT_ID = "";
+const CLIENT_SECRET = "";
+const REDIRECT_URI = "http://localhost:3000/api/auth/callback";
+const SCOPES = [
+  "https://www.googleapis.com/auth/gmail.send",
+  "https://www.googleapis.coom/auth/calendar.events",
+  "https://www.googleapis.com/auth/userinfo.email",
+];
+
+const oauth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI
+);
+
+// 認証用URLを生成
+const authUrl = oauth2Client.generateAuthUrl({
+  access_type: "offline",
+  scope: SCOPES,
+});
+
+console.log("Authorize this app by visiting this url:", authUrl);
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+// ユーザーに認証コードの入力を促す
+rl.question("Enter the code from that page here: ", (code) => {
+  rl.close();
+  oauth2Client.getToken(code, (err, token) => {
+    if (err) {
+      return console.error("Error retrieving access token", err);
+    }
+    oauth2Client.setCredentials(token);
+    console.log("Access Token:", token.access_token);
+    console.log("Refresh Token:", token.refresh_token);
+  });
+});

@@ -2,20 +2,20 @@ import { Timestamp } from "@firebase/firestore";
 
 export type AdminUser = {
   email: string;
-  createdAt: string;
+  createdAt: Timestamp;
 };
 
 export type Ban = {
   email: string;
-  bannedAt: string;
+  bannedAt: Timestamp;
 };
 
 export type Booking = Inputs & {
   id?: string;
   calendarEventId: string;
   email: string;
-  startDate: string;
-  endDate: string;
+  startDate: Timestamp;
+  endDate: Timestamp;
   roomId: string;
 };
 
@@ -29,13 +29,13 @@ export type BookingFormDetails = Booking & {
 export type BookingStatus = {
   calendarEventId: string;
   email: string;
-  requestedAt: string;
-  firstApprovedAt: string;
-  secondApprovedAt: string;
-  rejectedAt: string;
-  canceledAt: string;
-  checkedInAt: string;
-  noShowedAt: string;
+  requestedAt: Timestamp;
+  firstApprovedAt: Timestamp;
+  secondApprovedAt: Timestamp;
+  rejectedAt: Timestamp;
+  canceledAt: Timestamp;
+  checkedInAt: Timestamp;
+  noShowedAt: Timestamp;
 };
 
 export enum BookingStatusLabel {
@@ -100,7 +100,7 @@ export type Inputs = {
 export type LiaisonType = {
   email: string;
   department: string;
-  createdAt: string;
+  createdAt: Timestamp;
 };
 
 export type PaUser = {
@@ -116,7 +116,7 @@ export enum PagePermission {
 
 export type ReservationType = {
   reservationType: string;
-  createdAt: string;
+  createdAt: Timestamp;
 };
 
 export enum Role {
@@ -130,12 +130,12 @@ export type RoomSetting = {
   roomId: string;
   name: string;
   capacity: number;
-  calendarRef?: any;
+  calendarId?: any;
 };
 
 export type SafetyTraining = {
   email: string;
-  completedAt: string;
+  completedAt: Timestamp;
 };
 
 export type Settings = {

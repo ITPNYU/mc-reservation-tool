@@ -6,8 +6,7 @@ import Loading from "../../../utils/Loading";
 import { formatDate } from "../../../utils/date";
 import { getLiaisonTableName } from "../../../../policy";
 // This is a wrapper for google.script.run that lets us use promises.
-import { serverFunctions } from "../../../utils/serverFunctions";
-import { saveDataToFirestore } from "@/lib/firebase/saveData";
+import { saveDataToFirestore } from "@/lib/firebase/firebase";
 import { Timestamp } from "@firebase/firestore";
 
 interface AddLiaisonFormProps {

@@ -2,43 +2,41 @@ import {
   ActiveSheetBookingStatusColumns,
   TableNames,
   getSecondApproverEmail,
-} from '../policy';
-import { BookingFormDetails, BookingStatusLabel } from '../types';
-import { approvalUrl, getBookingToolDeployUrl, rejectUrl } from './ui';
-import {
-  fetchById,
-  fetchIndexByUniqueValue,
-  getActiveSheetValueById,
-  removeRowActive,
-  updateActiveSheetValueById,
-} from './db';
-import { inviteUserToCalendarEvent, updateEventPrefix } from './calendars';
+} from "../policy";
+import { BookingStatus, BookingStatusLabel } from "../types";
+import { approvalUrl, getBookingToolDeployUrl, rejectUrl } from "./ui";
 
-import { sendHTMLEmail } from './emails';
+import { Timestamp } from "@firebase/firestore";
+import { fetchSingleDoc, updateDataInFirestore } from "@/lib/firebase/firebase";
 
-export const bookingContents = (id: string): BookingFormDetails => {
-  const bookingObj = fetchById(TableNames.BOOKING, id);
-  bookingObj.approvalUrl = approvalUrl(id);
-  bookingObj.rejectedUrl = rejectUrl(id);
-  bookingObj.bookingToolUrl = getBookingToolDeployUrl();
-  return bookingObj;
+export const bookingContents = (id: string) => {
+  return fetchSingleDoc(TableNames.BOOKING, id)
+    .then((bookingObj) => {
+      const updatedBookingObj = Object.assign({}, bookingObj, {
+        headerMessage: "This is a request email for final approval.",
+        approvalUrl: approvalUrl(id),
+        bookingToolUrl: getBookingToolDeployUrl(),
+        rejectUrl: rejectUrl(id),
+      });
+      return updatedBookingObj;
+    })
+    .catch((error) => {
+      console.error("Error fetching booking contents:", error);
+      throw error;
+    });
 };
 
-const firstApprove = (id: string) =>
-  updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.FIRST_APPROVED_DATE,
-    new Date()
-  );
+const firstApprove = (id: string) => {
+  updateDataInFirestore(TableNames.BOOKING_STATUS, id, {
+    firestApprovedAt: Timestamp.now(),
+  });
+};
 
-const secondApprove = (id: string) =>
-  updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.SECOND_APPROVED_DATE,
-    new Date()
-  );
+const secondApprove = (id: string) => {
+  updateDataInFirestore(TableNames.BOOKING_STATUS, id, {
+    secondApprovedAt: Timestamp.now(),
+  });
+};
 
 export const approveInstantBooking = (id: string) => {
   firstApprove(id);
@@ -47,51 +45,71 @@ export const approveInstantBooking = (id: string) => {
 };
 
 // both first approve and second approve flows hit here
-export const approveBooking = (id: string) => {
-  const firstApproveDateRange = getActiveSheetValueById(
+export const approveBooking = async (id: string) => {
+  const bookingStatus = await fetchSingleDoc<BookingStatus>(
     TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.FIRST_APPROVED_DATE
+    id
   );
+  const firstApproveDateRange =
+    bookingStatus && bookingStatus.firstApprovedAt
+      ? bookingStatus.firstApprovedAt.toDate()
+      : null;
 
-  console.log('first approve date', firstApproveDateRange);
+  console.log("first approve date", firstApproveDateRange);
 
   // if already first approved, then this is a second approve
-  if (firstApproveDateRange !== '') {
+  if (firstApproveDateRange !== null) {
     secondApprove(id);
     approveEvent(id);
   } else {
     firstApprove(id);
 
-    updateEventPrefix(id, BookingStatusLabel.PRE_APPROVED);
+    const response = await fetch("/api/fetchFutureData", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarEventId: id,
+        newPrefix: BookingStatusLabel.PRE_APPROVED,
+      }),
+    });
 
     const contents = bookingContents(id);
     const emailContents = {
-      headerMessage: 'This is a request email for final approval.',
+      headerMessage: "This is a request email for final approval.",
       ...contents,
     };
     const recipient = getSecondApproverEmail(process.env.BRANCH_NAME);
-    sendHTMLEmail(
-      'approval_email',
-      emailContents,
-      recipient,
-      BookingStatusLabel.PRE_APPROVED,
-      contents.title,
-      ''
-    );
+    const formData = {
+      templateName: "approval_email",
+      contents: emailContents,
+      targetEmail: recipient,
+      status: BookingStatusLabel.PRE_APPROVED,
+      eventTitle: contents.title,
+      bodyMessage: "",
+    };
+    const res = await fetch("/api/sendEmail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    console.log(res.json());
   }
 };
 
 export const sendConfirmationEmail = (
   calendarEventId: string,
   status: BookingStatusLabel,
-  headerMessage
+  headerMessage: string
 ) => {
   const email = getSecondApproverEmail(process.env.BRANCH_NAME);
   sendBookingDetailEmail(calendarEventId, email, headerMessage, status);
 };
 
-export const sendBookingDetailEmail = (
+export const sendBookingDetailEmail = async (
   calendarEventId: string,
   email: string,
   headerMessage: string,
@@ -99,20 +117,32 @@ export const sendBookingDetailEmail = (
 ) => {
   const contents = bookingContents(calendarEventId);
   contents.headerMessage = headerMessage;
-  sendHTMLEmail('booking_detail', contents, email, status, contents.title, '');
+  const formData = {
+    templateName: "booking_detail",
+    contents: contents,
+    targetEmail: email,
+    status: status,
+    eventTitle: contents.title,
+    bodyMessage: "",
+  };
+  const res = await fetch("/api/sendEmail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+  console.log(res.json());
 };
 
-export const approveEvent = (id: string) => {
-  const guestEmail = getActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.EMAIL
-  );
+export const approveEvent = async (id: string) => {
+  const doc = await fetchSingleDoc(TableNames.BOOKING_STATUS, id);
+  const guestEmail = doc ? doc.email : null;
 
   // for user
   const headerMessage =
-    'Your reservation request for Media Commons is approved.';
-  console.log('sending booking detail email...');
+    "Your reservation request for Media Commons is approved.";
+  console.log("sending booking detail email...");
   sendBookingDetailEmail(
     id,
     guestEmail,
@@ -125,50 +155,67 @@ export const approveEvent = (id: string) => {
     BookingStatusLabel.APPROVED,
     `This is a confirmation email.`
   );
-
-  const contents = bookingContents(id);
-  updateEventPrefix(id, BookingStatusLabel.APPROVED, contents);
-  inviteUserToCalendarEvent(id, guestEmail);
+  const contents = await bookingContents(id);
+  const response = await fetch("/api/fetchFutureData", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarEventId: id,
+      newPrefix: BookingStatusLabel.APPROVED,
+      bookingContents: contents,
+    }),
+  });
+  const formData = {
+    guestEmail: guestEmail,
+    id: id,
+  };
+  const res = await fetch("/api/sendEmail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+  console.log(res.json());
 };
 
-export const reject = (id: string) => {
-  updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.REJECTED_DATE,
-    new Date()
-  );
+export const reject = async (id: string) => {
+  updateDataInFirestore(TableNames.BOOKING_STATUS, id, {
+    [ActiveSheetBookingStatusColumns.REJECTED_DATE]: Timestamp.now(),
+  });
 
-  const guestEmail = getActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.EMAIL
-  );
+  const doc = await fetchSingleDoc(TableNames.BOOKING_STATUS, id);
+  const guestEmail = doc ? doc.email : null;
   const headerMessage =
-    'Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.';
+    "Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
   sendBookingDetailEmail(
     id,
     guestEmail,
     headerMessage,
     BookingStatusLabel.REJECTED
   );
-  updateEventPrefix(id, BookingStatusLabel.REJECTED);
+  const response = await fetch("/api/fetchFutureData", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarEventId: id,
+      newPrefix: BookingStatusLabel.REJECTED,
+    }),
+  });
 };
 
-export const cancel = (id: string) => {
-  updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.CANCELLED_DATE,
-    new Date()
-  );
-  const guestEmail = getActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.EMAIL
-  );
+export const cancel = async (id: string) => {
+  updateDataInFirestore(TableNames.BOOKING_STATUS, id, {
+    [ActiveSheetBookingStatusColumns.CANCELLED_DATE]: Timestamp.now(),
+  });
+  const doc = await fetchSingleDoc(TableNames.BOOKING_STATUS, id);
+  const guestEmail = doc ? doc.email : null;
   const headerMessage =
-    'Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.';
+    "Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
   sendBookingDetailEmail(
     id,
     guestEmail,
@@ -180,48 +227,54 @@ export const cancel = (id: string) => {
     BookingStatusLabel.CANCELED,
     `This is a cancelation email.`
   );
-  updateEventPrefix(id, BookingStatusLabel.CANCELED);
+  const response = await fetch("/api/fetchFutureData", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarEventId: id,
+      newPrefix: BookingStatusLabel.CANCELED,
+    }),
+  });
 };
 
-export const checkin = (id: string) => {
-  updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.CHECKED_IN_DATE,
-    new Date()
-  );
-  const guestEmail = getActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.EMAIL
-  );
+export const checkin = async (id: string) => {
+  updateDataInFirestore(TableNames.BOOKING_STATUS, id, {
+    [ActiveSheetBookingStatusColumns.CHECKED_IN_DATE]: Timestamp.now(),
+  });
+  const doc = await fetchSingleDoc(TableNames.BOOKING_STATUS, id);
+  const guestEmail = doc ? doc.email : null;
 
   const headerMessage =
-    'Your reservation request for Media Commons has been checked in. Thank you for choosing Media Commons.';
+    "Your reservation request for Media Commons has been checked in. Thank you for choosing Media Commons.";
   sendBookingDetailEmail(
     id,
     guestEmail,
     headerMessage,
     BookingStatusLabel.CHECKED_IN
   );
-  updateEventPrefix(id, BookingStatusLabel.CHECKED_IN);
+  const response = await fetch("/api/fetchFutureData", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarEventId: id,
+      newPrefix: BookingStatusLabel.CHECKED_IN,
+    }),
+  });
 };
 
-export const noShow = (id: string) => {
-  updateActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.NO_SHOWED_DATE,
-    new Date()
-  );
-  const guestEmail = getActiveSheetValueById(
-    TableNames.BOOKING_STATUS,
-    id,
-    ActiveSheetBookingStatusColumns.EMAIL
-  );
+export const noShow = async (id: string) => {
+  updateDataInFirestore(TableNames.BOOKING_STATUS, id, {
+    [ActiveSheetBookingStatusColumns.NO_SHOWED_DATE]: Timestamp.now(),
+  });
+  const doc = await fetchSingleDoc(TableNames.BOOKING_STATUS, id);
+  const guestEmail = doc ? doc.email : null;
 
   const headerMessage =
-    'You did not check-in for your Media Commons Reservation and have been marked as a no-show.';
+    "You did not check-in for your Media Commons Reservation and have been marked as a no-show.";
   sendBookingDetailEmail(
     id,
     guestEmail,
@@ -233,16 +286,14 @@ export const noShow = (id: string) => {
     BookingStatusLabel.NO_SHOW,
     `This is a no show email.`
   );
-  updateEventPrefix(id, BookingStatusLabel.NO_SHOW);
-};
-
-// assumes the unique value is in column 0 but that can be overridden
-export const removeFromListByValue = (
-  sheetName: TableNames,
-  value: string,
-  column: number = 0
-) => {
-  const rowIndex = fetchIndexByUniqueValue(sheetName, column, value);
-  console.log('rowIndex to remove:', rowIndex);
-  removeRowActive(sheetName, rowIndex);
+  const response = await fetch("/api/fetchFutureData", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      calendarEventId: id,
+      newPrefix: BookingStatusLabel.NO_SHOW,
+    }),
+  });
 };

@@ -14,9 +14,10 @@ import {
 import React, { createContext, useEffect, useMemo, useState } from "react";
 
 import axios from "axios";
-import { fetchAllDataFromCollection } from "@/lib/firebase/saveData";
+import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { TableNames } from "@/components/src/policy";
 import { Tab, Table } from "react-bootstrap";
+import { fetchAllFutureDataFromCollection } from "@/components/src/server/db";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -120,7 +121,7 @@ export const DatabaseProvider = ({
   };
 
   const fetchBookings = async () => {
-    fetchAllDataFromCollection(TableNames.BOOKING)
+    fetchAllFutureDataFromCollection(TableNames.BOOKING)
       .then((fetchedData) => {
         const bookings = fetchedData.map((item: any) => ({
           id: item.id,
@@ -168,7 +169,7 @@ export const DatabaseProvider = ({
   };
 
   const fetchBookingStatuses = async () => {
-    fetchAllDataFromCollection(TableNames.BOOKING_STATUS)
+    fetchAllFutureDataFromCollection(TableNames.BOOKING_STATUS)
       .then((fetchedData) => {
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
@@ -262,7 +263,7 @@ export const DatabaseProvider = ({
           roomId: item.roomId,
           name: item.name,
           capacity: item.capacity,
-          calendarRef: item.calendarRef,
+          calendarId: item.calendarId,
         }));
         setRoomSettings(filtered);
       })
