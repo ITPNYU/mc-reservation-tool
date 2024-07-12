@@ -7,6 +7,8 @@ import { formatDate } from "../../../utils/date";
 import { getLiaisonTableName } from "../../../../policy";
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from "../../../utils/serverFunctions";
+import { saveDataToFirestore } from "@/lib/firebase/saveData";
+import { Timestamp } from "@firebase/firestore";
 
 interface AddLiaisonFormProps {
   liaisonEmails: string[];
@@ -33,11 +35,11 @@ const AddLiaisonForm: React.FC<AddLiaisonFormProps> = ({
 
     setLoading(true);
     try {
-      await serverFunctions.appendRowActive(getLiaisonTableName(), [
-        email,
-        department,
-        new Date().toString(),
-      ]);
+      await saveDataToFirestore(getLiaisonTableName(), {
+        email: email,
+        department: department,
+        createdAt: Timestamp.now(),
+      });
       await reloadLiaisonEmails();
     } catch (ex) {
       console.error(ex);
