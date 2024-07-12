@@ -2,11 +2,6 @@ import { approveBooking, reject } from "./admin";
 
 import { DevBranch } from "../types";
 
-export const scriptUrl = () => {
-  const url = "";
-  return url;
-};
-
 export const getBookingToolDeployUrl = () => {
   switch (process.env.BRANCH_NAME as DevBranch) {
     case "development":
@@ -19,18 +14,9 @@ export const getBookingToolDeployUrl = () => {
 };
 
 export const approvalUrl = (calendarEventId: string) => {
-  const url = "";
-  return `${url}?action=approve&page=admin&calendarEventId=${calendarEventId}`;
+  return `${process.env.NEXT_PUBLIC_BASE_URL}/approve&calendarEventId=${calendarEventId}`;
 };
 
 export const rejectUrl = (calendarEventId: string) => {
-  const url = "";
-  return `${url}?action=reject&page=admin&calendarEventId=${calendarEventId}`;
-};
-
-export const getActiveUserEmail = () => {
-  const user = Session.getActiveUser();
-  // user.getUsername() isn't a function
-  // console.log('userName', user.getUsername());
-  return user.getEmail();
+  return `${process.env.NEXT_PUBLIC_BASE_URL}/reject&calendarEventId=${calendarEventId}`;
 };

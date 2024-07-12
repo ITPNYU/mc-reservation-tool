@@ -18,7 +18,7 @@ type LayoutProps = {
 const RootLayout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <html lang="en">
-      <head>{/* 必要に応じてメタタグやリンクタグを追加 */}</head>
+      <head></head>
       <body className={inter.className}>
         <ClientProvider>{children}</ClientProvider>
       </body>

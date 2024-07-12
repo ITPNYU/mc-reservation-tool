@@ -3,7 +3,13 @@ import React, { useContext, useState } from "react";
 import { BookingStatusLabel } from "../../../../types";
 import { DatabaseContext } from "../../components/Provider";
 import Loading from "../../../utils/Loading";
-import { serverFunctions } from "../../../utils/serverFunctions";
+import {
+  approveBooking,
+  cancel,
+  checkin,
+  noShow,
+  reject,
+} from "@/components/src/server";
 
 interface Props {
   calendarEventId: string;
@@ -87,7 +93,7 @@ export default function BookingActions({
           {ActionButton(
             "Cancel",
             async () => {
-              await serverFunctions.cancel(calendarEventId);
+              await cancel(calendarEventId);
             },
             BookingStatusLabel.CANCELED,
             true
@@ -101,14 +107,14 @@ export default function BookingActions({
     const checkInBtn = ActionButton(
       "Check In",
       async () => {
-        await serverFunctions.checkin(calendarEventId);
+        await checkin(calendarEventId);
       },
       BookingStatusLabel.CHECKED_IN
     );
     const noShowBtn = ActionButton(
       "No Show",
       async () => {
-        await serverFunctions.noShow(calendarEventId);
+        await noShow(calendarEventId);
       },
       BookingStatusLabel.NO_SHOW
     );
@@ -149,7 +155,7 @@ export default function BookingActions({
           ActionButton(
             "2nd Approve",
             async () => {
-              await serverFunctions.approveBooking(calendarEventId);
+              await approveBooking(calendarEventId);
             },
             BookingStatusLabel.APPROVED
           )}
@@ -157,14 +163,14 @@ export default function BookingActions({
           ActionButton(
             "1st Approve",
             async () => {
-              await serverFunctions.approveBooking(calendarEventId);
+              await approveBooking(calendarEventId);
             },
             BookingStatusLabel.PRE_APPROVED
           )}
         {ActionButton(
           "Reject",
           async () => {
-            await serverFunctions.reject(calendarEventId);
+            await reject(calendarEventId);
           },
           BookingStatusLabel.REJECTED,
           true

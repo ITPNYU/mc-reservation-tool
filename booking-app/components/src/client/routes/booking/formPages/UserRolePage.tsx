@@ -11,6 +11,7 @@ export default function UserRolePage() {
   const router = useRouter();
 
   const handleNextClick = () => {
+    console.log("role", role, "department", department);
     if (!role || !department) {
       alert("Please make sure all fields are selected.");
       return;

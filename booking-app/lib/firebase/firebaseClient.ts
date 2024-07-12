@@ -1,16 +1,6 @@
 // firebaseClient.ts
 import { getApp, getApps, initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  Firestore,
-  Timestamp,
-  initializeFirestore,
-  setLogLevel,
-  connectFirestoreEmulator,
-  addDoc,
-  collection,
-} from "firebase/firestore";
-import { firebase } from "googleapis/build/src/apis/firebase";
+import { initializeFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdFBW-MHSbBCHg-6TLBgJUmp1hacx7Vr8",
