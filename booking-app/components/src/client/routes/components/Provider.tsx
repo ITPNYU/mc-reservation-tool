@@ -275,11 +275,11 @@ export const DatabaseProvider = ({
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
           reservationType: item.reservationType,
-          dateAdded: item.dateAdded,
+          createdAt: item.createdAt,
         }));
         setSettings((prev) => ({
           ...prev,
-          ...filtered,
+          reservationTypes: filtered as ReservationType[],
         }));
       })
       .catch((error) => console.error("Error fetching data:", error));

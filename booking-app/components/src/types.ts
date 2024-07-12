@@ -116,7 +116,7 @@ export enum PagePermission {
 
 export type ReservationType = {
   reservationType: string;
-  dateAdded: string;
+  createdAt: string;
 };
 
 export enum Role {
