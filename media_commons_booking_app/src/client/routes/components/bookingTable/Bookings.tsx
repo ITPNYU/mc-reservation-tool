@@ -12,10 +12,10 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import BookMoreButton from './BookMoreButton';
 import BookingTableFilters from './BookingTableFilters';
 import BookingTableRow from './BookingTableRow';
-import { DatabaseContext } from '../../components/Provider';
+import { DatabaseContext } from '../Provider';
 import Loading from '../../../utils/Loading';
 import MoreInfoModal from './MoreInfoModal';
-import getBookingStatus from '../hooks/getBookingStatus';
+import getBookingStatus from '../../hooks/getBookingStatus';
 import { styled } from '@mui/system';
 
 interface BookingsProps {

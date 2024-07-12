@@ -2,7 +2,7 @@ import { Booking, CalendarEvent, RoomSetting } from '../../../../types';
 import { CALENDAR_HIDE_STATUS, STORAGE_KEY_BOOKING } from '../../../../policy';
 import { useEffect, useState } from 'react';
 
-import getBookingStatus from '../../admin/hooks/getBookingStatus';
+import getBookingStatus from '../../hooks/getBookingStatus';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
 export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
