@@ -1,13 +1,12 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 
-import { Bookings } from '../admin/components/Bookings';
+import { Bookings } from '../components/bookingTable/Bookings';
+import { Box } from '@mui/material';
 import { DatabaseContext } from '../components/Provider';
 import Loading from '../../utils/Loading';
 import { PagePermission } from '../../../types';
-import SafetyTrainedUsers from '../admin/components/SafetyTraining';
 
 const PAPage = () => {
-  const [tab, setTab] = useState('bookings');
   const { paUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
   const paEmails = useMemo<string[]>(
@@ -24,17 +23,15 @@ const PAPage = () => {
   }
 
   return (
-    <div className="m-10">
+    <Box margin={3}>
       {!userHasPermission ? (
-        <div className="m-10">
-          You do not have permission to view this page.
-        </div>
+        <div>You do not have permission to view this page.</div>
       ) : (
         <div>
           <Bookings isPaView={true} />
         </div>
       )}
-    </div>
+    </Box>
   );
 };
 

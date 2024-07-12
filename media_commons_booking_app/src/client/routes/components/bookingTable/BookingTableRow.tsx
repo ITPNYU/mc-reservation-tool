@@ -9,12 +9,12 @@ import {
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { formatDateTable, formatTimeTable } from '../../../utils/date';
 
-import BookingActions from './BookingActions';
-import { DatabaseContext } from '../../components/Provider';
+import BookingActions from '../../admin/components/BookingActions';
+import { DatabaseContext } from '../Provider';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 import StackedTableCell from './StackedTableCell';
 import StatusChip from './StatusChip';
-import getBookingStatus from '../hooks/getBookingStatus';
+import getBookingStatus from '../../hooks/getBookingStatus';
 
 interface Props {
   booking: Booking;

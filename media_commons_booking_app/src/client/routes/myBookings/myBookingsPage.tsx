@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import React, { useContext } from 'react';
 
-import { Bookings } from '../admin/components/Bookings';
+import { Bookings } from '../components/bookingTable/Bookings';
 import { DatabaseContext } from '../components/Provider';
 import { styled } from '@mui/system';
 

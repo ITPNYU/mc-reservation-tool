@@ -1,7 +1,6 @@
 import { CalendarEvent, Department, Role, RoomSetting } from '../../../types';
 import React, {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,

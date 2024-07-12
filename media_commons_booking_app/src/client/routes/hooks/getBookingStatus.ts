@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, BookingStatusLabel } from '../../../../types';
+import { Booking, BookingStatus, BookingStatusLabel } from '../../../types';
 
 export default function getBookingStatus(
   booking: Booking,
