@@ -13,9 +13,9 @@ export default function BookingForm({ children }: BookingFormProps) {
   }, []);
 
   return (
-    <BookingProvider>
+    <div>
       <Header />
       {children}
-    </BookingProvider>
+    </div>
   );
 }

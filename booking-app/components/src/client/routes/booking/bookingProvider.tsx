@@ -10,7 +10,7 @@ import React, {
 
 import { DatabaseContext } from "../components/Provider";
 import { DateSelectArg } from "@fullcalendar/core";
-import { serverFunctions } from "../../utils/serverFunctions";
+import { getOldSafetyTrainingEmails } from "@/components/src/server";
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
@@ -50,7 +50,6 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
 
   const isBanned = useMemo<boolean>(() => {
-    console.log("userEmail", userEmail);
     if (!userEmail) return false;
     return bannedUsers
       .map((bannedUser) => bannedUser.email)
@@ -65,12 +64,9 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     console.log("isTrained from tool", isTrained);
     // if not on active list, check old list
     if (!isTrained) {
-      isTrained = await serverFunctions
-        .getOldSafetyTrainingEmails()
-        .then((rows) =>
-          //TODO: Fix it after connecting with API
-          ["rh3555@nyu.edu"].map((row) => row[0]).includes(userEmail)
-        );
+      isTrained = getOldSafetyTrainingEmails().some((rows) =>
+        rows.includes(userEmail)
+      );
     }
     console.log("isTrained from googlesheets", isTrained);
     setIsSafetyTrained(isTrained);
@@ -79,6 +75,11 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     fetchIsSafetyTrained();
   }, [fetchIsSafetyTrained]);
+
+  useEffect(() => {
+    console.log("change Role!");
+    console.log(role);
+  }, [role]);
 
   return (
     <BookingContext.Provider
@@ -99,3 +100,10 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     </BookingContext.Provider>
   );
 }
+export const useBookingContext = () => {
+  const context = useContext(BookingContext);
+  if (!context) {
+    throw new Error("useBookingContext must be used within a BookingProvider");
+  }
+  return context;
+};

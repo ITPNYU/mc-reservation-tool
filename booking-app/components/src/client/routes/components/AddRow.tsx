@@ -2,9 +2,9 @@ import React, { useMemo, useState } from "react";
 
 import Loading from "../../utils/Loading";
 import { TableNames } from "../../../policy";
-import { serverFunctions } from "../../utils/serverFunctions";
-import { saveDataToFirestore } from "@/lib/firebase/saveData";
+import { saveDataToFirestore } from "@/lib/firebase/firebase";
 import { Timestamp } from "@firebase/firestore";
+import { BookingStatusLabel } from "@/components/src/types";
 
 interface Props {
   addDuplicateErrorMessage?: string;

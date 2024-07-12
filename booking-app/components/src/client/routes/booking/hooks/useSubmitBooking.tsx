@@ -1,3 +1,4 @@
+"use client";
 import {
   Booking,
   BookingFormDetails,
@@ -10,16 +11,24 @@ import { useContext, useMemo, useState } from "react";
 
 import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
-import { serverFunctions } from "../../../utils/serverFunctions";
+import { saveDataToFirestore } from "@/lib/firebase/firebase";
+import { useRouter } from "next/navigation";
+import { Timestamp } from "@firebase/firestore";
+import {
+  approveInstantBooking,
+  sendBookingDetailEmail,
+} from "@/components/src/server";
 
 export default function useSubmitBooking(): [
   (x: Inputs) => Promise<void>,
-  boolean
+  boolean,
 ] {
+  const router = useRouter();
   const { liaisonUsers, userEmail, reloadBookings, reloadBookingStatuses } =
     useContext(DatabaseContext);
   const { bookingCalendarInfo, department, role, selectedRooms } =
     useContext(BookingContext);
+  console.log("bookingCalendarInfo", bookingCalendarInfo);
 
   const [loading, setLoading] = useState(false);
 
@@ -30,6 +39,7 @@ export default function useSubmitBooking(): [
         .map((liaison) => liaison.email),
     [liaisonUsers, department]
   );
+  console.log("firstApprovers", firstApprovers);
 
   if (!department || !role) {
     console.error("Missing info for submitting booking");
@@ -44,27 +54,30 @@ export default function useSubmitBooking(): [
 
   const roomCalendarId = (room: RoomSetting) => {
     console.log("ENVIRONMENT:", process.env.CALENDAR_ENV);
-    if (process.env.CALENDAR_ENV === "production") {
-      return room.calendarIdProd;
-    } else {
-      return room.calendarIdDev;
-    }
+    return room.calendarId;
   };
 
   const sendApprovalEmail = (
     recipients: string[],
     contents: BookingFormDetails
   ) => {
-    recipients.forEach((recipient) =>
-      serverFunctions.sendHTMLEmail(
-        "approval_email",
-        contents,
-        recipient,
-        BookingStatusLabel.REQUESTED,
-        contents.title,
-        ""
-      )
-    );
+    recipients.forEach(async (recipient) => {
+      const formData = {
+        templateName: "approval_email",
+        contents: contents,
+        targetEmail: "rh3555@nyu.edu",
+        status: BookingStatusLabel.REQUESTED,
+        eventTitle: contents.title,
+        bodyMessage: "",
+      };
+      const res = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+    });
   };
 
   const registerEvent = async (data) => {
@@ -90,38 +103,44 @@ export default function useSubmitBooking(): [
       return;
     }
 
-    // Add the event to the calendar.
-    const calendarEventId = await serverFunctions.addEventToCalendar(
-      calendarId,
-      `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(
-        ", "
-      )} ${department} ${data.title}`,
-      "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.",
-      bookingCalendarInfo.startStr,
-      bookingCalendarInfo.endStr,
-      otherRoomIds
-    );
+    const res = await fetch("/api/calendarEvents", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarId: calendarId,
+        title: `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(
+          ", "
+        )} ${department} ${data.title}`,
+        description:
+          "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.",
+        startTime: bookingCalendarInfo.startStr,
+        endTime: bookingCalendarInfo.endStr,
+        roomEmails: otherRoomIds,
+      }),
+    });
+    const calendarEventId = (await res.json()).calendarEventId;
 
     // Record the event to the spread sheet.
     const contents = order.map(function (key) {
-      return data[key];
+      return { [key]: data[key] };
     });
 
-    serverFunctions.appendRowActive(TableNames.BOOKING, [
-      calendarEventId,
-      selectedRoomIds.join(", "),
-      email,
-      bookingCalendarInfo.startStr,
-      bookingCalendarInfo.endStr,
+    console.log("contents", contents);
+    saveDataToFirestore(TableNames.BOOKING, {
+      calendarEventId: calendarEventId,
+      roomId: selectedRoomIds.join(", "),
+      email: email,
+      startDate: bookingCalendarInfo.startStr,
+      endDate: bookingCalendarInfo.endStr,
       ...contents,
-      process.env.BRANCH_NAME,
-    ]);
-
-    await serverFunctions.appendRowActive(TableNames.BOOKING_STATUS, [
-      calendarEventId,
-      email,
-      new Date().toLocaleString(),
-    ]);
+    });
+    saveDataToFirestore(TableNames.BOOKING_STATUS, {
+      calendarEventId: calendarEventId,
+      email: email,
+      requestedAt: Timestamp.now(),
+    });
 
     const isAutoApproval = (
       selectedRoomIds: string[],
@@ -143,11 +162,12 @@ export default function useSubmitBooking(): [
     };
 
     if (isAutoApproval(selectedRoomIds, data, bookingCalendarInfo)) {
-      serverFunctions.approveInstantBooking(calendarEventId);
+      approveInstantBooking(calendarEventId);
     } else {
-      const getApprovalUrl = serverFunctions.approvalUrl(calendarEventId);
-      const getRejectedUrl = serverFunctions.rejectUrl(calendarEventId);
-      const getBookingToolUrl = serverFunctions.getBookingToolDeployUrl();
+      //TODO Fix this
+      const getApprovalUrl = "http://localhost:3000/approval";
+      const getRejectedUrl = "http://localhost:3000/reject";
+      const getBookingToolUrl = "http://localhost:3000";
       Promise.all([getApprovalUrl, getRejectedUrl, getBookingToolUrl]).then(
         (values) => {
           const userEventInputs: BookingFormDetails = {
@@ -168,11 +188,11 @@ export default function useSubmitBooking(): [
     }
 
     alert("Your request has been sent.");
-    navigate("/");
+    router.push("/");
 
     const headerMessage =
       "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.";
-    serverFunctions.sendBookingDetailEmail(
+    sendBookingDetailEmail(
       calendarEventId,
       email,
       headerMessage,

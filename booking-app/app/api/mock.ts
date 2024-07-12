@@ -15,7 +15,6 @@ type ServerFunctions = {
   approvalUrl: (params: any) => { result: string };
   rejectUrl: (params: any) => { result: string };
   doGet: (params: any) => { result: string };
-  getActiveUserEmail: (params: any) => { result: string };
   sendHTMLEmail: (params: any) => { result: string };
   sendTextEmail: (params: any) => { result: string };
   approveBooking: (calendarEventId: string) => { result: string };

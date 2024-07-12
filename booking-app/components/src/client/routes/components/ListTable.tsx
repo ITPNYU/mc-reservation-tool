@@ -2,8 +2,7 @@ import React, { useMemo } from "react";
 
 import ListTableRow from "./ListTableRow";
 import { TableNames } from "../../../policy";
-import { serverFunctions } from "../../utils/serverFunctions";
-import { deleteDataFromFirestore } from "@/lib/firebase/saveData";
+import { deleteDataFromFirestore } from "@/lib/firebase/firebase";
 
 interface Props {
   columnFormatters?: { [key: string]: (value: string) => string };

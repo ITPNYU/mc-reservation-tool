@@ -1,23 +1,5 @@
-import {
-  addEventToCalendar,
-  confirmEvent,
-  getCalendarEvents,
-} from './calendars';
-import {
-  appendRowActive,
-  fetchById,
-  getActiveBookingsFutureDates,
-  getAllActiveSheetRows,
-  getOldSafetyTrainingEmails,
-} from './db';
-import {
-  approvalUrl,
-  doGet,
-  getActiveUserEmail,
-  getBookingToolDeployUrl,
-  rejectUrl,
-  scriptUrl,
-} from './ui';
+import { getActiveBookingsFutureDates } from "./db";
+import { approvalUrl, getBookingToolDeployUrl, rejectUrl } from "./ui";
 import {
   approveBooking,
   approveInstantBooking,
@@ -25,37 +7,20 @@ import {
   checkin,
   noShow,
   reject,
-  removeFromListByValue,
   sendBookingDetailEmail,
-} from './admin';
-import { sendHTMLEmail, sendTextEmail } from './emails';
+} from "./admin";
 
 // Public functions must be exported as named exports
 // Interface bewteen server <> client
 export {
-  // calendars
-  addEventToCalendar,
-  confirmEvent,
-  getCalendarEvents,
-
   // sheets
-  appendRowActive,
-  fetchById,
-  getAllActiveSheetRows,
   getActiveBookingsFutureDates,
-  getOldSafetyTrainingEmails,
 
   // ui
   getBookingToolDeployUrl,
-  scriptUrl,
   approvalUrl,
   rejectUrl,
-  doGet,
-  getActiveUserEmail,
 
-  // email
-  sendHTMLEmail,
-  sendTextEmail,
   // admin
   approveBooking,
   reject,
@@ -63,6 +28,5 @@ export {
   checkin,
   noShow,
   approveInstantBooking,
-  removeFromListByValue,
   sendBookingDetailEmail,
 };

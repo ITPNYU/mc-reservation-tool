@@ -10,7 +10,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import googleCalendarPlugin from "@fullcalendar/google-calendar";
 import interactionPlugin from "@fullcalendar/interaction"; // for selectable
-import { serverFunctions } from "../../../utils/serverFunctions";
 import timeGridPlugin from "@fullcalendar/timegrid"; // a plugin!
 import { HIDING_STATUS } from "../../../../policy";
 import axios from "axios";
@@ -42,11 +41,7 @@ export const RoomCalendar = ({
       process.env.CALENDAR_ENV,
       "calendars"
     );
-    fetchCalendarEvents(
-      process.env.CALENDAR_ENV === "production"
-        ? room.calendarIdProd
-        : room.calendarIdDev
-    );
+    fetchCalendarEvents(room.calendarId);
   }, []);
 
   function renderEventContent(eventInfo) {
