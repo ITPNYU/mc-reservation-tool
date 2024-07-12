@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext } from "react";
 
-import AddRow from '../../components/AddRow';
-import { DatabaseContext } from '../../components/Provider';
-import ListTable from '../../components/ListTable';
-import { TableNames } from '../../../../policy';
-import { formatDate } from '../../../utils/date';
+import AddRow from "../../components/AddRow";
+import { DatabaseContext } from "../../components/Provider";
+import ListTable from "../../components/ListTable";
+import { TableNames } from "../../../../policy";
+import { formatDate } from "../../../utils/date";
 
 export default function Settings() {
   const { settings, reloadReservationTypes } = useContext(DatabaseContext);
@@ -27,7 +27,7 @@ export default function Settings() {
           settings.reservationTypes as unknown as { [key: string]: string }[]
         }
         rowsRefresh={reloadReservationTypes}
-        columnFormatters={{ dateAdded: formatDate }}
+        columnFormatters={{ createdAt: formatDate }}
       />
     </>
   );

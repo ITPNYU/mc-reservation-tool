@@ -7,6 +7,8 @@ import {
   initializeFirestore,
   setLogLevel,
   connectFirestoreEmulator,
+  addDoc,
+  collection,
 } from "firebase/firestore";
 import { firebase } from "googleapis/build/src/apis/firebase";
 
