@@ -1,13 +1,7 @@
 import { Booking, BookingStatusLabel } from '../../../../types';
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from '@mui/material';
+import { Box, TableBody, TableCell, TableRow } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import Table, { TableEmpty, TableTopRow } from '../Table';
 
 import BookMoreButton from './BookMoreButton';
 import BookingTableFilters from './BookingTableFilters';
@@ -16,43 +10,12 @@ import { DatabaseContext } from '../Provider';
 import Loading from '../../../utils/Loading';
 import MoreInfoModal from './MoreInfoModal';
 import getBookingStatus from '../../hooks/getBookingStatus';
-import { styled } from '@mui/system';
 
 interface BookingsProps {
   isAdminView?: boolean;
   isPaView?: boolean;
   isUserView?: boolean;
 }
-
-const TableCustom = styled(Table)(({ theme }) => ({
-  border: `1px solid ${theme.palette.custom.border}`,
-}));
-
-const ShadedHeader = styled(TableHead)(({ theme }) => ({
-  backgroundColor: theme.palette.custom.gray,
-}));
-
-const TopRow = styled(Table)`
-  height: 48px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border-bottom: none;
-  border-radius: 4px 4px 0px 0px;
-
-  th,
-  td {
-    border: none;
-  }
-`;
-
-const Empty = styled(Box)`
-  color: rgba(0, 0, 0, 0.38);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 25vh;
-`;
 
 export const Bookings: React.FC<BookingsProps> = ({
   isAdminView = false,
@@ -110,79 +73,66 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const topRow = useMemo(() => {
     if (isUserView) {
-      return (
-        <TopRow>
-          <TableBody>
-            <TableRow>
-              <TableCell sx={{ color: 'rgba(0,0,0,0.6)' }}>
-                Your Bookings
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </TopRow>
-      );
+      return <Box sx={{ color: 'rgba(0,0,0,0.6)' }}>Your Bookings</Box>;
     }
     return (
-      <TopRow>
-        <BookingTableFilters
-          allowedStatuses={allowedStatuses}
-          selected={statusFilters}
-          setSelected={setStatusFilters}
-        />
-      </TopRow>
+      <BookingTableFilters
+        allowedStatuses={allowedStatuses}
+        selected={statusFilters}
+        setSelected={setStatusFilters}
+      />
     );
   }, [isUserView, statusFilters, allowedStatuses]);
 
   const bottomSection = useMemo(() => {
     if (bookingsLoading && bookings.length === 0) {
       return (
-        <Empty>
+        <TableEmpty>
           <Loading />
-        </Empty>
+        </TableEmpty>
       );
     }
     if (bookings.length === 0) {
       return (
-        <Empty>
+        <TableEmpty>
           {isUserView
             ? "You don't have any reservations"
             : 'No active reservations found'}
-        </Empty>
+        </TableEmpty>
       );
     }
   }, [isUserView, bookingsLoading, bookings]);
 
+  const columns = useMemo(
+    () => [
+      <TableCell>Status</TableCell>,
+      <TableCell>Dates</TableCell>,
+      <TableCell>Room</TableCell>,
+      !isUserView && <TableCell>Department/Role</TableCell>,
+      !isUserView && <TableCell>ID</TableCell>,
+      !isUserView && <TableCell>Contacts</TableCell>,
+      <TableCell>Title</TableCell>,
+      !isUserView && <TableCell>Other Info</TableCell>,
+      <TableCell>Action</TableCell>,
+    ],
+    [isUserView]
+  );
+
   return (
     <Box sx={{ marginTop: 4 }}>
-      {topRow}
-      <TableCustom size="small">
-        <ShadedHeader>
-          <TableRow>
-            <TableCell>Status</TableCell>
-            <TableCell>Dates</TableCell>
-            <TableCell>Room</TableCell>
-            {!isUserView && <TableCell>Department/Role</TableCell>}
-            {!isUserView && <TableCell>ID</TableCell>}
-            {!isUserView && <TableCell>Contacts</TableCell>}
-            <TableCell>Title</TableCell>
-            {!isUserView && <TableCell>Other Info</TableCell>}
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </ShadedHeader>
-        <TableBody>
-          {filteredBookings.map((booking, index) => (
-            <BookingTableRow
-              key={index}
-              {...{
-                booking,
-                isAdminView,
-                isUserView,
-                setModalData,
-              }}
-            />
-          ))}
-        </TableBody>
-      </TableCustom>
+      <Table {...{ columns, topRow }}>
+        {filteredBookings.map((booking, index) => (
+          <BookingTableRow
+            key={index}
+            {...{
+              booking,
+              isAdminView,
+              isUserView,
+              setModalData,
+            }}
+          />
+        ))}
+      </Table>
       {isUserView && <BookMoreButton />}
       {bottomSection}
       {modalData != null && (

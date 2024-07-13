@@ -12,11 +12,11 @@ export default function SafetyTrainedUsers() {
 
   return (
     <>
-      <AddEmail
+      {/* <AddEmail
         tableName={TableNames.SAFETY_TRAINING}
         userList={safetyTrainedUsers}
         userListRefresh={reloadSafetyTrainedUsers}
-      />
+      /> */}
       <EmailListTable
         columnFormatters={{ completedAt: formatDate }}
         tableName={TableNames.SAFETY_TRAINING}

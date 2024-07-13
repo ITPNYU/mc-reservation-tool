@@ -22,7 +22,7 @@ const tabs = [
 export default function Settings() {
   const [tab, setTab] = useState('safetyTraining');
   return (
-    <Grid container marginTop={4}>
+    <Grid container marginTop={4} spacing={2}>
       <Grid xs={2}>
         <Stack
           divider={<Divider sx={{ borderColor: '#21212154' }} />}
