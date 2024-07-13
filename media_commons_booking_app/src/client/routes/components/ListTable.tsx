@@ -12,10 +12,12 @@ interface Props {
   tableName: TableNames;
   rows: { [key: string]: string }[];
   rowsRefresh: () => Promise<void>;
+  topRow: React.ReactNode;
 }
 
 export default function ListTable(props: Props) {
   const refresh = props.rowsRefresh;
+  const topRow = props.topRow;
   const columnFormatters = props.columnFormatters || {};
 
   const columnNames = useMemo<string[]>(() => {
@@ -25,22 +27,22 @@ export default function ListTable(props: Props) {
     return Object.keys(props.rows[0]) as string[];
   }, [props.rows]);
 
-  if (props.rows.length === 0) {
-    return <p className="p-4">No results</p>;
-  }
+  // if (props.rows.length === 0) {
+  //   return <p>No results</p>;
+  // }
 
   const columns = useMemo(
     () => [
       ...columnNames.map((columnName, idx) => (
         <TableCell key={idx}>{formatColumnName(columnName)}</TableCell>
       )),
-      <TableCell>Action</TableCell>,
+      <TableCell align="right">Action</TableCell>,
     ],
-    []
+    [columnNames]
   );
 
   return (
-    <Table {...{ columns, topRow: <Box>Hi</Box> }}>
+    <Table {...{ columns, topRow }}>
       {props.rows.map((row, index: number) => (
         <ListTableRow
           key={index}

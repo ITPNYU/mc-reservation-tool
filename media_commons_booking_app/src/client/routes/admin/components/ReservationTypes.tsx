@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 
 import AddRow from '../../components/AddRow';
 import { DatabaseContext } from '../../components/Provider';
@@ -9,26 +9,29 @@ import { formatDate } from '../../../utils/date';
 export default function ReservationTypes() {
   const { settings, reloadReservationTypes } = useContext(DatabaseContext);
 
-  return (
-    <>
+  const addResType = useMemo(
+    () => (
       <AddRow
         columnNameToAddValue="reservationType"
-        label="Reservation Type"
         tableName={TableNames.RESERVATION_TYPES}
         rows={
           settings.reservationTypes as unknown as { [key: string]: string }[]
         }
         rowsRefresh={reloadReservationTypes}
+        inputPlaceholder="Add reservation type"
       />
-      <ListTable
-        columnNameToRemoveBy="reservationType"
-        tableName={TableNames.RESERVATION_TYPES}
-        rows={
-          settings.reservationTypes as unknown as { [key: string]: string }[]
-        }
-        rowsRefresh={reloadReservationTypes}
-        columnFormatters={{ dateAdded: formatDate }}
-      />
-    </>
+    ),
+    [settings.reservationTypes, reloadReservationTypes]
+  );
+
+  return (
+    <ListTable
+      columnNameToRemoveBy="reservationType"
+      tableName={TableNames.RESERVATION_TYPES}
+      rows={settings.reservationTypes as unknown as { [key: string]: string }[]}
+      rowsRefresh={reloadReservationTypes}
+      columnFormatters={{ dateAdded: formatDate }}
+      topRow={addResType}
+    />
   );
 }

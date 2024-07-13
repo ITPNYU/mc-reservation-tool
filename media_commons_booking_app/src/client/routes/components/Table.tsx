@@ -1,10 +1,12 @@
 import {
   Box,
   Table as MuiTable,
+  SxProps,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Theme,
 } from '@mui/material';
 
 import React from 'react';
@@ -12,6 +14,12 @@ import { styled } from '@mui/system';
 
 const TableCustom = styled(MuiTable)(({ theme }) => ({
   border: `1px solid ${theme.palette.custom.border}`,
+  borderCollapse: 'separate',
+  borderRadius: '0px 0px 4px 4px',
+
+  '& tr:last-child td': {
+    borderBottom: 'none',
+  },
 }));
 
 const ShadedHeader = styled(TableHead)(({ theme }) => ({
@@ -20,15 +28,15 @@ const ShadedHeader = styled(TableHead)(({ theme }) => ({
 
 export const TableTopRow = styled(MuiTable)`
   height: 48px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   border-bottom: none;
+  border-collapse: separate;
   border-radius: 4px 4px 0px 0px;
+  padding: 0;
 
   th,
   td {
     border: none;
+    padding: 0;
   }
 `;
 
@@ -44,11 +52,12 @@ interface Props {
   columns: React.ReactNode[];
   children: React.ReactNode[];
   topRow: React.ReactNode;
+  sx?: SxProps<Theme>;
 }
 
-export default function Table({ columns, children, topRow }: Props) {
+export default function Table({ columns, children, topRow, sx }: Props) {
   return (
-    <Box>
+    <>
       <TableTopRow>
         <TableBody>
           <TableRow>
@@ -56,12 +65,12 @@ export default function Table({ columns, children, topRow }: Props) {
           </TableRow>
         </TableBody>
       </TableTopRow>
-      <TableCustom size="small">
+      <TableCustom size="small" sx={sx ?? {}}>
         <ShadedHeader>
           <TableRow>{columns}</TableRow>
         </ShadedHeader>
         <TableBody>{children}</TableBody>
       </TableCustom>
-    </Box>
+    </>
   );
 }
