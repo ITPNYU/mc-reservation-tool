@@ -193,6 +193,7 @@ export const DatabaseProvider = ({ children }) => {
     const trained = await serverFunctions
       .getAllActiveSheetRows(TableNames.SAFETY_TRAINING)
       .then((rows) => JSON.parse(rows) as SafetyTraining[]);
+    console.log(trained[0]);
     setSafetyTrainedUsers(trained);
   };
 

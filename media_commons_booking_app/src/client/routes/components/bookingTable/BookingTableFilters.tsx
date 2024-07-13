@@ -25,7 +25,7 @@ export default function BookingTableFilters({
   };
 
   return (
-    <>
+    <Box sx={{ display: 'flex', paddingLeft: '16px' }}>
       <FilterList sx={{ marginRight: '14px', color: 'rgba(0,0,0,0.8)' }} />
       {allowedStatuses.map((status) =>
         status === BookingStatusLabel.UNKNOWN ? null : (
@@ -42,6 +42,6 @@ export default function BookingTableFilters({
           </Box>
         )
       )}
-    </>
+    </Box>
   );
 }

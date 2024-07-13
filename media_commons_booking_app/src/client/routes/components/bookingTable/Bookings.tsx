@@ -1,7 +1,7 @@
 import { Booking, BookingStatusLabel } from '../../../../types';
-import { Box, TableBody, TableCell, TableRow } from '@mui/material';
+import { Box, TableCell } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import Table, { TableEmpty, TableTopRow } from '../Table';
+import Table, { TableEmpty } from '../Table';
 
 import BookMoreButton from './BookMoreButton';
 import BookingTableFilters from './BookingTableFilters';
@@ -73,7 +73,18 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const topRow = useMemo(() => {
     if (isUserView) {
-      return <Box sx={{ color: 'rgba(0,0,0,0.6)' }}>Your Bookings</Box>;
+      return (
+        <Box
+          sx={{
+            color: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            paddingLeft: '16px',
+          }}
+        >
+          Your Bookings
+        </Box>
+      );
     }
     return (
       <BookingTableFilters
@@ -120,7 +131,12 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   return (
     <Box sx={{ marginTop: 4 }}>
-      <Table {...{ columns, topRow }}>
+      <Table
+        {...{ columns, topRow }}
+        sx={{
+          borderRadius: isUserView ? '0px' : '',
+        }}
+      >
         {filteredBookings.map((booking, index) => (
           <BookingTableRow
             key={index}
