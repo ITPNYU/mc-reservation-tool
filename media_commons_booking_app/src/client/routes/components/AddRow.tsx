@@ -53,7 +53,7 @@ export default function AddRow(props: Props) {
   };
 
   return (
-    <div className="mt-10 mr-10 ml-10">
+    <div className="mr-10 ml-10">
       <form className="flex items-center">
         <div className="mb-6 mr-6">
           <label
