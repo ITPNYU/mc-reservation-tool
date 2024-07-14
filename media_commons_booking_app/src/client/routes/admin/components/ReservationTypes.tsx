@@ -19,6 +19,7 @@ export default function ReservationTypes() {
         }
         rowsRefresh={reloadReservationTypes}
         inputPlaceholder="Add reservation type"
+        title="Booking Form Reservation Types"
       />
     ),
     [settings.reservationTypes, reloadReservationTypes]

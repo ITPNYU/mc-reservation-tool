@@ -11,6 +11,7 @@ interface EmailField {
 interface Props<T extends EmailField> {
   columnFormatters?: { [key: string]: (value: string) => string };
   tableName: TableNames;
+  title: string;
   userList: T[];
   userListRefresh: () => Promise<void>;
 }

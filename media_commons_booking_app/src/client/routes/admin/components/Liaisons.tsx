@@ -113,6 +113,7 @@ export const Liaisons = () => {
         userList={liaisonUsers}
         userListRefresh={reloadLiaisonUsers}
         columnFormatters={{ createdAt: formatDate }}
+        title="Liaisons"
       />
     </>
   );

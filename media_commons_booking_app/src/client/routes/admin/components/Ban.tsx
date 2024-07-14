@@ -16,6 +16,7 @@ export const BannedUsers = () => {
       userList={bannedUsers}
       userListRefresh={reloadBannedUsers}
       columnFormatters={{ bannedAt: formatDate }}
+      title="Banned Users"
     />
   );
 };

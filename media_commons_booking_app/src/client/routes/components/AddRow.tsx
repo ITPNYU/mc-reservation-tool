@@ -15,10 +15,11 @@ interface Props {
   tableName: TableNames;
   rows: { [key: string]: string }[];
   rowsRefresh: () => Promise<void>;
+  title: string;
 }
 
 export default function AddRow(props: Props) {
-  const { tableName, rows, rowsRefresh } = props;
+  const { tableName, rows, rowsRefresh, title } = props;
   const [valueToAdd, setValueToAdd] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
@@ -63,7 +64,7 @@ export default function AddRow(props: Props) {
       paddingRight="16px"
     >
       <Grid sx={{ paddingLeft: '16px', color: 'rgba(0,0,0,0.6)' }}>
-        Booking Form Reservation Types
+        {title}
       </Grid>
       <Grid paddingLeft={0} paddingRight={0}>
         <TextField
