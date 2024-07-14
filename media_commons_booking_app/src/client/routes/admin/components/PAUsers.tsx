@@ -15,6 +15,7 @@ export const PAUsers = () => {
       userList={paUsers}
       userListRefresh={reloadPaUsers}
       columnFormatters={{ createdAt: formatDate }}
+      title="PA Users"
     />
   );
 };

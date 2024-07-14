@@ -14,6 +14,7 @@ export default function SafetyTrainedUsers() {
     <EmailListTable
       columnFormatters={{ completedAt: formatDate }}
       tableName={TableNames.SAFETY_TRAINING}
+      title="Safety Trained Users"
       userList={safetyTrainedUsers}
       userListRefresh={reloadSafetyTrainedUsers}
     />

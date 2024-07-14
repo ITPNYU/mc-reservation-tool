@@ -15,6 +15,7 @@ export const AdminUsers = () => {
       userList={adminUsers}
       userListRefresh={reloadAdminUsers}
       columnFormatters={{ createdAt: formatDate }}
+      title="Admin Users"
     />
   );
 };
