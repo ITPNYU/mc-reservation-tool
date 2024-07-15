@@ -23,7 +23,7 @@ export default function AddEmail<T extends EmailField>({
     <AddRow
       addDuplicateErrorMessage="This user has already been added"
       addFailedErrorMessage="Failed to add user"
-      columnNameToAddValue="email"
+      columnNameUniqueValue="email"
       inputPlaceholder="Add email"
       rows={userList as unknown as { [key: string]: string }[]}
       rowsRefresh={userListRefresh}

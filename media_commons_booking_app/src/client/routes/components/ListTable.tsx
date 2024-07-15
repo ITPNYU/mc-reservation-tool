@@ -33,10 +33,12 @@ export default function ListTable(props: Props) {
 
   const columns = useMemo(
     () => [
-      ...columnNames.map((columnName, idx) => (
-        <TableCell key={idx}>{formatColumnName(columnName)}</TableCell>
+      ...columnNames.map((columnName) => (
+        <TableCell key={columnName}>{formatColumnName(columnName)}</TableCell>
       )),
-      <TableCell align="right">Action</TableCell>,
+      <TableCell align="right" key="action">
+        Action
+      </TableCell>,
     ],
     [columnNames]
   );
