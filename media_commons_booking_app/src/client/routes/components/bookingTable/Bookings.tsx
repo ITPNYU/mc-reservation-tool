@@ -116,15 +116,15 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const columns = useMemo(
     () => [
-      <TableCell>Status</TableCell>,
-      <TableCell>Dates</TableCell>,
-      <TableCell>Room</TableCell>,
-      !isUserView && <TableCell>Department/Role</TableCell>,
-      !isUserView && <TableCell>ID</TableCell>,
-      !isUserView && <TableCell>Contacts</TableCell>,
-      <TableCell>Title</TableCell>,
-      !isUserView && <TableCell>Other Info</TableCell>,
-      <TableCell>Action</TableCell>,
+      <TableCell key="status">Status</TableCell>,
+      <TableCell key="dates">Dates</TableCell>,
+      <TableCell key="room">Room</TableCell>,
+      !isUserView && <TableCell key="department">Department/Role</TableCell>,
+      !isUserView && <TableCell key="id">ID</TableCell>,
+      !isUserView && <TableCell key="contacts">Contacts</TableCell>,
+      <TableCell key="title">Title</TableCell>,
+      !isUserView && <TableCell key="other">Other Info</TableCell>,
+      <TableCell key="action">Action</TableCell>,
     ],
     [isUserView]
   );
@@ -137,9 +137,9 @@ export const Bookings: React.FC<BookingsProps> = ({
           borderRadius: isUserView ? '0px' : '',
         }}
       >
-        {filteredBookings.map((booking, index) => (
+        {filteredBookings.map((booking) => (
           <BookingTableRow
-            key={index}
+            key={booking.calendarEventId}
             {...{
               booking,
               isAdminView,

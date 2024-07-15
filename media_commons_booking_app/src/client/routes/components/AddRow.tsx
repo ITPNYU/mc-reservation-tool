@@ -10,21 +10,26 @@ import { serverFunctions } from '../../utils/serverFunctions';
 interface Props {
   addDuplicateErrorMessage?: string;
   addFailedErrorMessage?: string;
-  columnNameToAddValue: string;
+  columnNameUniqueValue: string;
   inputPlaceholder?: string;
   tableName: TableNames;
   rows: { [key: string]: string }[];
   rowsRefresh: () => Promise<void>;
   title: string;
+  extra?: {
+    components: React.ReactNode[];
+    values: string[];
+    updates: ((x: string) => void)[];
+  };
 }
 
 export default function AddRow(props: Props) {
-  const { tableName, rows, rowsRefresh, title } = props;
+  const { tableName, rows, rowsRefresh, title, extra } = props;
   const [valueToAdd, setValueToAdd] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   const uniqueValues = useMemo<string[]>(
-    () => rows.map((row) => row[props.columnNameToAddValue]),
+    () => rows.map((row) => row[props.columnNameUniqueValue]),
     [rows]
   );
 
@@ -42,6 +47,7 @@ export default function AddRow(props: Props) {
     try {
       await serverFunctions.appendRowActive(tableName, [
         valueToAdd,
+        ...(extra?.values ?? []),
         new Date().toString(),
       ]);
       await rowsRefresh();
@@ -51,6 +57,7 @@ export default function AddRow(props: Props) {
     } finally {
       setLoading(false);
       setValueToAdd('');
+      extra?.updates.forEach((update) => update(''));
     }
   };
 
@@ -61,25 +68,27 @@ export default function AddRow(props: Props) {
       display="flex"
       justifyContent={'space-between'}
       alignItems={'center'}
-      paddingRight="16px"
     >
       <Grid sx={{ paddingLeft: '16px', color: 'rgba(0,0,0,0.6)' }}>
         {title}
       </Grid>
-      <Grid paddingLeft={0} paddingRight={0}>
-        <TextField
-          id="valueToAdd"
-          onChange={(e) => {
-            setValueToAdd(e.target.value);
-          }}
-          value={valueToAdd}
-          placeholder={props.inputPlaceholder ?? ''}
-          size="small"
-        />
+      <Grid paddingLeft={0} paddingRight={4} display="flex" alignItems="center">
+        <Grid container paddingRight={1}>
+          <TextField
+            id="valueToAdd"
+            onChange={(e) => {
+              setValueToAdd(e.target.value);
+            }}
+            value={valueToAdd}
+            placeholder={props.inputPlaceholder ?? ''}
+            size="small"
+          />
+          {...extra?.components ?? []}
+        </Grid>
         {loading ? (
-          <Loading />
+          <Loading style={{ height: '25px', width: '25px' }} />
         ) : (
-          <IconButton onClick={addValue} color="primary">
+          <IconButton onClick={addValue} color="primary" sx={{ padding: 0 }}>
             <AddCircleOutline />
           </IconButton>
         )}

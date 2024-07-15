@@ -12,7 +12,7 @@ export default function ReservationTypes() {
   const addResType = useMemo(
     () => (
       <AddRow
-        columnNameToAddValue="reservationType"
+        columnNameUniqueValue="reservationType"
         tableName={TableNames.RESERVATION_TYPES}
         rows={
           settings.reservationTypes as unknown as { [key: string]: string }[]
