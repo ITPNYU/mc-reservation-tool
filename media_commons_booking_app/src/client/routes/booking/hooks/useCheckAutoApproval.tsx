@@ -4,7 +4,8 @@ import { BookingContext } from '../bookingProvider';
 import { INSTANT_APPROVAL_ROOMS } from '../../../../policy';
 
 export default function useCheckAutoApproval() {
-  const { bookingCalendarInfo, selectedRooms } = useContext(BookingContext);
+  const { bookingCalendarInfo, selectedRooms, formData } =
+    useContext(BookingContext);
 
   const [isAutoApproval, setIsAutoApproval] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -15,6 +16,7 @@ export default function useCheckAutoApproval() {
   };
 
   useEffect(() => {
+    // EVENT DURATION > 4 HOURS
     if (bookingCalendarInfo != null) {
       const startDate = bookingCalendarInfo.start;
       const endDate = bookingCalendarInfo.end;
@@ -25,6 +27,7 @@ export default function useCheckAutoApproval() {
       }
     }
 
+    // ROOMS REQUIRE APPROVAL
     if (
       !selectedRooms.every((room) =>
         INSTANT_APPROVAL_ROOMS.includes(room.roomId)
@@ -36,27 +39,45 @@ export default function useCheckAutoApproval() {
       return;
     }
 
+    // ROOM SETUP
+    if (formData?.roomSetup === 'yes') {
+      throwError(
+        'Requesting additional room setup for an event will require approval'
+      );
+      return;
+    }
+
+    // HAS MEDIA SERVICES
+    if (formData?.mediaServices?.length > 0) {
+      throwError(
+        'Requesting media services for an event will require approval'
+      );
+      return;
+    }
+
+    // HAS CATERING
+    if (formData?.catering === 'yes') {
+      throwError('Providing catering for an event will require approval');
+      return;
+    }
+
+    // HAS SECURITY
+    if (formData?.hireSecurity === 'yes') {
+      throwError('Hiring security for an event will require approval');
+      return;
+    }
+
     setIsAutoApproval(true);
     setErrorMessage(null);
-  }, [bookingCalendarInfo, selectedRooms]);
+  }, [
+    // WARNING WARNING make sure to update this dep list if relying on new props
+    bookingCalendarInfo,
+    selectedRooms,
+    formData?.catering,
+    formData?.hireSecurity,
+    formData?.mediaServices,
+    formData?.roomSetup,
+  ]);
 
   return { isAutoApproval, errorMessage };
-  // const isAutoApproval = (
-  //   selectedRoomIds: string[],
-  //   data: Booking,
-  //   bookingCalendarInfo
-  // ) => {
-  //   const startDate = new Date(bookingCalendarInfo?.startStr);
-  //   const endDate = new Date(bookingCalendarInfo?.endStr);
-  //   const duration = endDate.getTime() - startDate.getTime();
-  //   // If the selected rooms are all instant approval rooms and the user does not need catering, and hire security, and room setup, then it is auto-approval.
-  //   return (
-  //     duration <= 3.6e6 * 4 && // <= 4 hours
-  //     selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
-  //     data['catering'] === 'no' &&
-  //     data['hireSecurity'] === 'no' &&
-  //     data['mediaServices'].length === 0 &&
-  //     data['roomSetup'] === 'no'
-  //   );
-  // };
 }

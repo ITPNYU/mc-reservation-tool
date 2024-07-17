@@ -6,13 +6,21 @@ import {
   BookingFormTextField,
 } from './BookingFormInputs';
 import { Box, Button, Typography } from '@mui/material';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { BookingContext } from '../bookingProvider';
 import BookingFormMediaServices from './BookingFormMediaServices';
 import BookingSelection from './BookingSelection';
+import { CenterLoading } from '../../components/Loading';
 import { DatabaseContext } from '../../components/Provider';
+import useSubmitBooking from '../hooks/useSubmitBooking';
 
 const Section = ({ title, children }) => (
   <div style={{ marginBottom: '20px' }}>
@@ -23,9 +31,10 @@ const Section = ({ title, children }) => (
   </div>
 );
 
-export default function FormInput({ handleParentSubmit }) {
+export default function FormInput() {
   const { userEmail, settings } = useContext(DatabaseContext);
-  const { role, department, selectedRooms } = useContext(BookingContext);
+  const { role, department, selectedRooms, bookingCalendarInfo, setFormData } =
+    useContext(BookingContext);
   const {
     control,
     handleSubmit,
@@ -59,6 +68,11 @@ export default function FormInput({ handleParentSubmit }) {
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
 
+  const watchedFields = watch();
+  useEffect(() => {
+    setFormData(watchedFields);
+  }, [watchedFields, setFormData]);
+
   const maxCapacity = useMemo(
     () =>
       selectedRooms.reduce((sum, room) => {
@@ -90,13 +104,19 @@ export default function FormInput({ handleParentSubmit }) {
 
   const disabledButton = !(checklist && resetRoom && bookingPolicy && isValid);
 
+  const [registerEvent, loading] = useSubmitBooking();
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const dumpMediaServices = data.mediaServices || [];
-    data.mediaServices = Array.isArray(dumpMediaServices)
-      ? dumpMediaServices.join(', ')
-      : dumpMediaServices;
-    handleParentSubmit(data);
+    if (!bookingCalendarInfo) return;
+    // if (!userEmail && data.missingEmail) {
+    //   setUserEmail(data.missingEmail);
+    // }
+    registerEvent(data);
   };
+
+  if (loading) {
+    return <CenterLoading />;
+  }
 
   return (
     <Box sx={{ padding: '32px 0px' }}>
