@@ -242,17 +242,8 @@ export const DatabaseProvider = ({
   };
 
   const fetchLiaisonUsers = async () => {
-    fetchAllDataFromCollection(TableNames.LIAISONS_PROD)
-      .then((fetchedData) => {
-        const filtered = fetchedData.map((item: any) => ({
-          id: item.id,
-          email: item.email,
-          department: item.department,
-          createdAt: item.createdAt,
-        }));
-        setLiaisonUsers(filtered);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+    const response = await axios.get("/api/liaisons", {});
+    setLiaisonUsers(response.data);
   };
 
   const fetchRoomSettings = async () => {
