@@ -63,36 +63,43 @@
     <div id="index"></div>
     <div class="container"></div>
     <div class="container">
-      <p>{{ headerMessage }}</p>
-      <p>Room Number: {{ roomId }}</p>
+      <p>{{ contents.headerMessage }}</p>
+      <p>Room Number: {{ contents.roomId }}</p>
 
-      <p>First name: {{ firstName }}</p>
-      <p>Last name: {{ lastName }}</p>
-      <p>Email: {{ email }}</p>
-      <p>Start date: {{ startDate }}</p>
-      <p>End date: {{ endDate }}</p>
-      <p>Secondary Point of Contact: {{ secondaryName }}</p>
-      <p>NYU N-number: {{ nNumber }}</p>
-      <p>Net Id: {{ netId }}</p>
-      <p>Phone Number: {{ phoneNumber }}</p>
-      <p>Department: {{ department }}</p>
-      <p>Requestor's Role: {{ role}}</p>
-      <p>Sponsor First Name: {{ sponsorFirstName }}</p>
-      <p>Sponsor Last Name: {{ sponsorLastName }}</p>
-      <p>Sponsor Email: {{ sponsorEmail }}</p>
-      <p>Reservation Title: {{ title }}</p>
-      <p>Reservation Description: {{ description }}</p>
-      <p>Reservation Type: {{ reservationType }}</p>
-      <p>Expected Attendance: {{ expectedAttendance }}</p>
-      <p>Attendee Affiliations: {{ attendeeAffiliation }}</p>
-      <p>Room setup needed?: {{ roomSetup }} {{ setupDetails }}</p>
-      <p>Chartfield for Room setup?: {{ chartFieldForRoomSetup }}</p>
-      <p>Media Services: {{ mediaServices }} {{ mediaServicesDetails }}</p>
-      <p>Catering: {{ catering }}</p>
-      <p>Catering Details: {{ cateringService }}</p>
-      <p>Chartfield for Catering?: {{ chartFieldForCatering }}</p>
-      <p>Hire Security: {{ hireSecurity }}</p>
-      <p>Chartfield for Hiring Security?: {{ chartFieldForSecurity }}</p>
+      <p>First name: {{ contents.firstName }}</p>
+      <p>Last name: {{ contents.lastName }}</p>
+      <p>Email: {{ contents.email }}</p>
+      <p>Start date: {{ contents.startDate }}</p>
+      <p>End date: {{ contents.endDate }}</p>
+      <p>Secondary Point of Contact: {{ contents.secondaryName }}</p>
+      <p>NYU N-number: {{ contents.nNumber }}</p>
+      <p>Net Id: {{ contents.netId }}</p>
+      <p>Phone Number: {{ contents.phoneNumber }}</p>
+      <p>Department: {{ contents.department }}</p>
+      <p>Requestor's Role: {{ contents.role}}</p>
+      <p>Sponsor First Name: {{ contents.sponsorFirstName }}</p>
+      <p>Sponsor Last Name: {{ contents.sponsorLastName }}</p>
+      <p>Sponsor Email: {{ contents.sponsorEmail }}</p>
+      <p>Reservation Title: {{ contents.title }}</p>
+      <p>Reservation Description: {{ contents.description }}</p>
+      <p>Reservation Type: {{ contents.reservationType }}</p>
+      <p>Expected Attendance: {{ contents.expectedAttendance }}</p>
+      <p>Attendee Affiliations: {{ contents.attendeeAffiliation }}</p>
+      <p>
+        Room setup needed?: {{ contents.roomSetup }} {{ contents.setupDetails }}
+      </p>
+      <p>Chartfield for Room setup?: {{ contents.chartFieldForRoomSetup }}</p>
+      <p>
+        Media Services: {{ contents.mediaServices }} {{
+        contents.mediaServicesDetails }}
+      </p>
+      <p>Catering: {{ contents.catering }}</p>
+      <p>Catering Details: {{ contents.cateringService }}</p>
+      <p>Chartfield for Catering?: {{ contents.chartFieldForCatering }}</p>
+      <p>Hire Security: {{ contents.hireSecurity }}</p>
+      <p>
+        Chartfield for Hiring Security?: {{ contents.chartFieldForSecurity }}
+      </p>
     </div>
   </body>
 </html>
