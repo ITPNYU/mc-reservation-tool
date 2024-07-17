@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 
 import { BookingContext } from '../bookingProvider';
+import { CenterLoading } from '../../components/Loading';
 import { DatabaseContext } from '../../components/Provider';
 import FormInput from '../components/FormInput';
 import Grid from '@mui/material/Unstable_Grid2';
 import { Inputs } from '../../../../types';
-import Loading from '../../../utils/Loading';
 import useSubmitBooking from '../hooks/useSubmitBooking';
 
 export default function BookingFormDetailsPage() {
@@ -23,7 +23,7 @@ export default function BookingFormDetailsPage() {
   };
 
   if (loading) {
-    return <Loading />;
+    return <CenterLoading />;
   }
 
   return (

@@ -2,8 +2,8 @@ import React, { useContext, useMemo } from 'react';
 
 import { Bookings } from '../components/bookingTable/Bookings';
 import { Box } from '@mui/material';
+import { CenterLoading } from '../components/Loading';
 import { DatabaseContext } from '../components/Provider';
-import Loading from '../../utils/Loading';
 import { PagePermission } from '../../../types';
 
 const PAPage = () => {
@@ -19,7 +19,7 @@ const PAPage = () => {
     pagePermission === PagePermission.PA;
 
   if (paEmails.length === 0 || userEmail === null) {
-    return <Loading />;
+    return <CenterLoading />;
   }
 
   return (
