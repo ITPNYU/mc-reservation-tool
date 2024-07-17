@@ -6,7 +6,7 @@ import { BookingStatusLabel } from '../../../../types';
 import Check from '@mui/icons-material/Check';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { DatabaseContext } from '../../components/Provider';
-import Loading from '../../../utils/Loading';
+import Loading from '../../components/Loading';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
 interface Props {
@@ -85,11 +85,7 @@ export default function BookingActions({
   };
 
   if (uiLoading) {
-    return (
-      // <td className="px-2 py-4 w-28">
-      <Loading />
-      // </td>
-    );
+    return <Loading />;
   }
 
   const actions: { [key in Actions]: ActionDefinition } = {

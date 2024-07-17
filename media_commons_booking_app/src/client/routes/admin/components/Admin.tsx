@@ -1,15 +1,10 @@
 import React, { useContext, useMemo, useState } from 'react';
 
-import { AdminUsers } from './AdminUsers';
-import { BannedUsers } from './Ban';
 import { Bookings } from '../../components/bookingTable/Bookings';
 import { Box } from '@mui/material';
+import { CenterLoading } from '../../components/Loading';
 import { DatabaseContext } from '../../components/Provider';
-import { Liaisons } from './Liaisons';
-import Loading from '../../../utils/Loading';
-import { PAUsers } from './PAUsers';
 import { PagePermission } from '../../../../types';
-import SafetyTrainedUsers from './SafetyTraining';
 import Settings from './Settings';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -27,7 +22,7 @@ export default function Admin() {
   const userHasPermission = pagePermission === PagePermission.ADMIN;
 
   if (adminEmails.length === 0 || userEmail == null) {
-    return <Loading />;
+    return <CenterLoading />;
   }
 
   return (

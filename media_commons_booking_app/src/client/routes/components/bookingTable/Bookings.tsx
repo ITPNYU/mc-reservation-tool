@@ -7,7 +7,7 @@ import BookMoreButton from './BookMoreButton';
 import BookingTableFilters from './BookingTableFilters';
 import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../Provider';
-import Loading from '../../../utils/Loading';
+import Loading from '../Loading';
 import MoreInfoModal from './MoreInfoModal';
 import getBookingStatus from '../../hooks/getBookingStatus';
 

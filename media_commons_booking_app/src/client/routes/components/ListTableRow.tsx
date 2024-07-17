@@ -2,7 +2,7 @@ import { Button, IconButton, TableCell, TableRow } from '@mui/material';
 import React, { useState } from 'react';
 
 import { Delete } from '@mui/icons-material';
-import Loading from '../../utils/Loading';
+import Loading from './Loading';
 
 interface Props {
   columnFormatters?: { [key: string]: (value: string) => string };
