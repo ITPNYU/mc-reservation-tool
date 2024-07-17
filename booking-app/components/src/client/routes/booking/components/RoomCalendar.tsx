@@ -117,7 +117,6 @@ export const RoomCalendar = ({
       return;
     }
     allRooms.map((room) => {
-      console.log("handle datae select room", room);
       if (!room.calendarRef.current) return;
       let calendarApi = room.calendarRef.current.getApi();
       calendarApi.addEvent({

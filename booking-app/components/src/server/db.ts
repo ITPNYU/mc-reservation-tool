@@ -1,8 +1,4 @@
-import {
-  fetchAllDataFromCollection,
-  fetchSingleDoc,
-  updateDataInFirestore,
-} from "@/lib/firebase/firebase";
+import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { TableNames } from "../policy";
 import { where } from "@firebase/firestore";
 

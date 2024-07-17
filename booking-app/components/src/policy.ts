@@ -1,15 +1,15 @@
 /********** GOOGLE SHEETS ************/
 
-import { BookingStatusLabel, DevBranch } from './types';
+import { BookingStatusLabel, DevBranch } from "./types";
 
 /** ACTIVE master Google Sheet  */
-export const ACTIVE_SHEET_ID = '1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68';
+export const ACTIVE_SHEET_ID = "1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68";
 
 export function getLiaisonTableName() {
   switch (process.env.BRANCH_NAME as DevBranch) {
-    case 'development':
+    case "development":
       return TableNames.LIAISONS_DEV;
-    case 'staging':
+    case "staging":
       return TableNames.LIAISONS_STAGING;
     default:
       return TableNames.LIAISONS_PROD;
@@ -17,18 +17,18 @@ export function getLiaisonTableName() {
 }
 
 export enum TableNames {
-  ADMINS = 'admin_users',
-  BANNED = 'banned_users',
-  BOOKING = 'bookings',
-  BOOKING_STATUS = 'bookingStatus',
-  LIAISONS_DEV = 'liaisonsDev',
-  LIAISONS_PROD = 'liaisonsProd',
-  LIAISONS_STAGING = 'liaisonsStaging',
-  PAS = 'pa_users',
-  RESERVATION_TYPES = 'reservationTypes',
-  ROOMS = 'rooms',
-  SAFETY_TRAINING = 'safety_training_users',
-  SETTINGS = 'settings',
+  ADMINS = "admin_users",
+  BANNED = "banned_users",
+  BOOKING = "bookings",
+  BOOKING_STATUS = "bookingStatus",
+  LIAISONS_DEV = "liaisonsDev",
+  LIAISONS_PROD = "liaisonsProd",
+  LIAISONS_STAGING = "liaisonsStaging",
+  PAS = "pa_users",
+  RESERVATION_TYPES = "reservationTypes",
+  ROOMS = "rooms",
+  SAFETY_TRAINING = "safety_training_users",
+  SETTINGS = "settings",
 }
 
 export enum ActiveSheetBookingStatusColumns {
@@ -53,41 +53,39 @@ export enum ActiveSheetRoomsColumns {
 
 /** Old safety training Google Sheet */
 export const OLD_SAFETY_TRAINING_SHEET_ID =
-  '1Debe5qF-2qXJhqP0AMy5etEvwAPd3mNFiTswytsbKxQ';
+  "1Debe5qF-2qXJhqP0AMy5etEvwAPd3mNFiTswytsbKxQ";
 /** Old safety training sheet within OLD_SAFETY_TRAINING_SHEET_ID */
-export const OLD_SAFETY_TRAINING_SHEET_NAME = 'Sheet1';
+export const OLD_SAFETY_TRAINING_SHEET_NAME = "Sheet1";
 export const SECOND_OLD_SAFETY_TRAINING_SHEET_ID =
-  '1TZYBrX5X6TXM07V3OMTOnVWF8qRmWnTzh27zacrQHh0';
+  "1TZYBrX5X6TXM07V3OMTOnVWF8qRmWnTzh27zacrQHh0";
 export const SECOND_OLD_SAFETY_TRAINING_SHEET_GID = 293202487;
 
 /********** CONTACTS ************/
 
 // TODO configure this via admin UI
 export const getSecondApproverEmail = (branchName: string) =>
-  branchName === 'development'
-    ? 'media-commons-devs@itp.nyu.edu'
-    : 'jg5626@nyu.edu'; // Jhanele
+  branchName === "production" ? "jg5626@nyu.edu" : "rh3555@nyu.edu";
+//    : "media-commons-devs@itp.nyu.edu"; // Jhanele
 
 export const getApprovalCcEmail = (branchName: string) =>
-  branchName === 'development'
-    ? 'media-commons-devs@itp.nyu.edu'
-    : 'ss12430@nyu.edu'; // Samantha
+  branchName === "production" ? "ss12430@nyu.edu" : "rh3555@nyu.edu";
+//    : "media-commons-devs@itp.nyu.edu"; // Samantha
 
 /********** ROOMS ************/
 
-export type Purpose = 'multipleRoom' | 'motionCapture';
+export type Purpose = "multipleRoom" | "motionCapture";
 
 export const SAFETY_TRAINING_REQUIRED_ROOM = [
-  '103',
-  '220',
-  '221',
-  '222',
-  '223',
-  '224',
-  '230',
+  "103",
+  "220",
+  "221",
+  "222",
+  "223",
+  "224",
+  "230",
 ];
 
-export const INSTANT_APPROVAL_ROOMS = ['221', '222', '223', '224', '233'];
+export const INSTANT_APPROVAL_ROOMS = [221, 222, 223, 224, 233];
 
 export const HIDING_STATUS = [
   BookingStatusLabel.NO_SHOW,

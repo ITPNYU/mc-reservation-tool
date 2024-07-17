@@ -8,8 +8,10 @@ import {
   getDocs,
   query,
   QueryConstraint,
+  QuerySnapshot,
   Timestamp,
   updateDoc,
+  where,
 } from "@firebase/firestore";
 import { db } from "./firebaseClient";
 import { TableNames } from "@/components/src/policy";
@@ -51,6 +53,7 @@ export const fetchAllDataFromCollection = async <T>(
   const colRef = collection(db, collectionName);
   const q = query(colRef, ...queryConstraints);
   const snapshot = await getDocs(q);
+  console.log("snapshot", snapshot.docs);
   const data = snapshot.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as unknown as T),
@@ -58,15 +61,17 @@ export const fetchAllDataFromCollection = async <T>(
   return data;
 };
 
-export const fetchSingleDoc = async <T>(
+export const getDataByCalendarEventId = async <T>(
   collectionName: TableNames,
-  docId: string
-): Promise<T | null> => {
+  calendarEventId: string
+) => {
   try {
-    const docRef = doc(db, collectionName, docId);
-    const docSnap = await getDoc(docRef);
+    const colRef = collection(db, collectionName);
+    const q = query(colRef, where("calendarEventId", "==", calendarEventId));
+    const querySnapshot: QuerySnapshot = await getDocs(q);
 
-    if (docSnap.exists()) {
+    if (!querySnapshot.empty) {
+      const docSnap = querySnapshot.docs[0];
       const data = docSnap.data() as T;
       console.log("Document data:", data);
       return { id: docSnap.id, ...data };

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCalendarClient } from "@/lib/googleClient";
 import { updateEventPrefix } from "@/components/src/server/calendars";
+import { bookingContents } from "@/components/src/server/admin";
+import { BookingFormDetails } from "@/components/src/types";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -54,7 +56,6 @@ export async function POST(request: NextRequest) {
   const { calendarId, title, description, startTime, endTime, roomEmails } =
     await request.json();
   console.log(calendarId, title, description, startTime, endTime, roomEmails);
-  debugger;
 
   if (
     !calendarId ||
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const { calendarEventId, newPrefix, bookingContents } = await req.json();
+  const { calendarEventId, newPrefix } = await req.json();
 
   if (!calendarEventId || !newPrefix) {
     return NextResponse.json(
@@ -109,9 +110,10 @@ export async function PUT(req: NextRequest) {
       { status: 400 }
     );
   }
-
+  const contents = await bookingContents(calendarEventId);
+  console.log("contents", contents);
   try {
-    await updateEventPrefix(calendarEventId, newPrefix, bookingContents);
+    await updateEventPrefix(calendarEventId, newPrefix, contents);
     return NextResponse.json(
       { message: "Event updated successfully" },
       { status: 200 }
