@@ -5,7 +5,7 @@ import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { getCalendarClient } from "@/lib/googleClient";
 import { endAt, sum, where } from "@firebase/firestore";
 
-const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
+export const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
   const queryConstraints = [where("roomId", "==", roomId)];
   const rooms = await fetchAllDataFromCollection(
     TableNames.ROOMS,
@@ -13,6 +13,24 @@ const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
   );
   console.log(`Rooms: ${rooms}`);
   return rooms.map((room: any) => room.calendarId);
+};
+
+export const getRoomCalendarId = async (
+  roomId: number
+): Promise<string | null> => {
+  const queryConstraints = [where("roomId", "==", roomId)];
+  const rooms = await fetchAllDataFromCollection(
+    TableNames.ROOMS,
+    queryConstraints
+  );
+  if (rooms.length > 0) {
+    const room = rooms[0] as RoomSetting;
+    console.log(`Room: ${JSON.stringify(room)}`);
+    return room.calendarId;
+  } else {
+    console.log("No matching room found.");
+    return null;
+  }
 };
 
 const patchCalendarEvent = async (
