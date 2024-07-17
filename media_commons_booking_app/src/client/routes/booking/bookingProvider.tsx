@@ -1,4 +1,10 @@
-import { CalendarEvent, Department, Role, RoomSetting } from '../../../types';
+import {
+  CalendarEvent,
+  Department,
+  Inputs,
+  Role,
+  RoomSetting,
+} from '../../../types';
 import React, {
   createContext,
   useCallback,
@@ -13,19 +19,14 @@ import { DateSelectArg } from '@fullcalendar/core';
 import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../policy';
 import fetchCalendarEvents from './hooks/fetchCalendarEvents';
 import { serverFunctions } from '../../utils/serverFunctions';
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../policy';
-=======
 import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
->>>>>>> 4300bf5 (send test booking data to server to react)
-=======
->>>>>>> 4f4998e (show fake data for table testing)
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
   department: Department | undefined;
   existingCalendarEvents: CalendarEvent[];
+  formData: Inputs | undefined;
+  hasShownMocapModal: boolean;
   isBanned: boolean;
   isSafetyTrained: boolean;
   needsSafetyTraining: boolean;
@@ -33,6 +34,8 @@ export interface BookingContextType {
   selectedRooms: RoomSetting[];
   setBookingCalendarInfo: (x: DateSelectArg) => void;
   setDepartment: (x: Department) => void;
+  setFormData: (x: Inputs) => void;
+  setHasShownMocapModal: (x: boolean) => void;
   setRole: (x: Role) => void;
   setSelectedRooms: (x: RoomSetting[]) => void;
   setNeedsSafetyTraining: (x: boolean) => void;
@@ -42,6 +45,8 @@ export const BookingContext = createContext<BookingContextType>({
   bookingCalendarInfo: undefined,
   department: undefined,
   existingCalendarEvents: [],
+  formData: undefined,
+  hasShownMocapModal: false,
   isBanned: false,
   needsSafetyTraining: false,
   isSafetyTrained: true,
@@ -50,6 +55,8 @@ export const BookingContext = createContext<BookingContextType>({
   selectedRooms: [],
   setBookingCalendarInfo: (x: DateSelectArg) => {},
   setDepartment: (x: Department) => {},
+  setFormData: (x: Inputs) => {},
+  setHasShownMocapModal: (x: boolean) => {},
   setRole: (x: Role) => {},
   setSelectedRooms: (x: RoomSetting[]) => {},
   setNeedsSafetyTraining: (x: boolean) => {},
@@ -62,6 +69,8 @@ export function BookingProvider({ children }) {
   const [bookingCalendarInfo, setBookingCalendarInfo] =
     useState<DateSelectArg>();
   const [department, setDepartment] = useState<Department>();
+  const [formData, setFormData] = useState<Inputs>(undefined);
+  const [hasShownMocapModal, setHasShownMocapModal] = useState(false);
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [needsSafetyTraining, setNeedsSafetyTraining] = useState(false);
@@ -111,6 +120,8 @@ export function BookingProvider({ children }) {
         bookingCalendarInfo,
         department,
         existingCalendarEvents,
+        formData,
+        hasShownMocapModal,
         isBanned,
         isSafetyTrained,
         needsSafetyTraining,
@@ -118,6 +129,8 @@ export function BookingProvider({ children }) {
         selectedRooms,
         setBookingCalendarInfo,
         setDepartment,
+        setFormData,
+        setHasShownMocapModal,
         setRole,
         setSelectedRooms,
         setNeedsSafetyTraining,
