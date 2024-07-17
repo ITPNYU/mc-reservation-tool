@@ -11,16 +11,7 @@ import { useContext, useMemo, useState } from "react";
 
 import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
-import { saveDataToFirestore } from "@/lib/firebase/firebase";
 import { useRouter } from "next/navigation";
-import { Timestamp } from "@firebase/firestore";
-import {
-  approvalUrl,
-  approveInstantBooking,
-  getBookingToolDeployUrl,
-  rejectUrl,
-  sendBookingDetailEmail,
-} from "@/components/src/server";
 
 export default function useSubmitBooking(): [
   (x: Inputs) => Promise<void>,
@@ -35,15 +26,6 @@ export default function useSubmitBooking(): [
 
   const [loading, setLoading] = useState(false);
 
-  const firstApprovers = useMemo(
-    () =>
-      liaisonUsers
-        .filter((liaison) => liaison.department === department)
-        .map((liaison) => liaison.email),
-    [liaisonUsers, department]
-  );
-  console.log("firstApprovers", firstApprovers);
-
   if (!department || !role) {
     console.error("Missing info for submitting booking");
     return [
@@ -55,43 +37,9 @@ export default function useSubmitBooking(): [
     ];
   }
 
-  const roomCalendarId = (room: RoomSetting) => {
-    console.log("ENVIRONMENT:", process.env.CALENDAR_ENV);
-    return room.calendarId;
-  };
-
-  const sendApprovalEmail = (
-    recipients: string[],
-    contents: BookingFormDetails
-  ) => {
-    recipients.forEach(async (recipient) => {
-      const formData = {
-        templateName: "approval_email",
-        contents: contents,
-        targetEmail: "rh3555@nyu.edu",
-        status: BookingStatusLabel.REQUESTED,
-        eventTitle: contents.title,
-        bodyMessage: "",
-      };
-      const res = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-    });
-  };
-
   const registerEvent = async (data) => {
     setLoading(true);
     const email = userEmail || data.missingEmail;
-    const [room, ...otherRooms] = selectedRooms;
-    const selectedRoomIds = selectedRooms.map((r) => r.roomId);
-    const otherRoomIds = otherRooms
-      .map((r) => roomCalendarId(r))
-      .filter((x) => x != null) as string[];
-
     if (
       bookingCalendarInfo == null ||
       bookingCalendarInfo.startStr == null ||
@@ -100,135 +48,26 @@ export default function useSubmitBooking(): [
       return;
     }
 
-    let calendarId = roomCalendarId(room);
-    if (calendarId == null) {
-      console.error("ROOM CALENDAR ID NOT FOUND");
-      return;
-    }
-
-    const res = await fetch("/api/calendarEvents", {
+    const res = await fetch("/api/bookings", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        calendarId: calendarId,
-        title: `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(
-          ", "
-        )} ${department} ${data.title}`,
-        description:
-          "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.",
-        startTime: bookingCalendarInfo.startStr,
-        endTime: bookingCalendarInfo.endStr,
-        roomEmails: otherRoomIds,
+        email: email,
+        selectedRooms: selectedRooms,
+        bookingCalendarInfo: bookingCalendarInfo,
+        liaisonUsers:
+        data: data,
       }),
+    }).then((res) => {
+      alert("Your request has been sent.");
+      router.push("/")
+      setLoading(false);
+      reloadBookings();
+      reloadBookingStatuses();
     });
-    const calendarEventId = (await res.json()).calendarEventId;
-
-    saveDataToFirestore(TableNames.BOOKING, {
-      calendarEventId: calendarEventId,
-      roomId: selectedRoomIds.join(", "),
-      email: email,
-      startDate: bookingCalendarInfo.startStr,
-      endDate: bookingCalendarInfo.endStr,
-      ...data,
-    });
-    saveDataToFirestore(TableNames.BOOKING_STATUS, {
-      calendarEventId: calendarEventId,
-      email: email,
-      requestedAt: Timestamp.now(),
-    });
-
-    const isAutoApproval = (
-      selectedRoomIds: string[],
-      data: Booking,
-      bookingCalendarInfo
-    ) => {
-      const startDate = new Date(bookingCalendarInfo?.startStr);
-      const endDate = new Date(bookingCalendarInfo?.endStr);
-      const duration = endDate.getTime() - startDate.getTime();
-      // If the selected rooms are all instant approval rooms and the user does not need catering, and hire security, and room setup, then it is auto-approval.
-      console.log("duration", duration);
-      console.log("selectedRoomIds", selectedRoomIds);
-      console.log("data", data);
-      return (
-        duration <= 3.6e6 * 4 && // <= 4 hours
-        selectedRoomIds.every((r) => INSTANT_APPROVAL_ROOMS.includes(r)) &&
-        data["catering"] === "no" &&
-        data["hireSecurity"] === "no" &&
-        data["mediaServices"].length === 0 &&
-        data["roomSetup"] === "no"
-      );
-    };
-    console.log(
-      "isAutoApproval",
-      isAutoApproval(selectedRoomIds, data, bookingCalendarInfo)
-    );
-
-    if (isAutoApproval(selectedRoomIds, data, bookingCalendarInfo)) {
-      approveInstantBooking(calendarEventId);
-    } else {
-      const userEventInputs: BookingFormDetails = {
-        calendarEventId,
-        roomId: selectedRoomIds,
-        email,
-        startDate: bookingCalendarInfo?.startStr,
-        endDate: bookingCalendarInfo?.endStr,
-        approvalUrl,
-        rejectUrl,
-        bookingToolUrl: getBookingToolDeployUrl(),
-        headerMessage: "This is a request email for first approval.",
-        ...data,
-      };
-      console.log("userEventInputs", userEventInputs);
-      sendApprovalEmail(firstApprovers, userEventInputs);
-    }
-
-    alert("Your request has been sent.");
-    //router.push("/");
-
-    const headerMessage =
-      "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.";
-    sendBookingDetailEmail(
-      calendarEventId,
-      email,
-      headerMessage,
-      BookingStatusLabel.REQUESTED
-    );
-
-    setLoading(false);
-    reloadBookings();
-    reloadBookingStatuses();
   };
 
   return [registerEvent, loading];
 }
-
-const order: (keyof Inputs)[] = [
-  "firstName",
-  "lastName",
-  "secondaryName",
-  "nNumber",
-  "netId",
-  "phoneNumber",
-  "department",
-  "role",
-  "sponsorFirstName",
-  "sponsorLastName",
-  "sponsorEmail",
-  "title",
-  "description",
-  "reservationType",
-  "expectedAttendance",
-  "attendeeAffiliation",
-  "roomSetup",
-  "setupDetails",
-  "mediaServices",
-  "mediaServicesDetails",
-  "catering",
-  "cateringService",
-  "hireSecurity",
-  "chartFieldForCatering",
-  "chartFieldForSecurity",
-  "chartFieldForRoomSetup",
-];

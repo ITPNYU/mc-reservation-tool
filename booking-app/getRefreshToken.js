@@ -16,7 +16,6 @@ const oauth2Client = new google.auth.OAuth2(
   REDIRECT_URI
 );
 
-// 認証用URLを生成
 const authUrl = oauth2Client.generateAuthUrl({
   access_type: "offline",
   scope: SCOPES,
@@ -29,7 +28,6 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-// ユーザーに認証コードの入力を促す
 rl.question("Enter the code from that page here: ", (code) => {
   rl.close();
   oauth2Client.getToken(code, (err, token) => {

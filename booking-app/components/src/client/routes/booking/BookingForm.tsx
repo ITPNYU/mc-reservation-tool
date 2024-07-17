@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect } from "react";
-import { BookingProvider } from "./bookingProvider";
 import { Header } from "./components/Header";
 
 type BookingFormProps = {
