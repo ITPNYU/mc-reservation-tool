@@ -1,4 +1,10 @@
-import { CalendarEvent, Department, Role, RoomSetting } from '../../../types';
+import {
+  CalendarEvent,
+  Department,
+  Inputs,
+  Role,
+  RoomSetting,
+} from '../../../types';
 import React, {
   createContext,
   useContext,
@@ -17,6 +23,7 @@ export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
   department: Department | undefined;
   existingCalendarEvents: CalendarEvent[];
+  formData: Inputs | undefined;
   hasShownMocapModal: boolean;
   isBanned: boolean;
   isSafetyTrained: boolean;
@@ -25,6 +32,7 @@ export interface BookingContextType {
   selectedRooms: RoomSetting[];
   setBookingCalendarInfo: (x: DateSelectArg) => void;
   setDepartment: (x: Department) => void;
+  setFormData: (x: Inputs) => void;
   setHasShownMocapModal: (x: boolean) => void;
   setRole: (x: Role) => void;
   setSelectedRooms: (x: RoomSetting[]) => void;
@@ -34,6 +42,7 @@ export const BookingContext = createContext<BookingContextType>({
   bookingCalendarInfo: undefined,
   department: undefined,
   existingCalendarEvents: [],
+  formData: undefined,
   hasShownMocapModal: false,
   isBanned: false,
   isSafetyTrained: true,
@@ -42,6 +51,7 @@ export const BookingContext = createContext<BookingContextType>({
   selectedRooms: [],
   setBookingCalendarInfo: (x: DateSelectArg) => {},
   setDepartment: (x: Department) => {},
+  setFormData: (x: Inputs) => {},
   setHasShownMocapModal: (x: boolean) => {},
   setRole: (x: Role) => {},
   setSelectedRooms: (x: RoomSetting[]) => {},
@@ -54,6 +64,7 @@ export function BookingProvider({ children }) {
   const [bookingCalendarInfo, setBookingCalendarInfo] =
     useState<DateSelectArg>();
   const [department, setDepartment] = useState<Department>();
+  const [formData, setFormData] = useState<Inputs>(undefined);
   const [hasShownMocapModal, setHasShownMocapModal] = useState(false);
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
@@ -101,6 +112,7 @@ export function BookingProvider({ children }) {
         bookingCalendarInfo,
         department,
         existingCalendarEvents,
+        formData,
         hasShownMocapModal,
         isBanned,
         isSafetyTrained,
@@ -109,6 +121,7 @@ export function BookingProvider({ children }) {
         selectedRooms,
         setBookingCalendarInfo,
         setDepartment,
+        setFormData,
         setHasShownMocapModal,
         setRole,
         setSelectedRooms,
