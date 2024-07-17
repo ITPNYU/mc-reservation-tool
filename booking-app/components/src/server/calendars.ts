@@ -3,18 +3,43 @@ import { BookingFormDetails, BookingStatusLabel, RoomSetting } from "../types";
 import { TableNames } from "../policy";
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { getCalendarClient } from "@/lib/googleClient";
+import { endAt, sum, where } from "@firebase/firestore";
 
-const getAllRoomCalendarIds = async (): Promise<string[]> => {
-  const rooms = await fetchAllDataFromCollection(TableNames.ROOMS);
+const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
+  const queryConstraints = [where("roomId", "==", roomId)];
+  const rooms = await fetchAllDataFromCollection(
+    TableNames.ROOMS,
+    queryConstraints
+  );
+  console.log(`Rooms: ${rooms}`);
   return rooms.map((room: any) => room.calendarId);
+};
+
+const patchCalendarEvent = async (
+  event: any,
+  calendarId: string,
+  eventId: string,
+  body: any
+) => {
+  const calendar = getCalendarClient();
+  const requestBody = {
+    start: event.start,
+    end: event.end,
+    ...body,
+  };
+  await calendar.events.patch({
+    calendarId: calendarId,
+    eventId: eventId,
+    requestBody: requestBody,
+  });
 };
 
 export const inviteUserToCalendarEvent = async (
   calendarEventId: string,
-  guestEmail: string
+  guestEmail: string,
+  roomId: number
 ) => {
-  console.log(`Invite User: ${guestEmail}`);
-  const roomCalendarIds = await getAllRoomCalendarIds();
+  const roomCalendarIds = await getRoomCalendarIds(roomId);
   const calendar = getCalendarClient();
 
   for (const roomCalendarId of roomCalendarIds) {
@@ -23,17 +48,14 @@ export const inviteUserToCalendarEvent = async (
         calendarId: roomCalendarId,
         eventId: calendarEventId,
       });
+      console.log("event", event);
 
       if (event) {
+        const eventData = event.data;
         const attendees = event.data.attendees || [];
         attendees.push({ email: guestEmail });
-
-        calendar.events.update({
-          calendarId: roomCalendarId,
-          eventId: calendarEventId,
-          requestBody: {
-            attendees: attendees,
-          },
+        await patchCalendarEvent(event, roomCalendarId, calendarEventId, {
+          attendees: attendees,
         });
 
         console.log(
@@ -77,9 +99,13 @@ const bookingContentsToDescription = (bookingContents: BookingFormDetails) => {
 export const updateEventPrefix = async (
   calendarEventId: string,
   newPrefix: BookingStatusLabel,
-  bookingContents?: BookingFormDetails
+  bookingContents: BookingFormDetails
 ) => {
-  const roomCalendarIds = await getAllRoomCalendarIds();
+  const roomCalendarIds = await getRoomCalendarIds(
+    parseInt(bookingContents.roomId)
+  );
+  console.log(`Room Calendar Ids: ${roomCalendarIds}`);
+  console.log("bookingContents", bookingContents);
   const calendar = getCalendarClient();
 
   for (const roomCalendarId of roomCalendarIds) {
@@ -88,9 +114,11 @@ export const updateEventPrefix = async (
         calendarId: roomCalendarId,
         eventId: calendarEventId,
       });
+      console.log("event", event);
 
       if (event) {
-        const eventTitle = event.data.summary ?? "";
+        const eventData = event.data;
+        const eventTitle = eventData.summary ?? "";
         const prefixRegex = /\[.*?\]/g;
         const newTitle = eventTitle.replace(prefixRegex, `[${newPrefix}]`);
 
@@ -100,13 +128,9 @@ export const updateEventPrefix = async (
         description +=
           'To cancel reservations please return to the Booking Tool, visit My Bookings, and click "cancel" on the booking at least 24 hours before the date of the event. Failure to cancel an unused booking is considered a no-show and may result in restricted use of the space.';
 
-        calendar.events.patch({
-          calendarId: roomCalendarId,
-          eventId: calendarEventId,
-          requestBody: {
-            summary: newTitle,
-            description: description,
-          },
+        await patchCalendarEvent(event, roomCalendarId, calendarEventId, {
+          summary: newTitle,
+          description: description,
         });
 
         console.log(

@@ -14,19 +14,12 @@ export async function POST(req: NextRequest) {
   console.log("contents", contents);
   console.log("bodyMessage", bodyMessage);
 
-  if (
-    !templateName ||
-    !contents ||
-    !targetEmail ||
-    !status ||
-    !eventTitle ||
-    !bodyMessage
-  ) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
-  }
+  //if (!templateName || !contents || !targetEmail || !status || !eventTitle) {
+  //  return NextResponse.json(
+  //    { error: "Missing required fields" },
+  //    { status: 400 }
+  //  );
+  //}
 
   try {
     await sendHTMLEmail({
@@ -35,7 +28,7 @@ export async function POST(req: NextRequest) {
       targetEmail,
       status,
       eventTitle,
-      body: bodyMessage,
+      body: bodyMessage || "",
     });
     return NextResponse.json(
       { message: "Email sent successfully" },

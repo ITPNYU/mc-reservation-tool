@@ -16,7 +16,7 @@ export type Booking = Inputs & {
   email: string;
   startDate: Timestamp;
   endDate: Timestamp;
-  roomId: string;
+  roomId: number;
 };
 
 export type BookingFormDetails = Booking & {

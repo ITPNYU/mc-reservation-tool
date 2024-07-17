@@ -10,7 +10,7 @@ import React, {
 
 import { DatabaseContext } from "../components/Provider";
 import { DateSelectArg } from "@fullcalendar/core";
-import { getOldSafetyTrainingEmails } from "@/components/src/server";
+import { getOldSafetyTrainingEmails } from "@/components/src/server/db";
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;

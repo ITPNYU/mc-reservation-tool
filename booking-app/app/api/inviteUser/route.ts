@@ -3,10 +3,13 @@ import { getCalendarClient } from "@/lib/googleClient";
 import { inviteUserToCalendarEvent } from "@/components/src/server/calendars";
 
 export async function POST(request: NextRequest) {
-  const { id, guestEmail } = await request.json();
+  const { calendarEventId, guestEmail, roomId } = await request.json();
   try {
-    inviteUserToCalendarEvent(id, guestEmail);
-    return NextResponse.json({ calendarEventId: id }, { status: 200 });
+    inviteUserToCalendarEvent(calendarEventId, guestEmail, parseInt(roomId));
+    return NextResponse.json(
+      { calendarEventId: calendarEventId },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error adding event to calendar:", error);
     return NextResponse.json(
