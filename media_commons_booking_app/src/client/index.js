@@ -2,6 +2,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 
 import AdminPage from './routes/admin/adminPage';
 import BookingForm from './routes/booking/BookingForm';
+import BookingFormConfirmationPage from './routes/booking/formPages/BookingFormConfirmationPage';
 import BookingFormDetailsPage from './routes/booking/formPages/BookingFormDetailsPage';
 import ErrorPage from './errorPage';
 import LandingPage from './routes/booking/formPages/LandingPage';
@@ -46,6 +47,10 @@ const router = createMemoryRouter([
           {
             path: '/book/form',
             element: <BookingFormDetailsPage />,
+          },
+          {
+            path: '/book/confirmation',
+            element: <BookingFormConfirmationPage />,
           },
           {
             path: '/book',

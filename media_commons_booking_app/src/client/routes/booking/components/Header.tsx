@@ -1,4 +1,4 @@
-import { AppBar, Box, Toolbar, useScrollTrigger } from '@mui/material';
+import { Box, useScrollTrigger } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import BookingFormStepper from './Stepper';
@@ -23,7 +23,6 @@ export const Header = () => {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 100,
-    // target: window ? window() : undefined,
   });
 
   if (location.pathname === '/book') {
@@ -50,6 +49,8 @@ export const Header = () => {
     }
   })();
 
+  const hideNextButton = location.pathname === '/book/form';
+
   const showStatusBar =
     location.pathname === '/book/selectRoom' ||
     location.pathname === '/book/form';
@@ -64,7 +65,9 @@ export const Header = () => {
     >
       <div>
         <BookingFormStepper />
-        {showStatusBar && <BookingStatusBar {...{ goBack, goNext }} />}
+        {showStatusBar && (
+          <BookingStatusBar {...{ goBack, goNext, hideNextButton }} />
+        )}
       </div>
     </StickyScroll>
   );

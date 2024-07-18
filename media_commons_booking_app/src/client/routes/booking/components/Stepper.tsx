@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useLocation } from 'react-router';
 
-const steps = ['Affiliation', 'Select Time', 'Details'];
+const steps = ['Affiliation', 'Select Time', 'Details', 'Confirmation'];
 
 export default function BookingFormStepper() {
   const { pathname } = useLocation();
@@ -19,6 +19,9 @@ export default function BookingFormStepper() {
         break;
       case '/book/form':
         setActiveStep(2);
+        break;
+      case '/book/confirmation':
+        setActiveStep(3);
         break;
       default:
         setActiveStep(0);
