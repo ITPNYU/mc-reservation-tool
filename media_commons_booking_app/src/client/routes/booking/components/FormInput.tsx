@@ -84,8 +84,15 @@ export default function FormInput() {
   const validateExpectedAttendance = useCallback(
     (value: string) => {
       const attendance = parseInt(value);
+      console.log(attendance, maxCapacity);
+      if (isNaN(attendance)) {
+        return 'Enter a number';
+      }
+      if (attendance <= 0) {
+        return 'Expected attendance must be >= 1';
+      }
       return (
-        (!isNaN(attendance) && attendance <= maxCapacity) ||
+        attendance <= maxCapacity ||
         `Expected attendance exceeds maximum capacity of ${maxCapacity}`
       );
     },
