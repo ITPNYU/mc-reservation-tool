@@ -38,7 +38,8 @@ export interface BookingContextType {
   setHasShownMocapModal: (x: boolean) => void;
   setRole: (x: Role) => void;
   setSelectedRooms: (x: RoomSetting[]) => void;
-  setNeedsSafetyTraining: (x: boolean) => void;
+  setSubmitting: (x: boolean) => void;
+  submitting: boolean;
 }
 
 export const BookingContext = createContext<BookingContextType>({
@@ -59,7 +60,8 @@ export const BookingContext = createContext<BookingContextType>({
   setHasShownMocapModal: (x: boolean) => {},
   setRole: (x: Role) => {},
   setSelectedRooms: (x: RoomSetting[]) => {},
-  setNeedsSafetyTraining: (x: boolean) => {},
+  setSubmitting: (x: boolean) => {},
+  submitting: false,
 });
 
 export function BookingProvider({ children }) {
@@ -75,6 +77,7 @@ export function BookingProvider({ children }) {
   const [role, setRole] = useState<Role>();
   const [needsSafetyTraining, setNeedsSafetyTraining] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const existingCalendarEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
@@ -133,7 +136,8 @@ export function BookingProvider({ children }) {
         setHasShownMocapModal,
         setRole,
         setSelectedRooms,
-        setNeedsSafetyTraining,
+        setSubmitting,
+        submitting,
       }}
     >
       {children}

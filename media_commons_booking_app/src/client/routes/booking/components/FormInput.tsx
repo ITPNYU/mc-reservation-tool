@@ -18,8 +18,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { BookingContext } from '../bookingProvider';
 import BookingFormMediaServices from './BookingFormMediaServices';
 import BookingSelection from './BookingSelection';
-import { CenterLoading } from '../../components/Loading';
 import { DatabaseContext } from '../../components/Provider';
+import { useNavigate } from 'react-router';
 import useSubmitBooking from '../hooks/useSubmitBooking';
 
 const Section = ({ title, children }) => (
@@ -35,6 +35,9 @@ export default function FormInput() {
   const { userEmail, settings } = useContext(DatabaseContext);
   const { role, department, selectedRooms, bookingCalendarInfo, setFormData } =
     useContext(BookingContext);
+  const navigate = useNavigate();
+  const registerEvent = useSubmitBooking();
+
   const {
     control,
     handleSubmit,
@@ -49,16 +52,18 @@ export default function FormInput() {
       sponsorLastName: '',
       sponsorEmail: '',
       mediaServicesDetails: '',
-      role,
       catering: 'no',
       chartFieldForCatering: '',
       chartFieldForSecurity: '',
       chartFieldForRoomSetup: '',
       hireSecurity: 'no',
       attendeeAffiliation: '',
-      department,
       roomSetup: 'no',
       reservationType: '',
+      secondaryName: '',
+      // copy department + role from earlier in form
+      department,
+      role,
     },
     mode: 'onBlur',
   });
@@ -104,19 +109,15 @@ export default function FormInput() {
 
   const disabledButton = !(checklist && resetRoom && bookingPolicy && isValid);
 
-  const [registerEvent, loading] = useSubmitBooking();
-
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     if (!bookingCalendarInfo) return;
     // if (!userEmail && data.missingEmail) {
     //   setUserEmail(data.missingEmail);
     // }
+    setFormData(data);
     registerEvent(data);
+    navigate('/book/confirmation');
   };
-
-  if (loading) {
-    return <CenterLoading />;
-  }
 
   return (
     <Box sx={{ padding: '32px 0px' }}>

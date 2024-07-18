@@ -1,4 +1,4 @@
-import { Alert, Box, Button } from '@mui/material';
+import { Alert, AlertColor, Box, Button, Tooltip } from '@mui/material';
 import { Check, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import React, { useContext, useMemo } from 'react';
 
@@ -10,36 +10,96 @@ import useCheckAutoApproval from '../hooks/useCheckAutoApproval';
 interface Props {
   goBack: () => void;
   goNext: () => void;
+  hideNextButton: boolean;
 }
 
 export default function BookingStatusBar(props: Props) {
   const { isAutoApproval, errorMessage } = useCheckAutoApproval();
-  const { bookingCalendarInfo, selectedRooms } = useContext(BookingContext);
+  const { bookingCalendarInfo, selectedRooms, isBanned, needsSafetyTraining } =
+    useContext(BookingContext);
   const isOverlap = useCalculateOverlap();
 
-  const showAlert = bookingCalendarInfo != null && selectedRooms.length > 0;
+  const showAlert =
+    isBanned ||
+    needsSafetyTraining ||
+    (bookingCalendarInfo != null && selectedRooms.length > 0);
 
-  const message = useMemo(() => {
+  // order of precedence matters
+  // unfixable blockers > fixable blockers > non-blockers
+  const state: {
+    message: React.ReactNode;
+    severity: AlertColor;
+    icon?: React.ReactNode;
+    variant?: 'filled' | 'standard' | 'outlined';
+    btnDisabled: boolean;
+    btnDisabledMessage?: string;
+  } = (() => {
+    if (isBanned)
+      return {
+        btnDisabled: true,
+        btnDisabledMessage: 'You are banned',
+        message: <p>You are banned from booking with the Media Commons</p>,
+        severity: 'error',
+        variant: 'filled',
+      };
+    if (needsSafetyTraining)
+      return {
+        btnDisabled: true,
+        btnDisabledMessage: 'You need to take safety training',
+        message: (
+          <p>
+            You have not taken safety training, which is required for at least
+            one of the rooms you have selected
+          </p>
+        ),
+        severity: 'error',
+      };
     if (isOverlap)
-      return 'Your selection conflicts with at least one existing reservation. Please make another selection.';
+      return {
+        btnDisabled: true,
+        btnDisabledMessage:
+          "Select a different time slot that doesn't conflict with existing reservations",
+        message: (
+          <p>
+            Your selection conflicts with at least one existing reservation.
+            Please make another selection.
+          </p>
+        ),
+        severity: 'error',
+      };
     if (isAutoApproval)
-      return 'Yay! This request is eligible for automatic approval';
-    else return 'This request will require approval';
-  }, [isAutoApproval, isOverlap]);
+      return {
+        btnDisabled: false,
+        btnDisabledMessage: null,
+        message: <p>Yay! This request is eligible for automatic approval</p>,
+        severity: 'success',
+        icon: <Check fontSize="inherit" />,
+      };
 
-  const color = useMemo(() => {
-    if (isOverlap) return 'error';
-    if (isAutoApproval) return 'success';
-    else return 'warning';
-  }, [isOverlap, isAutoApproval]);
+    return {
+      btnDisabled: false,
+      btnDisabledMessage: null,
+      message: (
+        <p>
+          This request will require approval.{' '}
+          <Tooltip title={errorMessage}>
+            <a>Why?</a>
+          </Tooltip>
+        </p>
+      ),
+      severity: 'warning',
+    };
+  })();
 
-  const icon = useMemo(() => {
-    if (isOverlap) return undefined;
-    if (isAutoApproval) return <Check fontSize="inherit" />;
-    else return undefined;
-  }, [isOverlap, isAutoApproval]);
-
-  const canContinue = !isOverlap && bookingCalendarInfo != null;
+  const [disabled, disabledMessage] = (() => {
+    if (state.btnDisabled) {
+      return [true, state.btnDisabledMessage];
+    }
+    if (bookingCalendarInfo == null) {
+      return [true, 'Click and drag on the calendar to select a time slot'];
+    }
+    return [false, ''];
+  })();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -55,20 +115,31 @@ export default function BookingStatusBar(props: Props) {
         </Grid>
         <Grid>
           {showAlert && (
-            <Alert severity={color} icon={icon} sx={{ padding: '3px 16px' }}>
-              {message}
+            <Alert
+              severity={state.severity}
+              icon={state.icon}
+              variant={state.variant ?? 'standard'}
+              sx={{ padding: '3px 16px' }}
+            >
+              {state.message}
             </Alert>
           )}
         </Grid>
         <Grid sx={{ marginLeft: 'auto', paddingRight: '18px' }}>
-          <Button
-            variant="outlined"
-            endIcon={<ChevronRight />}
-            onClick={props.goNext}
-            disabled={!canContinue}
-          >
-            Next
-          </Button>
+          {!props.hideNextButton && (
+            <Tooltip title={disabledMessage}>
+              <span>
+                <Button
+                  variant="outlined"
+                  endIcon={<ChevronRight />}
+                  onClick={props.goNext}
+                  disabled={disabled}
+                >
+                  Next
+                </Button>
+              </span>
+            </Tooltip>
+          )}
         </Grid>
       </Grid>
     </Box>
