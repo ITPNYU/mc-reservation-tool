@@ -130,10 +130,9 @@ export function BookingFormTextField(props: TextFieldProps) {
         required: required && `${label} is required`,
         validate: (value) => {
           if (!required) return true;
-          return (
-            (validate(value) && value?.trim().length > 0) ||
-            `${label} is required`
-          );
+          const isNotEmpty = value?.trim().length > 0;
+          const isValid = validate(value);
+          return (isNotEmpty && isValid) || `${label} is required`;
         },
         pattern,
       }}
