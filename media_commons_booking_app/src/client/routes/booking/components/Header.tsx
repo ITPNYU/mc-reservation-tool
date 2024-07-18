@@ -1,23 +1,36 @@
-import React, { useContext } from 'react';
+import { AppBar, Box, Toolbar, useScrollTrigger } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { BookingContext } from '../bookingProvider';
 import BookingFormStepper from './Stepper';
 import BookingStatusBar from './BookingStatusBar';
-import { DatabaseContext } from '../../components/Provider';
+import React from 'react';
+import { styled } from '@mui/system';
+
+const StickyScroll = styled(Box)`
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white;
+  padding-bottom: 20px;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+`;
 
 export const Header = () => {
-  const { isBanned, needsSafetyTraining } = useContext(BookingContext);
-  const { userEmail } = useContext(DatabaseContext);
-
   const location = useLocation();
   const navigate = useNavigate();
+
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 100,
+    // target: window ? window() : undefined,
+  });
 
   if (location.pathname === '/book') {
     return null;
   }
 
-  const goBack = () => {
+  const goBack = (() => {
     switch (location.pathname) {
       case '/book/selectRoom':
         return () => navigate('/book/role');
@@ -26,39 +39,33 @@ export const Header = () => {
       default:
         return () => {};
     }
-  };
+  })();
 
-  const goNext = () => {
+  const goNext = (() => {
     switch (location.pathname) {
       case '/book/selectRoom':
         return () => navigate('/book/form');
       default:
         return () => {};
     }
-  };
+  })();
 
   const showStatusBar =
     location.pathname === '/book/selectRoom' ||
     location.pathname === '/book/form';
 
   return (
-    <div>
-      {/* <p className="dark:text-white">
-        Email:{' '}
-        {userEmail ? `${userEmail}` : `Unable to retrieve the email address.`}
-      </p>
+    <StickyScroll
+      boxShadow={
+        trigger
+          ? '0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)'
+          : ''
+      }
+    >
       <div>
-        {needsSafetyTraining && (
-          <p className="text-red-500 text-bold  ">
-            You have to take safety training before booking!
-          </p>
-        )}
-        {isBanned && <p className="text-red-500 text-bold  ">You're banned </p>}
-      </div> */}
-      <BookingFormStepper />
-      {showStatusBar && (
-        <BookingStatusBar goBack={goBack()} goNext={goNext()} />
-      )}
-    </div>
+        <BookingFormStepper />
+        {showStatusBar && <BookingStatusBar {...{ goBack, goNext }} />}
+      </div>
+    </StickyScroll>
   );
 };
