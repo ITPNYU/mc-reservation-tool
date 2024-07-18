@@ -10,6 +10,7 @@ import useCheckAutoApproval from '../hooks/useCheckAutoApproval';
 interface Props {
   goBack: () => void;
   goNext: () => void;
+  hideNextButton: boolean;
 }
 
 export default function BookingStatusBar(props: Props) {
@@ -125,18 +126,20 @@ export default function BookingStatusBar(props: Props) {
           )}
         </Grid>
         <Grid sx={{ marginLeft: 'auto', paddingRight: '18px' }}>
-          <Tooltip title={disabledMessage}>
-            <span>
-              <Button
-                variant="outlined"
-                endIcon={<ChevronRight />}
-                onClick={props.goNext}
-                disabled={disabled}
-              >
-                Next
-              </Button>
-            </span>
-          </Tooltip>
+          {!props.hideNextButton && (
+            <Tooltip title={disabledMessage}>
+              <span>
+                <Button
+                  variant="outlined"
+                  endIcon={<ChevronRight />}
+                  onClick={props.goNext}
+                  disabled={disabled}
+                >
+                  Next
+                </Button>
+              </span>
+            </Tooltip>
+          )}
         </Grid>
       </Grid>
     </Box>
