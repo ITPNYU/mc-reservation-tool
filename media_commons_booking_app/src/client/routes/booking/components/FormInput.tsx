@@ -33,8 +33,14 @@ const Section = ({ title, children }) => (
 
 export default function FormInput() {
   const { userEmail, settings } = useContext(DatabaseContext);
-  const { role, department, selectedRooms, bookingCalendarInfo, setFormData } =
-    useContext(BookingContext);
+  const {
+    role,
+    department,
+    selectedRooms,
+    bookingCalendarInfo,
+    formData,
+    setFormData,
+  } = useContext(BookingContext);
   const navigate = useNavigate();
   const registerEvent = useSubmitBooking();
 
@@ -64,6 +70,7 @@ export default function FormInput() {
       // copy department + role from earlier in form
       department,
       role,
+      ...formData, // restore answers if navigating between form pages
     },
     mode: 'onBlur',
   });
@@ -131,31 +138,6 @@ export default function FormInput() {
       <BookingSelection />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* {userEmail == null && (
-          <div className="mb-6">
-            <label
-              htmlFor="missingEmail"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Email
-            </label>
-            <p className="text-xs">
-              This section is displayed only to those who couldn't obtain an
-              email
-            </p>
-
-            {errors.missingEmail && (
-              <ErrorMessage errors={errors.missingEmail.message} />
-            )}
-            <input
-              type="text"
-              id="missingEmail"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder=""
-              {...register('missingEmail')}
-            />
-          </div>
-        )} */}
         <Section title="Contact Information">
           <BookingFormTextField
             id="firstName"
