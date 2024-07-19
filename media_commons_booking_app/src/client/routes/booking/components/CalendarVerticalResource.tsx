@@ -49,6 +49,11 @@ const FullCalendarWrapper = styled(Box)({
   '.fc-timegrid-event-harness': {
     left: '0% !important',
   },
+
+  '.disabled div': {
+    background: '#55555569',
+    border: 'none',
+  },
 });
 
 const Empty = styled(Box)(({ theme }) => ({
@@ -99,11 +104,30 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       id: Date.now().toString(),
       resourceId: room.roomId,
       title: NEW_TITLE_TAG,
-      overlap: false,
+      overlap: true,
       url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
     }));
     setNewEvents(newRoomEvents);
   }, [bookingCalendarInfo, rooms]);
+
+  const blockPastTimes = useMemo(() => {
+    const block = rooms.map((room, index) => {
+      const today = new Date();
+      const start = new Date();
+      start.setHours(9);
+      start.setMinutes(0);
+      return {
+        start: start.toISOString(),
+        end: today.toISOString(),
+        id: room.roomId,
+        resourceId: room.roomId,
+        overlap: false,
+        display: 'background',
+        classNames: ['disabled'],
+      };
+    });
+    return block;
+  }, [rooms]);
 
   const handleEventSelect = (selectInfo: DateSelectArg) => {
     setBookingCalendarInfo(selectInfo);
@@ -117,6 +141,10 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
     api.unselect();
     setBookingCalendarInfo(selectInfo);
     return true;
+  };
+
+  const handleSelectOverlap = (el) => {
+    return el.overlap;
   };
 
   const handleEventClick = (info: EventClickArg) => {
@@ -148,10 +176,11 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
         selectable={true}
         select={handleEventSelect}
         selectAllow={handleEventSelecting}
+        selectOverlap={handleSelectOverlap}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         resources={resources}
         resourceOrder={'index'}
-        events={[...existingCalendarEvents, ...newEvents]}
+        events={[...existingCalendarEvents, ...newEvents, ...blockPastTimes]}
         eventContent={CalendarEventBlock}
         eventClick={function (info) {
           info.jsEvent.preventDefault();
