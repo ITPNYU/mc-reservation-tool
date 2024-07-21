@@ -62,6 +62,12 @@ export const Bookings: React.FC<BookingsProps> = ({
       );
     else filtered = bookings;
 
+    // sort chronologically
+    filtered.sort(
+      (a, b) =>
+        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+
     // if no status filters are selected, view all
     if (statusFilters.length === 0) {
       return filtered;
