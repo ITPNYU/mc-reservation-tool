@@ -56,8 +56,8 @@ export default function BookingTableRow({
       )}
       {!isUserView && (
         <StackedTableCell
-          topText={`${booking.firstName} ${booking.lastName}`}
-          bottomText={booking.netId}
+          topText={booking.netId}
+          bottomText={`${booking.firstName} ${booking.lastName}`}
         />
       )}
       {!isUserView && (
