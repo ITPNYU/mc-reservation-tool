@@ -1,6 +1,12 @@
-import { Booking, BookingStatusLabel } from '../../../../types';
+import { Booking, BookingStatusLabel, Inputs } from '../../../../types';
 import { Box, TableCell } from '@mui/material';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Table, { TableEmpty } from '../Table';
 
 import BookMoreButton from './BookMoreButton';
@@ -9,6 +15,7 @@ import BookingTableRow from './BookingTableRow';
 import { DatabaseContext } from '../Provider';
 import Loading from '../Loading';
 import MoreInfoModal from './MoreInfoModal';
+import SortableTableCell from './SortableTableCell';
 import getBookingStatus from '../../hooks/getBookingStatus';
 
 interface BookingsProps {
@@ -16,6 +23,15 @@ interface BookingsProps {
   isPaView?: boolean;
   isUserView?: boolean;
 }
+
+const COMPARATORS: {
+  [property: string]: (a: Booking, b: Booking) => number;
+} = {
+  startDate: (a, b) =>
+    new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+  department: (a, b) => a.department.localeCompare(b.department),
+  netId: (a, b) => a.netId.localeCompare(b.netId),
+};
 
 export const Bookings: React.FC<BookingsProps> = ({
   isAdminView = false,
@@ -33,6 +49,8 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const [modalData, setModalData] = useState(null);
   const [statusFilters, setStatusFilters] = useState([]);
+  const [orderBy, setOrderBy] = useState<keyof Booking>('startDate');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     reloadBookingStatuses();
@@ -54,6 +72,7 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const filteredBookings = useMemo(() => {
     let filtered: Booking[];
+    // filter based on user view
     if (isUserView)
       filtered = bookings.filter((booking) => booking.email === userEmail);
     else if (isPaView)
@@ -62,20 +81,27 @@ export const Bookings: React.FC<BookingsProps> = ({
       );
     else filtered = bookings;
 
-    // sort chronologically
-    filtered.sort(
-      (a, b) =>
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-    );
+    // column sorting
+    const comparator = COMPARATORS[orderBy];
+    const coeff = order === 'asc' ? 1 : -1;
+    comparator != null && filtered.sort((a, b) => coeff * comparator(a, b));
 
-    // if no status filters are selected, view all
+    // status chip filters
     if (statusFilters.length === 0) {
       return filtered;
     }
     return filtered.filter((booking) =>
       statusFilters.includes(getBookingStatus(booking, bookingStatuses))
     );
-  }, [isUserView, isPaView, bookings, allowedStatuses, statusFilters]);
+  }, [
+    isUserView,
+    isPaView,
+    bookings,
+    allowedStatuses,
+    statusFilters,
+    order,
+    orderBy,
+  ]);
 
   const topRow = useMemo(() => {
     if (isUserView) {
@@ -120,19 +146,47 @@ export const Bookings: React.FC<BookingsProps> = ({
     }
   }, [isUserView, bookingsLoading, bookings, filteredBookings]);
 
+  const createSortHandler = useCallback(
+    (property: keyof Booking) => (_: React.MouseEvent<unknown>) => {
+      const isAsc = orderBy === property && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(property);
+    },
+    [order, orderBy]
+  );
+
   const columns = useMemo(
     () => [
       <TableCell key="status">Status</TableCell>,
-      <TableCell key="dates">Date / Time</TableCell>,
+      <SortableTableCell
+        label="Date / Time"
+        property="startDate"
+        key="startDate"
+        {...{ createSortHandler, order, orderBy }}
+      />,
       <TableCell key="room">Room(s)</TableCell>,
-      !isUserView && <TableCell key="department">Department/Role</TableCell>,
-      !isUserView && <TableCell key="id">Requestor</TableCell>,
+      !isUserView && (
+        <SortableTableCell
+          label="Department / Role"
+          property="department"
+          key="department"
+          {...{ createSortHandler, order, orderBy }}
+        />
+      ),
+      !isUserView && (
+        <SortableTableCell
+          key="netId"
+          label="Requestor"
+          property="netId"
+          {...{ createSortHandler, order, orderBy }}
+        />
+      ),
       !isUserView && <TableCell key="contacts">Contact Info</TableCell>,
       <TableCell key="title">Title</TableCell>,
       !isUserView && <TableCell key="other">Details</TableCell>,
       <TableCell key="action">Action</TableCell>,
     ],
-    [isUserView]
+    [isUserView, order, orderBy]
   );
 
   return (
