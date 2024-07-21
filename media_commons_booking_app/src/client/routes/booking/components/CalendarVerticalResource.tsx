@@ -50,6 +50,10 @@ const FullCalendarWrapper = styled(Box)({
     left: '0% !important',
   },
 
+  '.fc-bg-event': {
+    background: 'none',
+  },
+
   '.disabled div': {
     background: '#55555569',
     border: 'none',
@@ -65,7 +69,7 @@ const Empty = styled(Box)(({ theme }) => ({
 }));
 
 export default function CalendarVerticalResource({ rooms, dateView }: Props) {
-  const [newEvents, setNewEvents] = useState<CalendarEvent[]>([]);
+  // const [newEvents, setNewEvents] = useState<CalendarEvent[]>([]);
   const {
     bookingCalendarInfo,
     existingCalendarEvents,
@@ -92,13 +96,12 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
     api.gotoDate(dateView);
   }, [dateView]);
 
-  useEffect(() => {
+  const newEvents = useMemo(() => {
     if (bookingCalendarInfo == null) {
-      setNewEvents([]);
-      return;
+      return [];
     }
 
-    const newRoomEvents = rooms.map((room, index) => ({
+    return rooms.map((room, index) => ({
       start: bookingCalendarInfo.startStr,
       end: bookingCalendarInfo.endStr,
       id: Date.now().toString(),
@@ -107,26 +110,31 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       overlap: true,
       url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
     }));
-    setNewEvents(newRoomEvents);
   }, [bookingCalendarInfo, rooms]);
 
   const blockPastTimes = useMemo(() => {
-    const block = rooms.map((room, index) => {
+    const blocks = rooms.map((room) => {
       const today = new Date();
       const start = new Date();
       start.setHours(9);
       start.setMinutes(0);
+      today.setHours(
+        today.getMinutes() > 30 ? today.getHours() + 1 : today.getHours()
+      );
+      today.setMinutes(today.getMinutes() <= 30 ? 30 : 0);
+      today.setSeconds(0);
+      today.setMilliseconds(0);
       return {
         start: start.toISOString(),
         end: today.toISOString(),
-        id: room.roomId,
+        id: room.roomId + 'bg',
         resourceId: room.roomId,
         overlap: false,
         display: 'background',
         classNames: ['disabled'],
       };
     });
-    return block;
+    return blocks;
   }, [rooms]);
 
   const handleEventSelect = (selectInfo: DateSelectArg) => {
@@ -180,7 +188,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         resources={resources}
         resourceOrder={'index'}
-        events={[...existingCalendarEvents, ...newEvents, ...blockPastTimes]}
+        events={[...blockPastTimes, ...existingCalendarEvents, ...newEvents]}
         eventContent={CalendarEventBlock}
         eventClick={function (info) {
           info.jsEvent.preventDefault();
