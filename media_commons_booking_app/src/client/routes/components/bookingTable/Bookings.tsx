@@ -103,7 +103,7 @@ export const Bookings: React.FC<BookingsProps> = ({
         </TableEmpty>
       );
     }
-    if (bookings.length === 0) {
+    if (filteredBookings.length === 0) {
       return (
         <TableEmpty>
           {isUserView
@@ -112,18 +112,18 @@ export const Bookings: React.FC<BookingsProps> = ({
         </TableEmpty>
       );
     }
-  }, [isUserView, bookingsLoading, bookings]);
+  }, [isUserView, bookingsLoading, bookings, filteredBookings]);
 
   const columns = useMemo(
     () => [
       <TableCell key="status">Status</TableCell>,
-      <TableCell key="dates">Dates</TableCell>,
+      <TableCell key="dates">Date / Time</TableCell>,
       <TableCell key="room">Room(s)</TableCell>,
       !isUserView && <TableCell key="department">Department/Role</TableCell>,
-      !isUserView && <TableCell key="id">ID</TableCell>,
-      !isUserView && <TableCell key="contacts">Contacts</TableCell>,
+      !isUserView && <TableCell key="id">Requestor</TableCell>,
+      !isUserView && <TableCell key="contacts">Contact Info</TableCell>,
       <TableCell key="title">Title</TableCell>,
-      !isUserView && <TableCell key="other">Other Info</TableCell>,
+      !isUserView && <TableCell key="other">Details</TableCell>,
       <TableCell key="action">Action</TableCell>,
     ],
     [isUserView]
