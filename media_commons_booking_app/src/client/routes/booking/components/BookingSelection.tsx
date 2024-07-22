@@ -5,7 +5,9 @@ import { BookingContext } from '../bookingProvider';
 import Grid from '@mui/material/Unstable_Grid2';
 import { styled } from '@mui/system';
 
-const RoomDetails = styled(Grid)`
+export const RoomDetails = styled(Grid)`
+  display: flex;
+  align-items: center;
   label {
     font-weight: 700;
     margin-right: 4px;
