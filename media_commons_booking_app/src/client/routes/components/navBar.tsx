@@ -31,6 +31,15 @@ const Divider = styled(Box)(({ theme }) => ({
   margin: '0px 20px',
 }));
 
+const envTitle = (() => {
+  const branch = process.env.BRANCH_NAME;
+  if (branch.toLowerCase() === 'production') {
+    return '';
+  }
+  const branchTitle = branch.charAt(0).toUpperCase() + branch.slice(1);
+  return `[${branchTitle}]`;
+})();
+
 export default function NavBar() {
   const navigate = useNavigate();
   const { pagePermission, userEmail } = useContext(DatabaseContext);
@@ -112,7 +121,7 @@ export default function NavBar() {
     <Nav>
       <Box flex={1}>
         <Title as="h1" onClick={handleClickHome}>
-          Media Commons Production
+          Media Commons {envTitle}
         </Title>
       </Box>
       <Box display="flex" alignItems="center">

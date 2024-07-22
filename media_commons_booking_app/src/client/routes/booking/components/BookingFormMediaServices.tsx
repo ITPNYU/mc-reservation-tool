@@ -3,7 +3,7 @@ import {
   CHECKOUT_EQUIPMENT_ROOMS,
   LIGHTING_DMX_ROOMS,
 } from '../../../../policy';
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { Checkbox, FormControlLabel, Switch } from '@mui/material';
 import { Control, Controller, UseFormTrigger } from 'react-hook-form';
 import { Inputs, MediaServices } from '../../../../types';
 import React, { useContext, useMemo } from 'react';
@@ -22,10 +22,13 @@ interface Props {
   id: keyof Inputs;
   control: Control<Inputs, any>;
   trigger: UseFormTrigger<Inputs>;
+  showMediaServices: boolean;
+  setShowMediaServices: any;
 }
 
 export default function BookingFormMediaServices(props: Props) {
-  const { id, control, trigger } = props;
+  const { id, control, trigger, showMediaServices, setShowMediaServices } =
+    props;
   const { selectedRooms } = useContext(BookingContext);
   const roomIds = selectedRooms.map((room) => room.roomId);
 
@@ -52,38 +55,71 @@ export default function BookingFormMediaServices(props: Props) {
   return (
     <div style={{ marginBottom: 8 }}>
       <Label htmlFor={id}>Media Services</Label>
+      <p style={{ fontSize: '0.75rem' }}>
+        Check out equipment, use DMX lighting grid, request a technician, etc.
+      </p>
       <Controller
         name={id}
         control={control}
         render={({ field }) => (
-          <div>
-            {checkboxes.map((checkbox) => (
-              <FormControlLabel
-                key={checkbox}
-                label={checkbox}
-                sx={{ display: 'block' }}
-                control={
-                  <Checkbox
-                    checked={field.value?.includes(checkbox) || false}
-                    onChange={(e) => {
-                      const values = field.value ? field.value.split(', ') : [];
-                      let newValue: string[];
-                      if (e.target.checked) {
-                        newValue = [...values, checkbox];
-                      } else {
-                        newValue = values.filter((value) => value !== checkbox);
-                      }
-                      field.onChange(newValue.join(', '));
-                      trigger(id);
-                    }}
-                    onBlur={() => trigger(id)}
-                  />
-                }
+          <FormControlLabel
+            label={showMediaServices ? 'Yes' : 'No'}
+            control={
+              <Switch
+                checked={showMediaServices}
+                onChange={(e) => {
+                  setShowMediaServices(e.target.checked);
+                  if (!e.target.checked) {
+                    // de-select boxes if switch says "no media services"
+                    field.onChange('');
+                  }
+                  trigger(id);
+                }}
+                onBlur={() => trigger(id)}
               />
-            ))}
-          </div>
+            }
+          />
         )}
       ></Controller>
+
+      {showMediaServices && (
+        <Controller
+          name={id}
+          control={control}
+          render={({ field }) => (
+            <div>
+              {checkboxes.map((checkbox) => (
+                <FormControlLabel
+                  key={checkbox}
+                  label={checkbox}
+                  sx={{ display: 'block' }}
+                  control={
+                    <Checkbox
+                      checked={field.value?.includes(checkbox) || false}
+                      onChange={(e) => {
+                        const values = field.value
+                          ? field.value.split(', ')
+                          : [];
+                        let newValue: string[];
+                        if (e.target.checked) {
+                          newValue = [...values, checkbox];
+                        } else {
+                          newValue = values.filter(
+                            (value) => value !== checkbox
+                          );
+                        }
+                        field.onChange(newValue.join(', '));
+                        trigger(id);
+                      }}
+                      onBlur={() => trigger(id)}
+                    />
+                  }
+                />
+              ))}
+            </div>
+          )}
+        ></Controller>
+      )}
     </div>
   );
 }

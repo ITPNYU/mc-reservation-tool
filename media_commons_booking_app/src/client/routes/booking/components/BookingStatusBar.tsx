@@ -1,4 +1,11 @@
-import { Alert, AlertColor, Box, Button, Tooltip } from '@mui/material';
+import {
+  Alert,
+  AlertColor,
+  Box,
+  Button,
+  Tooltip,
+  useTheme,
+} from '@mui/material';
 import { Check, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import React, { useContext, useMemo } from 'react';
 
@@ -18,6 +25,7 @@ export default function BookingStatusBar(props: Props) {
   const { bookingCalendarInfo, selectedRooms, isBanned, needsSafetyTraining } =
     useContext(BookingContext);
   const isOverlap = useCalculateOverlap();
+  const theme = useTheme();
 
   const showAlert =
     isBanned ||
@@ -103,8 +111,13 @@ export default function BookingStatusBar(props: Props) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container sx={{ alignItems: 'center' }}>
-        <Grid width={330} sx={{ paddingLeft: '24px' }}>
+      <Grid
+        container
+        sx={{ alignItems: 'center' }}
+        paddingLeft="24px"
+        paddingRight="18px"
+      >
+        <Grid xs={'auto'}>
           <Button
             variant="outlined"
             startIcon={<ChevronLeft />}
@@ -113,19 +126,19 @@ export default function BookingStatusBar(props: Props) {
             Back
           </Button>
         </Grid>
-        <Grid>
+        <Grid md={10} xs={'auto'}>
           {showAlert && (
             <Alert
               severity={state.severity}
               icon={state.icon}
-              variant={state.variant ?? 'standard'}
-              sx={{ padding: '3px 16px' }}
+              variant={state.variant ?? 'filled'}
+              sx={{ padding: '0px 16px', margin: '0px 12px', width: '100%' }}
             >
               {state.message}
             </Alert>
           )}
         </Grid>
-        <Grid sx={{ marginLeft: 'auto', paddingRight: '18px' }}>
+        <Grid sx={{ marginLeft: 'auto' }}>
           {!props.hideNextButton && (
             <Tooltip title={disabledMessage}>
               <span>
