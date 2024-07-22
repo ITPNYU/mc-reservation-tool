@@ -69,7 +69,6 @@ const Empty = styled(Box)(({ theme }) => ({
 }));
 
 export default function CalendarVerticalResource({ rooms, dateView }: Props) {
-  // const [newEvents, setNewEvents] = useState<CalendarEvent[]>([]);
   const {
     bookingCalendarInfo,
     existingCalendarEvents,
@@ -104,7 +103,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
     return rooms.map((room, index) => ({
       start: bookingCalendarInfo.startStr,
       end: bookingCalendarInfo.endStr,
-      id: Date.now().toString(),
+      id: room.roomId + bookingCalendarInfo.startStr,
       resourceId: room.roomId,
       title: NEW_TITLE_TAG,
       overlap: true,
