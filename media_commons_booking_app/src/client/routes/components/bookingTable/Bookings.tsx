@@ -1,6 +1,13 @@
-import { Booking, BookingStatusLabel } from '../../../../types';
+import { Booking, BookingRow, BookingStatusLabel } from '../../../../types';
 import { Box, TableCell } from '@mui/material';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import SortableTableCell, { COMPARATORS } from './SortableTableCell';
 import Table, { TableEmpty } from '../Table';
 
 import BookMoreButton from './BookMoreButton';
@@ -31,13 +38,24 @@ export const Bookings: React.FC<BookingsProps> = ({
     reloadBookingStatuses,
   } = useContext(DatabaseContext);
 
-  const [modalData, setModalData] = useState(null);
+  const [modalData, setModalData] = useState<BookingRow>(null);
   const [statusFilters, setStatusFilters] = useState([]);
+  const [orderBy, setOrderBy] = useState<keyof BookingRow>('startDate');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     reloadBookingStatuses();
     reloadBookings();
   }, []);
+
+  const rows: BookingRow[] = useMemo(
+    () =>
+      bookings.map((booking) => ({
+        ...booking,
+        status: getBookingStatus(booking, bookingStatuses),
+      })),
+    [bookings]
+  );
 
   const allowedStatuses: BookingStatusLabel[] = useMemo(() => {
     const paViewStatuses = [
@@ -52,24 +70,32 @@ export const Bookings: React.FC<BookingsProps> = ({
     }
   }, [isUserView, isPaView]);
 
-  const filteredBookings = useMemo(() => {
-    let filtered: Booking[];
-    if (isUserView)
-      filtered = bookings.filter((booking) => booking.email === userEmail);
+  const filteredRows = useMemo(() => {
+    let filtered: BookingRow[] = rows;
+    // filter based on user view
+    if (isUserView) filtered = rows.filter((row) => row.email === userEmail);
     else if (isPaView)
-      filtered = bookings.filter((booking) =>
-        allowedStatuses.includes(getBookingStatus(booking, bookingStatuses))
-      );
-    else filtered = bookings;
+      filtered = rows.filter((row) => allowedStatuses.includes(row.status));
 
-    // if no status filters are selected, view all
+    // column sorting
+    const comparator = COMPARATORS[orderBy];
+    const coeff = order === 'asc' ? 1 : -1;
+    comparator != null && filtered.sort((a, b) => coeff * comparator(a, b));
+
+    // status chip filters
     if (statusFilters.length === 0) {
       return filtered;
     }
-    return filtered.filter((booking) =>
-      statusFilters.includes(getBookingStatus(booking, bookingStatuses))
-    );
-  }, [isUserView, isPaView, bookings, allowedStatuses, statusFilters]);
+    return filtered.filter((row) => statusFilters.includes(row.status));
+  }, [
+    isUserView,
+    isPaView,
+    bookings,
+    allowedStatuses,
+    statusFilters,
+    order,
+    orderBy,
+  ]);
 
   const topRow = useMemo(() => {
     if (isUserView) {
@@ -103,7 +129,7 @@ export const Bookings: React.FC<BookingsProps> = ({
         </TableEmpty>
       );
     }
-    if (bookings.length === 0) {
+    if (filteredRows.length === 0) {
       return (
         <TableEmpty>
           {isUserView
@@ -112,21 +138,54 @@ export const Bookings: React.FC<BookingsProps> = ({
         </TableEmpty>
       );
     }
-  }, [isUserView, bookingsLoading, bookings]);
+  }, [isUserView, bookingsLoading, filteredRows]);
+
+  const createSortHandler = useCallback(
+    (property: keyof Booking) => (_: React.MouseEvent<unknown>) => {
+      const isAsc = orderBy === property && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(property);
+    },
+    [order, orderBy]
+  );
 
   const columns = useMemo(
     () => [
-      <TableCell key="status">Status</TableCell>,
-      <TableCell key="dates">Dates</TableCell>,
+      <SortableTableCell
+        key="status"
+        label="Status"
+        property="status"
+        {...{ createSortHandler, order, orderBy }}
+      />,
+      <SortableTableCell
+        label="Date / Time"
+        property="startDate"
+        key="startDate"
+        {...{ createSortHandler, order, orderBy }}
+      />,
       <TableCell key="room">Room(s)</TableCell>,
-      !isUserView && <TableCell key="department">Department/Role</TableCell>,
-      !isUserView && <TableCell key="id">ID</TableCell>,
-      !isUserView && <TableCell key="contacts">Contacts</TableCell>,
+      !isUserView && (
+        <SortableTableCell
+          label="Department / Role"
+          property="department"
+          key="department"
+          {...{ createSortHandler, order, orderBy }}
+        />
+      ),
+      !isUserView && (
+        <SortableTableCell
+          key="netId"
+          label="Requestor"
+          property="netId"
+          {...{ createSortHandler, order, orderBy }}
+        />
+      ),
+      !isUserView && <TableCell key="contacts">Contact Info</TableCell>,
       <TableCell key="title">Title</TableCell>,
-      !isUserView && <TableCell key="other">Other Info</TableCell>,
+      !isUserView && <TableCell key="other">Details</TableCell>,
       <TableCell key="action">Action</TableCell>,
     ],
-    [isUserView]
+    [isUserView, order, orderBy]
   );
 
   return (
@@ -137,11 +196,11 @@ export const Bookings: React.FC<BookingsProps> = ({
           borderRadius: isUserView ? '0px' : '',
         }}
       >
-        {filteredBookings.map((booking) => (
+        {filteredRows.map((row) => (
           <BookingTableRow
-            key={booking.calendarEventId}
+            key={row.calendarEventId}
             {...{
-              booking,
+              booking: row,
               isAdminView,
               isUserView,
               setModalData,

@@ -7,18 +7,22 @@ interface Props {
   bottomText: string;
 }
 
-const Stacked = styled(TableCell)`
-  p {
-    font-weight: 500;
-  }
-  label {
-    font-size: 12px;
-  }
-`;
+interface CellProps {
+  $bold: boolean;
+}
+
+const Stacked = styled(TableCell)<CellProps>(({ $bold }) => ({
+  p: {
+    fontWeight: $bold ? 500 : 400,
+  },
+  label: {
+    fontSize: '12px',
+  },
+}));
 
 export default function StackedTableCell({ topText, bottomText }: Props) {
   return (
-    <Stacked>
+    <Stacked $bold={bottomText?.length > 0}>
       <p>{topText}</p>
       <label>{bottomText}</label>
     </Stacked>

@@ -23,6 +23,11 @@ export type Booking = Inputs & {
   devBranch: string;
 };
 
+// used for Booking table rows that show status
+export type BookingRow = Booking & {
+  status: BookingStatusLabel;
+};
+
 export type BookingFormDetails = Booking & {
   approvalUrl: string;
   bookingToolUrl: string;
