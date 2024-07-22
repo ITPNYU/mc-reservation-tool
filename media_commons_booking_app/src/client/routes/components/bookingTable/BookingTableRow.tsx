@@ -1,4 +1,4 @@
-import { Booking, BookingStatusLabel } from '../../../../types';
+import { BookingRow, BookingStatusLabel } from '../../../../types';
 import {
   IconButton,
   TableCell,
@@ -6,7 +6,7 @@ import {
   Tooltip,
   tooltipClasses,
 } from '@mui/material';
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { formatDateTable, formatTimeTable } from '../../../utils/date';
 
 import BookingActions from '../../admin/components/BookingActions';
@@ -17,10 +17,10 @@ import StatusChip from './StatusChip';
 import getBookingStatus from '../../hooks/getBookingStatus';
 
 interface Props {
-  booking: Booking;
+  booking: BookingRow;
   isAdminView: boolean;
   isUserView: boolean;
-  setModalData: (x: Booking) => void;
+  setModalData: (x: BookingRow) => void;
 }
 
 export default function BookingTableRow({
@@ -47,7 +47,7 @@ export default function BookingTableRow({
           booking.endDate
         )}`}
       />
-      <TableCell>{booking.roomId}</TableCell>
+      <TableCell sx={{ maxWidth: '150px' }}>{booking.roomId}</TableCell>
       {!isUserView && (
         <StackedTableCell
           topText={booking.department}

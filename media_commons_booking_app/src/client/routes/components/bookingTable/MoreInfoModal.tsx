@@ -8,13 +8,13 @@ import {
   Typography,
 } from '@mui/material';
 
-import { Booking } from '../../../../types';
+import { BookingRow } from '../../../../types';
 import React from 'react';
 import StackedTableCell from './StackedTableCell';
 import { styled } from '@mui/system';
 
 interface Props {
-  booking: Booking;
+  booking: BookingRow;
   closeModal: () => void;
 }
 
