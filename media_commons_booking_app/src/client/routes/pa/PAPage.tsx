@@ -1,13 +1,14 @@
-import React, { useContext, useMemo } from 'react';
+import { Box, Tab, Tabs } from '@mui/material';
+import React, { useContext, useMemo, useState } from 'react';
 
 import { Bookings } from '../components/bookingTable/Bookings';
-import { Box } from '@mui/material';
 import { CenterLoading } from '../components/Loading';
 import { DatabaseContext } from '../components/Provider';
 import { PagePermission } from '../../../types';
 
 const PAPage = () => {
   const { paUsers, pagePermission, userEmail } = useContext(DatabaseContext);
+  const [tab, setTab] = useState('bookings');
 
   const paEmails = useMemo<string[]>(
     () => paUsers.map((user) => user.email),
@@ -28,7 +29,15 @@ const PAPage = () => {
         <div>You do not have permission to view this page.</div>
       ) : (
         <div>
-          <Bookings isPaView={true} />
+          <Tabs
+            value={tab}
+            onChange={(_, newVal) => setTab(newVal)}
+            textColor="primary"
+            indicatorColor="primary"
+          >
+            <Tab value="bookings" label="Bookings" />
+          </Tabs>
+          {tab === 'bookings' && <Bookings isPaView={true} />}
         </div>
       )}
     </Box>
