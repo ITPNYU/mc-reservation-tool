@@ -9,6 +9,7 @@ const theme = createTheme({
     },
     secondary: {
       main: deepPurple.A100,
+      light: deepPurple[50],
     },
     custom: {
       gray: 'rgba(33, 33, 33, 0.08)',
