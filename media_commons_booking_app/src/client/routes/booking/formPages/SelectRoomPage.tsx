@@ -1,55 +1,38 @@
+import { Box, Stack, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
+import { CalendarDatePicker } from '../components/CalendarDatePicker';
+import CalendarVerticalResource from '../components/CalendarVerticalResource';
 import { DatabaseContext } from '../../components/Provider';
-import { DateSelectArg } from '@fullcalendar/core';
-import { MultipleCalendars } from '../components/MultipleCalendars';
-import { Role, RoomSetting } from '../../../../types';
-import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../../policy';
-import { useNavigate } from 'react-router-dom';
+import Grid from '@mui/material/Unstable_Grid2';
+import { SelectRooms } from '../components/SelectRooms';
 
 export default function SelectRoomPage() {
-  const navigate = useNavigate();
   const { roomSettings, userEmail } = useContext(DatabaseContext);
-  const {
-    isBanned,
-    needsSafetyTraining,
-    selectedRooms,
-    setBookingCalendarInfo,
-    setSelectedRooms,
-  } = useContext(BookingContext);
-
-  const handleSetDate = (info: DateSelectArg, rooms: RoomSetting[]) => {
-    console.log('handle set date', info, rooms, selectedRooms);
-
-    setBookingCalendarInfo(info);
-    setSelectedRooms(rooms);
-    const requiresSafetyTraining = rooms.some((room) =>
-      SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
-    );
-    if (needsSafetyTraining) {
-      alert('You have to take safety training before booking!');
-      return;
-    }
-    if (userEmail && isBanned) {
-      alert('You are banned');
-      return;
-    }
-
-    navigate('/book/form');
-  };
+  const { selectedRooms, setSelectedRooms } = useContext(BookingContext);
+  const [date, setDate] = useState<Date>(new Date());
 
   return (
-    <div className="p-4 w-full">
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-        {' '}
-        Select room and view calendar
-      </h3>
-      <MultipleCalendars
-        key="calendars"
-        allRooms={roomSettings}
-        handleSetDate={handleSetDate}
-      />
-    </div>
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid container>
+        <Grid width={330}>
+          <Stack spacing={2}>
+            <CalendarDatePicker handleChange={setDate} />
+            <Box paddingLeft="24px">
+              <Typography fontWeight={500}>Spaces</Typography>
+              <SelectRooms
+                allRooms={roomSettings}
+                selected={selectedRooms}
+                setSelected={setSelectedRooms}
+              />
+            </Box>
+          </Stack>
+        </Grid>
+        <Grid paddingRight={2} flex={1}>
+          <CalendarVerticalResource rooms={selectedRooms} dateView={date} />
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

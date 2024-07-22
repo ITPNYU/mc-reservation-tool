@@ -11,18 +11,12 @@ export const BannedUsers = () => {
   const { bannedUsers, reloadBannedUsers } = useContext(DatabaseContext);
 
   return (
-    <>
-      <AddEmail
-        tableName={TableNames.BANNED}
-        userList={bannedUsers}
-        userListRefresh={reloadBannedUsers}
-      />
-      <EmailListTable
-        tableName={TableNames.BANNED}
-        userList={bannedUsers}
-        userListRefresh={reloadBannedUsers}
-        columnFormatters={{ bannedAt: formatDate }}
-      />
-    </>
+    <EmailListTable
+      tableName={TableNames.BANNED}
+      userList={bannedUsers}
+      userListRefresh={reloadBannedUsers}
+      columnFormatters={{ bannedAt: formatDate }}
+      title="Banned Users"
+    />
   );
 };

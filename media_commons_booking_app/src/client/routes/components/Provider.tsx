@@ -15,11 +15,17 @@ import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { TableNames, getLiaisonTableName } from '../../../policy';
 
 import { serverFunctions } from '../../utils/serverFunctions';
+import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
+
+type WithId = {
+  calendarEventId: string;
+};
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
   bannedUsers: Ban[];
   bookings: Booking[];
+  bookingsLoading: boolean;
   bookingStatuses: BookingStatus[];
   liaisonUsers: LiaisonType[];
   pagePermission: PagePermission;
@@ -43,6 +49,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   adminUsers: [],
   bannedUsers: [],
   bookings: [],
+  bookingsLoading: true,
   bookingStatuses: [],
   liaisonUsers: [],
   pagePermission: PagePermission.BOOKING,
@@ -65,6 +72,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
 export const DatabaseProvider = ({ children }) => {
   const [bannedUsers, setBannedUsers] = useState<Ban[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState<boolean>(true);
   const [bookingStatuses, setBookingStatuses] = useState<BookingStatus[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
@@ -87,39 +95,69 @@ export const DatabaseProvider = ({ children }) => {
     else return PagePermission.BOOKING;
   }, [userEmail, adminUsers, paUsers]);
 
+  useFakeDataLocalStorage(setBookings, setBookingStatuses);
+
   useEffect(() => {
-    // fetch most important tables first - determine page permissions
-    Promise.all([
-      fetchActiveUserEmail(),
-      fetchAdminUsers(),
-      fetchPaUsers(),
-    ]).then(() => {
-      fetchBookings();
-      fetchBookingStatuses();
+    const fetchInitialData = async () => {
+      // fetch most important tables first - determine page permissions
+      await Promise.all([
+        fetchActiveUserEmail(),
+        fetchAdminUsers(),
+        fetchPaUsers(),
+      ]);
+      await Promise.all([fetchBookings(), fetchBookingStatuses()]);
+      setBookingsLoading(false);
+    };
+
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    if (!bookingsLoading) {
       fetchSafetyTrainedUsers();
       fetchBannedUsers();
       fetchLiaisonUsers();
       fetchRoomSettings();
       fetchSettings();
-    });
-
+    }
     // refresh booking data every 10s;
-    setInterval(() => {
-      console.log('UPDATING');
+    const intervalId = setInterval(() => {
       fetchBookings();
       fetchBookingStatuses();
     }, 10000);
-  }, []);
+    return () => clearInterval(intervalId);
+  }, [bookingsLoading]);
 
   const fetchActiveUserEmail = () => {
     serverFunctions.getActiveUserEmail().then((response) => {
-      console.log('userEmail:', response);
       setUserEmail(response);
     });
   };
 
+  const updateOrAddRows = <T extends WithId>(state: T[], newRows: T[]): T[] => {
+    const updatedState = [...state];
+
+    newRows.forEach((newRow) => {
+      const existingRowIndex = updatedState.findIndex(
+        (row) => row.calendarEventId === newRow.calendarEventId
+      );
+
+      if (existingRowIndex !== -1) {
+        // If the row exists, update its content
+        updatedState[existingRowIndex] = {
+          ...updatedState[existingRowIndex],
+          ...newRow,
+        };
+      } else {
+        // Otherwise just add new row
+        updatedState.push(newRow);
+      }
+    });
+
+    return updatedState;
+  };
+
   const fetchBookings = async () => {
-    console.log('CURRENT BRANCH:', process.env.BRANCH_NAME);
     const bookingRows = await serverFunctions
       .getActiveBookingsFutureDates()
       .then((rows) => {
@@ -127,14 +165,14 @@ export const DatabaseProvider = ({ children }) => {
           return booking.devBranch === process.env.BRANCH_NAME;
         });
       });
-    setBookings(bookingRows);
+    setBookings((prev) => updateOrAddRows(prev, bookingRows));
   };
 
   const fetchBookingStatuses = async () => {
     const bookingStatusRows = await serverFunctions
       .getAllActiveSheetRows(TableNames.BOOKING_STATUS)
       .then((rows) => JSON.parse(rows) as BookingStatus[]);
-    setBookingStatuses(bookingStatusRows);
+    setBookingStatuses((prev) => updateOrAddRows(prev, bookingStatusRows));
   };
 
   const fetchAdminUsers = async () => {
@@ -201,6 +239,7 @@ export const DatabaseProvider = ({ children }) => {
         adminUsers,
         bannedUsers,
         bookings,
+        bookingsLoading,
         bookingStatuses,
         liaisonUsers,
         paUsers,

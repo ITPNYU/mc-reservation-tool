@@ -1,44 +1,36 @@
-import React, { useState } from 'react';
-import Datepicker from 'tailwind-datepicker-react';
+import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers';
+import React, { useContext, useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { BookingContext } from '../bookingProvider';
 
 export const CalendarDatePicker = ({ handleChange }) => {
-  const options = {
-    title: 'Date',
-    autoHide: true,
-    todayBtn: true,
-    clearBtn: false,
-    maxDate: new Date('2030-01-01'),
-    minDate: new Date('1950-01-01'),
-    theme: {
-      background: '',
-      todayBtn: '',
-      clearBtn: '',
-      icons: '',
-      text: 'text-sm',
-      disabledText: '',
-      input: '',
-      inputIcon: '',
-      selected: '',
-    },
-    datepickerClassNames: 'top-12',
-    defaultDate: new Date(),
-    language: 'en',
+  const [date, setDate] = useState<Dayjs | null>(dayjs(new Date()));
+  const { bookingCalendarInfo } = useContext(BookingContext);
+
+  const handleDateChange = (newVal: Dayjs) => {
+    setDate(newVal);
+    handleChange(newVal.toDate());
   };
 
-  const [show, setShow] = useState(false);
-
-  const handleClose = (state: boolean) => {
-    setShow(state);
-  };
+  // if go back to calendar from booking form, show currently selected date
+  useEffect(() => {
+    if (bookingCalendarInfo != null) {
+      handleDateChange(dayjs(bookingCalendarInfo.start));
+    }
+  }, []);
 
   return (
-    <div>
-      <Datepicker
-        options={options}
-        onChange={handleChange}
-        show={show}
-        setShow={handleClose}
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DateCalendar
+        value={date}
+        onChange={handleDateChange}
+        views={['day', 'month']}
+        autoFocus
+        disablePast
+        showDaysOutsideCurrentMonth
       />
-    </div>
+    </LocalizationProvider>
   );
 };

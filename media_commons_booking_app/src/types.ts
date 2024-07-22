@@ -3,6 +3,12 @@ export type AdminUser = {
   createdAt: string;
 };
 
+export enum AttendeeAffiliation {
+  NYU = 'NYU Members with an active NYU ID',
+  NON_NYU = 'Non-NYU guests',
+  BOTH = 'All of the above',
+}
+
 export type Ban = {
   email: string;
   bannedAt: string;
@@ -17,10 +23,15 @@ export type Booking = Inputs & {
   devBranch: string;
 };
 
+// used for Booking table rows that show status
+export type BookingRow = Booking & {
+  status: BookingStatusLabel;
+};
+
 export type BookingFormDetails = Booking & {
   approvalUrl: string;
   bookingToolUrl: string;
-  rejectUrl: string;
+  rejectedUrl: string;
   headerMessage?: string;
 };
 
@@ -36,13 +47,14 @@ export type BookingStatus = {
   noShowedAt: string;
 };
 
+// the order here is the order these are displayed as table filters
 export enum BookingStatusLabel {
   APPROVED = 'APPROVED',
   CANCELED = 'CANCELED',
   CHECKED_IN = 'CHECKED-IN',
   NO_SHOW = 'NO-SHOW',
   PRE_APPROVED = 'PRE-APPROVED',
-  REJECTED = 'REJECTED',
+  REJECTED = 'DECLINED',
   REQUESTED = 'REQUESTED',
   UNKNOWN = 'UNKNOWN',
 }
@@ -51,6 +63,11 @@ export type CalendarEvent = {
   title: string;
   start: string;
   end: string;
+  id: string;
+  resourceId: string;
+  display?: string;
+  overlap?: boolean;
+  url?: string;
 };
 
 export enum Department {
@@ -64,7 +81,6 @@ export enum Department {
   MUSIC_TECH = 'Music Tech',
   OTHER = 'Other',
 }
-
 export type DevBranch = 'development' | 'staging' | 'production' | '';
 
 export type Inputs = {
@@ -103,15 +119,24 @@ export type LiaisonType = {
   createdAt: string;
 };
 
+export enum MediaServices {
+  AUDIO_TECH_103 = '(Garage 103) Request an audio technician',
+  AUDIO_TECH_230 = '(Audio Lab 230) Request an audio technician',
+  CAMPUS_MEDIA_SERVICES = '(Rooms 202 and 1201) Contact Campus Media to check out equipment or for technical/event support',
+  CHECKOUT_EQUIPMENT = 'Checkout Equipment',
+  LIGHTING_TECH_103 = '(Garage 103) Request a lighting technician',
+  LIGHTING_DMX = '(Rooms 220-224) Using DMX lights in ceiling grid',
+}
+
 export type PaUser = {
   email: string;
   createdAt: string;
 };
 
 export enum PagePermission {
-  ADMIN,
-  BOOKING,
-  PA,
+  ADMIN = 'Admin',
+  BOOKING = 'User',
+  PA = 'PA',
 }
 
 export type ReservationType = {
