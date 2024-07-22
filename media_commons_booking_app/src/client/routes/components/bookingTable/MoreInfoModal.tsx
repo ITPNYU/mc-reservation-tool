@@ -8,14 +8,15 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Event, Label } from '@mui/icons-material';
 
 import { BookingRow } from '../../../../types';
+import { Event } from '@mui/icons-material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import React from 'react';
 import { RoomDetails } from '../../booking/components/BookingSelection';
 import StackedTableCell from './StackedTableCell';
 import StatusChip from './StatusChip';
+import { formatTimeAmPm } from '../../../utils/date';
 import { styled } from '@mui/system';
 
 interface Props {
@@ -66,11 +67,9 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
           </RoomDetails>
           <RoomDetails container>
             <label>Time:</label>
-            <p>{`${new Date(
-              booking.startDate
-            ).toLocaleTimeString()} - ${new Date(
+            <p>{`${formatTimeAmPm(booking.startDate)} - ${formatTimeAmPm(
               booking.endDate
-            ).toLocaleTimeString()}`}</p>
+            )}`}</p>
           </RoomDetails>
           <RoomDetails container>
             <label>Status:</label>

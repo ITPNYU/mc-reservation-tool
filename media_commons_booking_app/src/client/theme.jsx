@@ -17,6 +17,9 @@ const theme = createTheme({
       gray3: 'rgba(0,0,0,0.3)',
       border: '#e3e3e3',
     },
+    success: { main: 'rgb(0 255 0)' },
+    warning: { main: 'rgb(255 167 0)' },
+    error: { main: 'rgba(255, 26, 26, 1)' },
   },
   components: {
     MuiCssBaseline: {

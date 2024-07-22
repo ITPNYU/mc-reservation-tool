@@ -35,3 +35,11 @@ export const formatTimeTable = (d: string) => {
 
   return `${hours}:${minutes}`;
 };
+
+export const formatTimeAmPm = (d: string) => {
+  return new Date(d).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
+};
