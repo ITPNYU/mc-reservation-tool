@@ -1,15 +1,25 @@
+import { Booking, BookingRow } from '../../../../types';
 import { TableCell, TableSortLabel } from '@mui/material';
 
-import { Booking } from '../../../../types';
 import React from 'react';
 
 interface Props {
   createSortHandler: any;
-  property: keyof Booking;
+  property: keyof BookingRow;
   label: string;
-  orderBy: keyof Booking;
+  orderBy: keyof BookingRow;
   order: 'asc' | 'desc';
 }
+
+export const COMPARATORS: {
+  [property: string]: (a: BookingRow, b: BookingRow) => number;
+} = {
+  startDate: (a, b) =>
+    new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+  department: (a, b) => a.department.localeCompare(b.department),
+  netId: (a, b) => a.netId.localeCompare(b.netId),
+  status: (a, b) => a.status.localeCompare(b.status),
+};
 
 export default function SortableTableCell(props: Props) {
   const { orderBy, order, property } = props;
