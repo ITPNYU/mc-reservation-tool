@@ -35,14 +35,10 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
     const rows = await serverFunctions.getCalendarEvents(calendarId);
     const rowsWithResourceIds = rows.map((row) => ({
       ...row,
-      id: room.roomId,
+      id: room.roomId + row.start,
       resourceId: room.roomId,
     }));
     return rowsWithResourceIds;
-    // const filteredEvents = rowsWithResourceIds.filter((row) => {
-    //   return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
-    // });
-    // return filteredEvents;
   };
 
   const getFakeEvents: () => CalendarEvent[] = () => {
