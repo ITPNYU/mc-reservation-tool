@@ -4,7 +4,7 @@ import handlebars, { templates } from "handlebars";
 import { getGmailClient } from "@/lib/googleClient";
 import { BookingStatusLabel } from "@/components/src/types";
 import { app } from "firebase-admin";
-import { approvalUrl, reject } from "@/components/src/server";
+import { approvalUrl, rejectUrl } from "@/components/src/server/ui";
 
 interface BookingFormDetails {
   [key: string]: string;
@@ -28,7 +28,7 @@ export const sendHTMLEmail = async (params: SendHTMLEmailParams) => {
   const templatePath = path.join(
     process.cwd(),
     "app/templates",
-    `${templateName}.html`
+    `${templateName}.html`,
   );
   const templateSource = fs.readFileSync(templatePath, "utf8");
   const template = handlebars.compile(templateSource);
@@ -39,11 +39,11 @@ export const sendHTMLEmail = async (params: SendHTMLEmailParams) => {
     body,
     contents,
     approvalUrl: approvalUrl(contents.calendarEventId),
-    rejectUrl: approvalUrl(contents.calendarEventId),
+    rejectUrl: rejectUrl(contents.calendarEventId),
   });
 
   const messageParts = [
-    `From: "Media Commons" <>`,
+    "From: 'Media Commons' <>",
     `To: ${targetEmail}`,
     "Content-Type: text/html; charset=utf-8",
     "MIME-Version: 1.0",

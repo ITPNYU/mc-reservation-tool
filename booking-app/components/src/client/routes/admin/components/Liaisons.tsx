@@ -113,7 +113,7 @@ export const Liaisons = () => {
 
   const liaisonEmails = useMemo<string[]>(
     () => liaisonUsers.map((user) => user.email),
-    [liaisonUsers]
+    [liaisonUsers],
   );
 
   return (

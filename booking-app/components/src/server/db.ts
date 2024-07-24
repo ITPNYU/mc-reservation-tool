@@ -1,17 +1,21 @@
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { TableNames } from "../policy";
-import { where } from "@firebase/firestore";
+import { Timestamp, where } from "@firebase/firestore";
 
-export const fetchAllFutureDataFromCollection = async <T>(
-  collectionName: TableNames
+export const fetchAllFutureBooking = async <T>(
+  collectionName: TableNames,
 ): Promise<T[]> => {
-  const now = new Date().toISOString();
+  const now = Timestamp.now();
   const futureQueryConstraints = [where("startDate", ">", now)];
   return fetchAllDataFromCollection<T>(collectionName, futureQueryConstraints);
 };
 
-export const getActiveBookingsFutureDates = () => {
-  const rows = fetchAllDataFromCollection(TableNames.BOOKING);
+export const fetchAllFutureBookingStatus = async <T>(
+  collectionName: TableNames,
+): Promise<T[]> => {
+  const now = Timestamp.now();
+  const futureQueryConstraints = [where("requestedAt", ">", now)];
+  return fetchAllDataFromCollection<T>(collectionName, futureQueryConstraints);
 };
 
 export const getOldSafetyTrainingEmails = () => {
@@ -43,4 +47,24 @@ export const getOldSafetyTrainingEmails = () => {
 
   //const combinedValues = [...values, ...secondValues];
   //return combinedValues;
+};
+
+export const liaisons = async () => {
+  const fetchedData = await fetchAllDataFromCollection(
+    TableNames.LIAISONS_PROD,
+  );
+  const filtered = fetchedData.map((item: any) => ({
+    id: item.id,
+    email: item.email,
+    department: item.department,
+    createdAt: item.createdAt,
+  }));
+  return filtered;
+};
+
+export const firstApproverEmails = async (department: string) => {
+  const liaisonsData = await liaisons();
+  return liaisonsData
+    .filter((liaison) => liaison.department === department)
+    .map((liaison) => liaison.email);
 };

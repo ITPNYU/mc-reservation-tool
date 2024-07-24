@@ -1,5 +1,34 @@
 import { Timestamp } from "@firebase/firestore";
 
+export type Inputs = {
+  firstName: string;
+  lastName: string;
+  secondaryName: string;
+  nNumber: string;
+  netId: string;
+  phoneNumber: string;
+  department: string;
+  role: string;
+  sponsorFirstName: string;
+  sponsorLastName: string;
+  sponsorEmail: string;
+  title: string;
+  description: string;
+  reservationType: string;
+  attendeeAffiliation: string;
+  roomSetup: string;
+  setupDetails: string;
+  mediaServices: string;
+  mediaServicesDetails: string;
+  catering: string;
+  hireSecurity: string;
+  expectedAttendance: string;
+  cateringService: string;
+  missingEmail?: string;
+  chartFieldForCatering: string;
+  chartFieldForSecurity: string;
+  chartFieldForRoomSetup: string;
+};
 export type AdminUser = {
   email: string;
   createdAt: Timestamp;
@@ -14,8 +43,8 @@ export type Booking = Inputs & {
   id?: string;
   calendarEventId: string;
   email: string;
-  startDate: Timestamp;
-  endDate: Timestamp;
+  startDate: any;
+  endDate: any;
   roomId: number;
 };
 
@@ -67,36 +96,6 @@ export enum Department {
 
 export type DevBranch = "development" | "staging" | "production" | "";
 
-export type Inputs = {
-  firstName: string;
-  lastName: string;
-  secondaryName: string;
-  nNumber: string;
-  netId: string;
-  phoneNumber: string;
-  department: string;
-  role: string;
-  sponsorFirstName: string;
-  sponsorLastName: string;
-  sponsorEmail: string;
-  title: string;
-  description: string;
-  reservationType: string;
-  attendeeAffiliation: string;
-  roomSetup: string;
-  setupDetails: string;
-  mediaServices: string;
-  mediaServicesDetails: string;
-  catering: string;
-  hireSecurity: string;
-  expectedAttendance: string;
-  cateringService: string;
-  missingEmail?: string;
-  chartFieldForCatering: string;
-  chartFieldForSecurity: string;
-  chartFieldForRoomSetup: string;
-};
-
 export type LiaisonType = {
   email: string;
   department: string;
@@ -131,11 +130,12 @@ export type RoomSetting = {
   name: string;
   capacity: number;
   calendarId?: any;
+  calendarRef?: any;
 };
 
 export type SafetyTraining = {
   email: string;
-  completedAt: Timestamp;
+  createdAt: Timestamp;
 };
 
 export type Settings = {

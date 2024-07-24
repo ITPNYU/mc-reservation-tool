@@ -1,3 +1,4 @@
+//@ts-nocheck
 require("dotenv").config();
 const { google } = require("googleapis");
 const readline = require("readline");

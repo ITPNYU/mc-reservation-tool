@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from "react";
 
-import { BookingStatusLabel } from '../../../../types';
-import BookingTableRow from './BookingTableRow';
-import { DatabaseContext } from '../../components/Provider';
-import getBookingStatus from '../hooks/getBookingStatus';
+import { BookingStatusLabel } from "../../../../types";
+import BookingTableRow from "./BookingTableRow";
+import { DatabaseContext } from "../../components/Provider";
+import getBookingStatus from "../hooks/getBookingStatus";
 
 interface BookingsProps {
   isAdminView?: boolean;
@@ -45,7 +45,7 @@ export const Bookings: React.FC<BookingsProps> = ({
       return bookings.filter((booking) => booking.email === userEmail);
     if (isPaView)
       return bookings.filter((booking) =>
-        paViewStatuses.includes(getBookingStatus(booking, bookingStatuses))
+        paViewStatuses.includes(getBookingStatus(booking, bookingStatuses)),
       );
     return bookings;
   }, [isUserView, bookings]);
@@ -56,32 +56,32 @@ export const Bookings: React.FC<BookingsProps> = ({
         <table className="w-[2500px] text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              {TableHeader('Action')}
-              {TableHeader('Status')}
-              {TableHeader('Room ID')}
-              {TableHeader('Contact')}
-              {TableHeader('Booking Start')}
-              {TableHeader('Booking End')}
-              {TableHeader('Secondary Name')}
-              {isAdminView && TableHeader('N Number')}
-              {TableHeader('Net ID')}
-              {TableHeader('Department')}
-              {TableHeader('Role')}
-              {TableHeader('Sponsor Name')}
-              {TableHeader('Sponsor Email')}
-              {TableHeader('Title')}
-              {TableHeader('Description')}
-              {TableHeader('Type')}
-              {TableHeader('Expected Attendees')}
-              {TableHeader('Attendee Affiliation')}
-              {TableHeader('Setup')}
-              {TableHeader('Chartfield Info for Room Setup')}
-              {TableHeader('Media Service')}
-              {TableHeader('Catering')}
-              {TableHeader('Catering Service')}
-              {TableHeader('Chartfield Info for Catering')}
-              {TableHeader('Security')}
-              {TableHeader('Chartfield Info for Security')}
+              {TableHeader("Action")}
+              {TableHeader("Status")}
+              {TableHeader("Room ID")}
+              {TableHeader("Contact")}
+              {TableHeader("Booking Start")}
+              {TableHeader("Booking End")}
+              {TableHeader("Secondary Name")}
+              {isAdminView && TableHeader("N Number")}
+              {TableHeader("Net ID")}
+              {TableHeader("Department")}
+              {TableHeader("Role")}
+              {TableHeader("Sponsor Name")}
+              {TableHeader("Sponsor Email")}
+              {TableHeader("Title")}
+              {TableHeader("Description")}
+              {TableHeader("Type")}
+              {TableHeader("Expected Attendees")}
+              {TableHeader("Attendee Affiliation")}
+              {TableHeader("Setup")}
+              {TableHeader("Chartfield Info for Room Setup")}
+              {TableHeader("Media Service")}
+              {TableHeader("Catering")}
+              {TableHeader("Catering Service")}
+              {TableHeader("Chartfield Info for Catering")}
+              {TableHeader("Security")}
+              {TableHeader("Chartfield Info for Security")}
             </tr>
           </thead>
           <tbody>

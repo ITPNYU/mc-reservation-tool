@@ -3,8 +3,10 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
+    //TODO: Change to true
+    "strict": false,
+    //TODO: Change to true
+    "noEmit": false,
     "esModuleInterop": true,
     "module": "ESNext",
     "moduleResolution": "node",

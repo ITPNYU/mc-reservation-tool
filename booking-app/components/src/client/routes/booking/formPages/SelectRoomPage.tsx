@@ -26,7 +26,7 @@ export default function SelectRoomPage() {
     "department",
     department,
     "selectedRooms",
-    selectedRooms
+    selectedRooms,
   );
 
   const handleSetDate = (info: DateSelectArg, rooms: RoomSetting[]) => {
@@ -53,7 +53,7 @@ export default function SelectRoomPage() {
       "department",
       department,
       "selectedRooms",
-      selectedRooms
+      selectedRooms,
     );
 
     setTimeout(() => {

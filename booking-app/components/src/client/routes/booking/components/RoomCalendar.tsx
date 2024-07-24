@@ -18,11 +18,11 @@ const TITLE_TAG = "[Click to Delete]";
 
 interface Props {
   allRooms: RoomSetting[];
-  bookingTimeEvent: DateSelectArg;
+  bookingTimeEvent: DateSelectArg | null;
   isOverlap: (x: DateSelectArg) => boolean;
   room: RoomSetting;
   selectedRooms: RoomSetting[];
-  setBookingTimeEvent: (x: DateSelectArg) => void;
+  setBookingTimeEvent: (x: DateSelectArg | null) => void;
 }
 
 export const RoomCalendar = ({
@@ -39,12 +39,12 @@ export const RoomCalendar = ({
     console.log(
       "Fetching calendar events from:",
       process.env.CALENDAR_ENV,
-      "calendars"
+      "calendars",
     );
     fetchCalendarEvents(room.calendarId);
   }, []);
 
-  function renderEventContent(eventInfo) {
+  function renderEventContent(eventInfo: any) {
     const match = eventInfo.event.title.match(/\[(.*?)\]/);
     const title = match ? match[1] : eventInfo.event.title;
 
@@ -91,7 +91,7 @@ export const RoomCalendar = ({
     setEvents(filteredEvents);
   };
 
-  const handleEventClick = (info) => {
+  const handleEventClick = (info: any) => {
     if (!editableEvent(info.event)) return;
     const targetGroupId = info.event.groupId;
     const isConfirmed = window.confirm("Do you want to delete this event?");
@@ -101,7 +101,7 @@ export const RoomCalendar = ({
         if (!room.calendarRef.current) return;
         let calendarApi = room.calendarRef.current.getApi();
         const events = calendarApi.getEvents();
-        events.map((event) => {
+        events.map((event: any) => {
           if (event.groupId === targetGroupId) {
             event.remove();
           }
@@ -111,7 +111,7 @@ export const RoomCalendar = ({
       return;
     }
   };
-  const handleDateSelect = (selectInfo) => {
+  const handleDateSelect = (selectInfo: any) => {
     if (bookingTimeEvent) {
       alert("You can only book one time slot per reservation");
       return;
@@ -129,18 +129,18 @@ export const RoomCalendar = ({
     });
     setBookingTimeEvent(selectInfo);
   };
-  const handleSelectAllow = (selectInfo) => {
+  const handleSelectAllow = (selectInfo: any) => {
     console.log("isOverlap", !isOverlap(selectInfo));
     return !isOverlap(selectInfo);
   };
 
-  const syncEventLengthAcrossCalendars = (changedEvent) => {
+  const syncEventLengthAcrossCalendars = (changedEvent: any) => {
     allRooms.forEach((room) => {
       const targetGroupId = changedEvent.groupId;
       if (room.calendarRef.current) {
         let calendarApi = room.calendarRef.current.getApi();
         const events = calendarApi.getEvents();
-        events.map((event) => {
+        events.map((event: any) => {
           //All events are retrieved, so change only for the event retrieved this time.
           if (event.groupId === targetGroupId) {
             event.setStart(changedEvent.start);
@@ -151,7 +151,7 @@ export const RoomCalendar = ({
     });
     setBookingTimeEvent(changedEvent);
   };
-  const editableEvent = (info) => {
+  const editableEvent = (info: any) => {
     return info.title.includes(TITLE_TAG);
   };
   return (

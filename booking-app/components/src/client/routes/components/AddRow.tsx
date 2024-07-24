@@ -25,7 +25,7 @@ export default function AddRow(props: Props) {
 
   const uniqueValues = useMemo<string[]>(
     () => rows.map((row) => row[props.columnNameToAddValue]),
-    [rows]
+    [rows],
   );
 
   const addValue = async () => {
@@ -33,11 +33,94 @@ export default function AddRow(props: Props) {
 
     if (uniqueValues.includes(valueToAdd)) {
       alert(
-        props.addDuplicateErrorMessage ?? "This value has already been added"
+        props.addDuplicateErrorMessage ?? "This value has already been added",
       );
       return;
     }
 
+    const selectedRooms = [
+      {
+        id: "2cSxp18i87Hb1wUGgyhu",
+        roomId: 202,
+        name: "Lecture Hall",
+        capacity: 210,
+        calendarId:
+          "c_cadf2be353a6162aab2c58b8b30ff75ea35b5f6c5163ed4fd57df71c00f03f6b@group.calendar.google.com",
+        calendarRef: { current: null },
+      },
+      {
+        id: "rREVwmFOnJDVD8FWkGh1",
+        roomId: 260,
+        name: "Post Production Lab",
+        capacity: 20,
+        calendarId:
+          "c_ed4919e8a07e1338ed3df9c7d7bceaece5a466b8d669a8a70d83b30a8627089e@group.calendar.google.com",
+        calendarRef: { current: null },
+      },
+    ];
+    const bookingCalendarInfo = {
+      start: "2024-07-24T02:30:00.000Z",
+      end: "2024-07-24T03:00:00.000Z",
+      startStr: "2024-07-23T22:30:00-04:00",
+      endStr: "2024-07-23T23:00:00-04:00",
+      allDay: false,
+      jsEvent: { isTrusted: true },
+      view: {
+        type: "timeGridDay",
+        dateEnv: {
+          timeZone: "local",
+          canComputeOffset: true,
+          calendarSystem: {},
+          locale: [Object],
+          weekDow: 0,
+          weekDoy: 4,
+          weekText: "W",
+          weekTextLong: "Week",
+          cmdFormatter: null,
+          defaultSeparator: " - ",
+        },
+      },
+    };
+    const data = {
+      setupDetails: "setup",
+      cateringService: "Outside Catering",
+      sponsorFirstName: "",
+      sponsorLastName: "",
+      sponsorEmail: "",
+      mediaServicesDetails: "aa",
+      role: "Resident/Fellow",
+      catering: "yes",
+      chartFieldForCatering: "ChartField for Catering",
+      chartFieldForSecurity: "hartField for Security",
+      chartFieldForRoomSetup: "ChartField for Room Setup",
+      hireSecurity: "yes",
+      attendeeAffiliation: "NYU Members",
+      department: "ITP / IMA / Low Res",
+      roomSetup: "yes",
+      reservationType: "test",
+      firstName: "RIho",
+      lastName: "Hagi",
+      secondaryName: "",
+      nNumber: "N12345678",
+      netId: "rh3555",
+      phoneNumber: "5513008348",
+      title: "title",
+      description: "a",
+      expectedAttendance: "3",
+      mediaServices: "Checkout equipment",
+    };
+    const res = await fetch("/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: "rh3555@nyu.edu",
+        selectedRooms: selectedRooms,
+        bookingCalendarInfo: bookingCalendarInfo,
+        data: data,
+      }),
+    });
     setLoading(true);
     try {
       await saveDataToFirestore(tableName, {

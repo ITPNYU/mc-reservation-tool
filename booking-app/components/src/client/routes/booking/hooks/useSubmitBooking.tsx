@@ -31,7 +31,7 @@ export default function useSubmitBooking(): [
     return [
       (_) =>
         new Promise((resolve, reject) =>
-          reject("Missing info for submitting booking")
+          reject("Missing info for submitting booking"),
         ),
       false,
     ];
@@ -57,12 +57,12 @@ export default function useSubmitBooking(): [
         email: email,
         selectedRooms: selectedRooms,
         bookingCalendarInfo: bookingCalendarInfo,
-        liaisonUsers:
+        liaisonUsers: liaisonUsers,
         data: data,
       }),
     }).then((res) => {
       alert("Your request has been sent.");
-      router.push("/")
+      router.push("/");
       setLoading(false);
       reloadBookings();
       reloadBookingStatuses();

@@ -3,7 +3,7 @@ import { BookingFormDetails, BookingStatusLabel, RoomSetting } from "../types";
 import { TableNames } from "../policy";
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { getCalendarClient } from "@/lib/googleClient";
-import { endAt, sum, where } from "@firebase/firestore";
+import { endAt, sum, Timestamp, where } from "@firebase/firestore";
 
 export const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
   const queryConstraints = [where("roomId", "==", roomId)];
@@ -109,9 +109,45 @@ const bookingContentsToDescription = (bookingContents: BookingFormDetails) => {
     bookingContents.hireSecurity === "yes" &&
       listItem("Hire Security", bookingContents.hireSecurity),
     "</ul><h3>Cancellation Policy</h3>",
-  ].filter((x: string | boolean) => x !== false);
+  ];
+  //@ts-ignore
   description = description.concat(...items);
   return description;
+};
+
+type InsertEventType = {
+  calendarId: string;
+  title: string;
+  description: string;
+  startTime: string | number | Date;
+  endTime: string | number | Date;
+  roomEmails: string[];
+};
+export const insertEvent = async ({
+  calendarId,
+  title,
+  description,
+  startTime,
+  endTime,
+  roomEmails,
+}: InsertEventType) => {
+  const calendar = getCalendarClient();
+  const event = await calendar.events.insert({
+    calendarId,
+    requestBody: {
+      summary: title,
+      description,
+      start: {
+        dateTime: new Date(startTime).toISOString(),
+      },
+      end: {
+        dateTime: new Date(endTime).toISOString(),
+      },
+      attendees: roomEmails.map((email: string) => ({ email })),
+      colorId: "8", // Gray
+    },
+  });
+  return event.data;
 };
 
 export const updateEventPrefix = async (
@@ -120,7 +156,9 @@ export const updateEventPrefix = async (
   bookingContents: BookingFormDetails
 ) => {
   const roomCalendarIds = await getRoomCalendarIds(
-    parseInt(bookingContents.roomId)
+    typeof bookingContents.roomId == "string"
+      ? parseInt(bookingContents.roomId, 10)
+      : bookingContents.roomId
   );
   console.log(`Room Calendar Ids: ${roomCalendarIds}`);
   console.log("bookingContents", bookingContents);

@@ -18,5 +18,5 @@ export const db = initializeFirestore(
     experimentalForceLongPolling: true,
     experimentalAutoDetectLongPolling: false,
   },
-  "media-commons1"
+  "media-commons1",
 );

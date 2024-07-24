@@ -1,25 +1,25 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from "react";
 
-import { AdminUsers } from './AdminUsers';
-import { BannedUsers } from './Ban';
-import { Bookings } from './Bookings';
-import { DatabaseContext } from '../../components/Provider';
-import { Liaisons } from './Liaisons';
-import Loading from '../../../utils/Loading';
-import { PAUsers } from './PAUsers';
-import { PagePermission } from '../../../../types';
-import SafetyTrainedUsers from './SafetyTraining';
-import Settings from './Settings';
+import { AdminUsers } from "./AdminUsers";
+import { BannedUsers } from "./Ban";
+import { Bookings } from "./Bookings";
+import { DatabaseContext } from "../../components/Provider";
+import { Liaisons } from "./Liaisons";
+import Loading from "../../../utils/Loading";
+import { PAUsers } from "./PAUsers";
+import { PagePermission } from "../../../../types";
+import SafetyTrainedUsers from "./SafetyTraining";
+import Settings from "./Settings";
 
 // This is a wrapper for google.script.run that lets us use promises.
 
 export default function Admin() {
-  const [tab, setTab] = useState('bookings');
+  const [tab, setTab] = useState("bookings");
   const { adminUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
   const adminEmails = useMemo<string[]>(
     () => adminUsers.map((user) => user.email),
-    [adminUsers]
+    [adminUsers],
   );
   const userHasPermission = pagePermission === PagePermission.ADMIN;
 
@@ -38,12 +38,12 @@ export default function Admin() {
           <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
             <li className="mr-2">
               <a
-                onClick={() => setTab('bookings')}
+                onClick={() => setTab("bookings")}
                 aria-current="page"
                 className={`${
-                  tab === 'bookings'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "bookings"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 Bookings
@@ -51,11 +51,11 @@ export default function Admin() {
             </li>
             <li className="mr-2">
               <a
-                onClick={() => setTab('safety_training')}
+                onClick={() => setTab("safety_training")}
                 className={`${
-                  tab === 'safety_training'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "safety_training"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 Safety Training
@@ -63,11 +63,11 @@ export default function Admin() {
             </li>
             <li className="mr-2">
               <a
-                onClick={() => setTab('ban')}
+                onClick={() => setTab("ban")}
                 className={`${
-                  tab === 'ban'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "ban"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 Ban
@@ -75,11 +75,11 @@ export default function Admin() {
             </li>
             <li className="mr-2">
               <a
-                onClick={() => setTab('paUsers')}
+                onClick={() => setTab("paUsers")}
                 className={`${
-                  tab === 'paUsers'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "paUsers"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 PA users
@@ -87,11 +87,11 @@ export default function Admin() {
             </li>
             <li className="mr-2">
               <a
-                onClick={() => setTab('adminUsers')}
+                onClick={() => setTab("adminUsers")}
                 className={`${
-                  tab === 'adminUsers'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "adminUsers"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 Admin users
@@ -99,11 +99,11 @@ export default function Admin() {
             </li>
             <li className="mr-2">
               <a
-                onClick={() => setTab('liaesons')}
+                onClick={() => setTab("liaesons")}
                 className={`${
-                  tab === 'liaesons'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "liaesons"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 Liaisons
@@ -111,24 +111,24 @@ export default function Admin() {
             </li>
             <li className="mr-2">
               <a
-                onClick={() => setTab('settings')}
+                onClick={() => setTab("settings")}
                 className={`${
-                  tab === 'settings'
-                    ? 'inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500'
-                    : 'inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 '
+                  tab === "settings"
+                    ? "inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+                    : "inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300 "
                 }`}
               >
                 Settings
               </a>
             </li>
           </ul>
-          {tab === 'safety_training' && <SafetyTrainedUsers />}
-          {tab === 'ban' && <BannedUsers />}
-          {tab === 'adminUsers' && <AdminUsers />}
-          {tab === 'paUsers' && <PAUsers />}
-          {tab === 'liaesons' && <Liaisons />}
-          {tab === 'bookings' && <Bookings isAdminView={true} />}
-          {tab === 'settings' && <Settings />}
+          {tab === "safety_training" && <SafetyTrainedUsers />}
+          {tab === "ban" && <BannedUsers />}
+          {tab === "adminUsers" && <AdminUsers />}
+          {tab === "paUsers" && <PAUsers />}
+          {tab === "liaesons" && <Liaisons />}
+          {tab === "bookings" && <Bookings isAdminView={true} />}
+          {tab === "settings" && <Settings />}
         </div>
       )}
     </div>

@@ -3,7 +3,7 @@
 
 import React from "react";
 import { DatabaseProvider } from "@/components/src/client/routes/components/Provider";
-import NavBar from "../booking/components/ NavBar";
+import NavBar from "../booking/components/NavBar";
 import { BookingProvider } from "../booking/bookingProvider";
 
 type ClientProviderProps = {

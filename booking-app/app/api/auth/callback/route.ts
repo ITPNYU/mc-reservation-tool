@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   if (!code) {
     return NextResponse.json(
       { error: "Missing code parameter" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     console.error("Error getting tokens:", error);
     return NextResponse.json(
       { error: "Failed to get tokens" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
