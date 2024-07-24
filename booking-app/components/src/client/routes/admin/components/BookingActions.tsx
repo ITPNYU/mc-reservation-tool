@@ -9,7 +9,7 @@ import {
   checkin,
   noShow,
   reject,
-} from "@/components/src/server";
+} from "@/components/src/server/admin";
 
 interface Props {
   calendarEventId: string;
@@ -39,7 +39,7 @@ export default function BookingActions({
     text: string,
     action: () => Promise<void>,
     optimisticNextStatus: BookingStatusLabel,
-    confirmation?: boolean
+    confirmation?: boolean,
   ) => (
     <button
       className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
@@ -60,8 +60,8 @@ export default function BookingActions({
             })
             .finally(() =>
               reload().then(() =>
-                setOptimisticStatus(BookingStatusLabel.UNKNOWN)
-              )
+                setOptimisticStatus(BookingStatusLabel.UNKNOWN),
+              ),
             );
         } catch (ex) {
           console.error(ex);
@@ -96,7 +96,7 @@ export default function BookingActions({
               await cancel(calendarEventId);
             },
             BookingStatusLabel.CANCELED,
-            true
+            true,
           )}
         </div>
       </td>
@@ -109,14 +109,14 @@ export default function BookingActions({
       async () => {
         await checkin(calendarEventId);
       },
-      BookingStatusLabel.CHECKED_IN
+      BookingStatusLabel.CHECKED_IN,
     );
     const noShowBtn = ActionButton(
       "No Show",
       async () => {
         await noShow(calendarEventId);
       },
-      BookingStatusLabel.NO_SHOW
+      BookingStatusLabel.NO_SHOW,
     );
 
     if (status === BookingStatusLabel.APPROVED) {
@@ -157,7 +157,7 @@ export default function BookingActions({
             async () => {
               await approveBooking(calendarEventId);
             },
-            BookingStatusLabel.APPROVED
+            BookingStatusLabel.APPROVED,
           )}
         {status === BookingStatusLabel.REQUESTED &&
           ActionButton(
@@ -165,7 +165,7 @@ export default function BookingActions({
             async () => {
               await approveBooking(calendarEventId);
             },
-            BookingStatusLabel.PRE_APPROVED
+            BookingStatusLabel.PRE_APPROVED,
           )}
         {ActionButton(
           "Reject",
@@ -173,7 +173,7 @@ export default function BookingActions({
             await reject(calendarEventId);
           },
           BookingStatusLabel.REJECTED,
-          true
+          true,
         )}
         {paBtns()}
       </div>

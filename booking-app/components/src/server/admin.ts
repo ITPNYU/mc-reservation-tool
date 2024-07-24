@@ -35,7 +35,7 @@ export const bookingContents = (id: string) => {
 export const updateDataByCalendarEventId = async (
   collectionName: TableNames,
   calendarEventId: string,
-  updatedData: object
+  updatedData: object,
 ) => {
   const data = await getDataByCalendarEventId(collectionName, calendarEventId);
 
@@ -48,7 +48,6 @@ export const updateDataByCalendarEventId = async (
 };
 
 const firstApprove = (id: string) => {
-  console.log("first approve");
   updateDataByCalendarEventId(TableNames.BOOKING_STATUS, id, {
     firstApprovedAt: Timestamp.now(),
   });
@@ -71,7 +70,7 @@ export const approveBooking = async (id: string) => {
   console.log("approveBooking");
   const bookingStatus = await getDataByCalendarEventId<BookingStatus>(
     TableNames.BOOKING_STATUS,
-    id
+    id,
   );
   console.log("bookingStatus", bookingStatus);
   const firstApproveDateRange =
@@ -88,16 +87,19 @@ export const approveBooking = async (id: string) => {
   } else {
     firstApprove(id);
 
-    const response = await fetch("/api/calendarEvents", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          calendarEventId: id,
+          newPrefix: BookingStatusLabel.PRE_APPROVED,
+        }),
       },
-      body: JSON.stringify({
-        calendarEventId: id,
-        newPrefix: BookingStatusLabel.PRE_APPROVED,
-      }),
-    });
+    );
     const contents = await bookingContents(id);
 
     const emailContents = {
@@ -105,7 +107,7 @@ export const approveBooking = async (id: string) => {
       headerMessage: "This is a request email for final approval.",
     };
     const recipient = getSecondApproverEmail(
-      process.env.NEXT_PUBLIC_BRANCH_NAME || ""
+      process.env.NEXT_PUBLIC_BRANCH_NAME || "",
     );
     const formData = {
       templateName: "approval_email",
@@ -129,7 +131,7 @@ export const approveBooking = async (id: string) => {
 export const sendConfirmationEmail = (
   calendarEventId: string,
   status: BookingStatusLabel,
-  headerMessage: string
+  headerMessage: string,
 ) => {
   const email = getSecondApproverEmail(process.env.BRANCH_NAME);
   sendBookingDetailEmail(calendarEventId, email, headerMessage, status);
@@ -139,7 +141,7 @@ export const sendBookingDetailEmail = async (
   calendarEventId: string,
   email: string,
   headerMessage: string,
-  status: BookingStatusLabel
+  status: BookingStatusLabel,
 ) => {
   const contents = await bookingContents(calendarEventId);
   console.log("sendBookingDetailEmail");
@@ -154,7 +156,7 @@ export const sendBookingDetailEmail = async (
     eventTitle: contents.title,
     bodyMessage: "",
   };
-  const res = await fetch("/api/sendEmail", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/sendEmail`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -170,6 +172,7 @@ export const approveEvent = async (id: string) => {
     console.error("Booking status not found for calendar event id: ", id);
     return;
   }
+  //@ts-ignore
   const guestEmail = doc.email;
 
   // for user
@@ -180,19 +183,19 @@ export const approveEvent = async (id: string) => {
     id,
     guestEmail,
     headerMessage,
-    BookingStatusLabel.APPROVED
+    BookingStatusLabel.APPROVED,
   );
   // for second approver
   sendConfirmationEmail(
     id,
     BookingStatusLabel.APPROVED,
-    `This is a confirmation email.`
+    `This is a confirmation email.`,
   );
   const formDataForCalendarEvents = {
     calendarEventId: id,
     newPrefix: BookingStatusLabel.APPROVED,
   };
-  await fetch("/api/calendarEvents", {
+  await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -221,6 +224,7 @@ export const reject = async (id: string) => {
   });
 
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
+  //@ts-ignore
   const guestEmail = doc ? doc.email : null;
   const headerMessage =
     "Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
@@ -228,18 +232,21 @@ export const reject = async (id: string) => {
     id,
     guestEmail,
     headerMessage,
-    BookingStatusLabel.REJECTED
+    BookingStatusLabel.REJECTED,
   );
-  const response = await fetch("/api/calendarEvents", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarEventId: id,
+        newPrefix: BookingStatusLabel.REJECTED,
+      }),
     },
-    body: JSON.stringify({
-      calendarEventId: id,
-      newPrefix: BookingStatusLabel.REJECTED,
-    }),
-  });
+  );
 };
 
 export const cancel = async (id: string) => {
@@ -247,6 +254,7 @@ export const cancel = async (id: string) => {
     [ActiveSheetBookingStatusColumns.CANCELLED_DATE]: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
+  //@ts-ignore
   const guestEmail = doc ? doc.email : null;
   const headerMessage =
     "Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
@@ -254,23 +262,26 @@ export const cancel = async (id: string) => {
     id,
     guestEmail,
     headerMessage,
-    BookingStatusLabel.CANCELED
+    BookingStatusLabel.CANCELED,
   );
   sendConfirmationEmail(
     id,
     BookingStatusLabel.CANCELED,
-    `This is a cancelation email.`
+    `This is a cancelation email.`,
   );
-  const response = await fetch("/api/calendarEvents", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarEventId: id,
+        newPrefix: BookingStatusLabel.CANCELED,
+      }),
     },
-    body: JSON.stringify({
-      calendarEventId: id,
-      newPrefix: BookingStatusLabel.CANCELED,
-    }),
-  });
+  );
 };
 
 export const checkin = async (id: string) => {
@@ -278,6 +289,7 @@ export const checkin = async (id: string) => {
     [ActiveSheetBookingStatusColumns.CHECKED_IN_DATE]: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
+  //@ts-ignore
   const guestEmail = doc ? doc.email : null;
 
   const headerMessage =
@@ -286,18 +298,21 @@ export const checkin = async (id: string) => {
     id,
     guestEmail,
     headerMessage,
-    BookingStatusLabel.CHECKED_IN
+    BookingStatusLabel.CHECKED_IN,
   );
-  const response = await fetch("/api/calendarEvents", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarEventId: id,
+        newPrefix: BookingStatusLabel.CHECKED_IN,
+      }),
     },
-    body: JSON.stringify({
-      calendarEventId: id,
-      newPrefix: BookingStatusLabel.CHECKED_IN,
-    }),
-  });
+  );
 };
 
 export const noShow = async (id: string) => {
@@ -305,6 +320,7 @@ export const noShow = async (id: string) => {
     [ActiveSheetBookingStatusColumns.NO_SHOWED_DATE]: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
+  //@ts-ignore
   const guestEmail = doc ? doc.email : null;
 
   const headerMessage =
@@ -313,21 +329,24 @@ export const noShow = async (id: string) => {
     id,
     guestEmail,
     headerMessage,
-    BookingStatusLabel.NO_SHOW
+    BookingStatusLabel.NO_SHOW,
   );
   sendConfirmationEmail(
     id,
     BookingStatusLabel.NO_SHOW,
-    `This is a no show email.`
+    `This is a no show email.`,
   );
-  const response = await fetch("/api/calendarEvents", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarEventId: id,
+        newPrefix: BookingStatusLabel.NO_SHOW,
+      }),
     },
-    body: JSON.stringify({
-      calendarEventId: id,
-      newPrefix: BookingStatusLabel.NO_SHOW,
-    }),
-  });
+  );
 };

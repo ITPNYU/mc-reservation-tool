@@ -5,7 +5,7 @@ import { TableNames } from "@/components/src/policy";
 export async function GET(req: NextRequest) {
   try {
     const fetchedData = await fetchAllDataFromCollection(
-      TableNames.LIAISONS_PROD
+      TableNames.LIAISONS_PROD,
     );
     const filtered = fetchedData.map((item: any) => ({
       id: item.id,
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching data:", error);
     return NextResponse.json(
       { error: "Failed to fetch data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

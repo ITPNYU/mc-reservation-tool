@@ -1,3 +1,4 @@
+//@ts-nocheck
 const { google } = require("googleapis");
 const readline = require("readline");
 

@@ -1,5 +1,5 @@
+import { approveBooking } from "@/components/src/server/admin";
 import { NextRequest, NextResponse } from "next/server";
-import { approveBooking } from "@/components/src/server";
 
 export async function POST(request: NextRequest) {
   const { calendarId } = await request.json();
@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   if (!calendarId) {
     return NextResponse.json(
       { error: "Missing required fields" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { result: "success", calendarEventId: calendarId },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json({ error: "Failed to approve" }, { status: 500 });

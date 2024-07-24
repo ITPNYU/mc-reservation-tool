@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import Loading from '../../utils/Loading';
+import Loading from "../../utils/Loading";
 
 interface Props {
   columnFormatters?: { [key: string]: (value: string) => string };
@@ -18,7 +18,7 @@ export default function ListTableRow(props: Props) {
   const [isRemoved, setIsRemoved] = useState(false);
 
   const onError = () => {
-    alert('Failed to remove value');
+    alert("Failed to remove value");
   };
 
   /**

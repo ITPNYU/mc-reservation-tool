@@ -1,10 +1,10 @@
-import { Booking, BookingStatusLabel } from '../../../../types';
-import React, { useContext, useState } from 'react';
+import { Booking, BookingStatusLabel } from "../../../../types";
+import React, { useContext, useState } from "react";
 
-import BookingActions from './BookingActions';
-import { DatabaseContext } from '../../components/Provider';
-import { formatDate } from '../../../utils/date';
-import getBookingStatus from '../hooks/getBookingStatus';
+import BookingActions from "./BookingActions";
+import { DatabaseContext } from "../../components/Provider";
+import { formatDate } from "../../../utils/date";
+import getBookingStatus from "../hooks/getBookingStatus";
 
 interface Props {
   booking: Booking;

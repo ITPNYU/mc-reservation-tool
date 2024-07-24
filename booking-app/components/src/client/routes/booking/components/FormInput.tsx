@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-
 import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
 import { Inputs } from "../../../../types";
@@ -19,14 +18,7 @@ const ErrorMessage = (message) => {
 const FormInput = ({ handleParentSubmit }) => {
   const { userEmail, settings } = useContext(DatabaseContext);
   const { role, department, selectedRooms } = useContext(BookingContext);
-  console.log(
-    "role",
-    role,
-    "department",
-    department,
-    "selectedRooms",
-    selectedRooms
-  );
+
   const {
     register,
     handleSubmit,
@@ -59,14 +51,12 @@ const FormInput = ({ handleParentSubmit }) => {
   const [bookingPolicy, setBookingPolicy] = useState(false);
   const roomNumber = selectedRooms.map((room) => room.roomId);
 
-  console.log("selectedRooms", selectedRooms);
-  console.log("roomNumber", roomNumber);
   const maxCapacity = selectedRooms.reduce((sum, room) => {
     return sum + room.capacity;
   }, 0);
 
   const validateExpectedAttendance = (value) => {
-    const attendance = parseInt(value);
+    const attendance = parseInt(value, 10);
     return (
       (!isNaN(attendance) && attendance <= maxCapacity) ||
       `Expected attendance exceeds maximum capacity of ${maxCapacity}`
@@ -85,8 +75,10 @@ const FormInput = ({ handleParentSubmit }) => {
     trigger();
   }, [trigger]);
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  // @ts-ignore
+  const onSubmit: SubmitHandler = (data) => {
     const dumpMediaServices = data.mediaServices || [];
+    // eslint-disable-next-line no-param-reassign
     data.mediaServices = Array.isArray(dumpMediaServices)
       ? dumpMediaServices.join(", ")
       : dumpMediaServices;
@@ -418,6 +410,7 @@ const FormInput = ({ handleParentSubmit }) => {
             href="https://www.nyu.edu/about/visitor-information/sponsoring-visitors.html"
             className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
             target="_blank"
+            rel="noreferrer"
           >
             click here
           </a>
@@ -455,11 +448,12 @@ const FormInput = ({ handleParentSubmit }) => {
         <p className="text-xs">
           If your reservation is in 233 or 1201 and requires a specific room
           setup that is different from the standard configuration, it is the
-          reservation holder’s responsibility to submit a
+          reservation holder's responsibility to submit a
           <a
             className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
             href="https://nyu.service-now.com/csmp?id=sc_home"
             target="_blank"
+            rel="noreferrer"
           >
             work order with CBS
           </a>
@@ -630,6 +624,7 @@ const FormInput = ({ handleParentSubmit }) => {
                 href="https://docs.google.com/document/d/1oRtvZ0SR52Mq_ykoNXelwqat4JFgdado5JDY6A746VY/edit#heading=h.iv9c7z15bn0t"
                 target="_blank"
                 className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+                rel="noreferrer"
               >
                 Inventory for Black Box 220 and Ballrooms 221-224
               </a>
@@ -638,6 +633,7 @@ const FormInput = ({ handleParentSubmit }) => {
                 href="https://docs.google.com/spreadsheets/d/1fziyVrzeytQJyZ8585Wtqxer-PBt6L-u-Z0LHVavK5k/edit#gid=870626522"
                 target="_blank"
                 className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+                rel="noreferrer"
               >
                 Inventory for Garage 103
               </a>
@@ -747,6 +743,7 @@ const FormInput = ({ handleParentSubmit }) => {
             href="https://www.nyu.edu/life/safety-health-wellness/campus-safety.html"
             target="_blank"
             className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+            rel="noreferrer"
           >
             Click for Campus Safety Form
           </a>
@@ -795,6 +792,7 @@ const FormInput = ({ handleParentSubmit }) => {
             href="https://docs.google.com/document/d/1TIOl8f8-7o2BdjHxHYIYELSb4oc8QZMj1aSfaENWjR8/edit?usp=sharing"
             target="_blank"
             className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
+            rel="noreferrer"
           >
             370J Pre-Event Checklist
           </a>
@@ -858,6 +856,7 @@ const FormInput = ({ handleParentSubmit }) => {
             href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit?usp=sharing"
             target="_blank"
             className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
+            rel="noreferrer"
           >
             Booking Policy for 370 Jay Street Shared Spaces
           </a>

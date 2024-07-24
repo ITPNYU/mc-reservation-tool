@@ -1,20 +1,8 @@
-/********** GOOGLE SHEETS ************/
-
+// @ts-ignore
 import { BookingStatusLabel, DevBranch } from "./types";
 
 /** ACTIVE master Google Sheet  */
 export const ACTIVE_SHEET_ID = "1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68";
-
-export function getLiaisonTableName() {
-  switch (process.env.BRANCH_NAME as DevBranch) {
-    case "development":
-      return TableNames.LIAISONS_DEV;
-    case "staging":
-      return TableNames.LIAISONS_STAGING;
-    default:
-      return TableNames.LIAISONS_PROD;
-  }
-}
 
 export enum TableNames {
   ADMINS = "admin_users",
@@ -31,6 +19,16 @@ export enum TableNames {
   SETTINGS = "settings",
 }
 
+export function getLiaisonTableName() {
+  switch (process.env.BRANCH_NAME as DevBranch) {
+    case "development":
+      return TableNames.LIAISONS_DEV;
+    case "staging":
+      return TableNames.LIAISONS_STAGING;
+    default:
+      return TableNames.LIAISONS_PROD;
+  }
+}
 export enum ActiveSheetBookingStatusColumns {
   CALENDAR_ID = 0,
   EMAIL = 1,
@@ -43,14 +41,6 @@ export enum ActiveSheetBookingStatusColumns {
   NO_SHOWED_DATE = 8,
 }
 
-export enum ActiveSheetRoomsColumns {
-  ROOM_ID = 0,
-  NAME = 1,
-  CAPACITY = 2,
-  CALENDAR_ID = 3,
-  CALENDAR_ID_PROD = 4,
-}
-
 /** Old safety training Google Sheet */
 export const OLD_SAFETY_TRAINING_SHEET_ID =
   "1Debe5qF-2qXJhqP0AMy5etEvwAPd3mNFiTswytsbKxQ";
@@ -60,7 +50,7 @@ export const SECOND_OLD_SAFETY_TRAINING_SHEET_ID =
   "1TZYBrX5X6TXM07V3OMTOnVWF8qRmWnTzh27zacrQHh0";
 export const SECOND_OLD_SAFETY_TRAINING_SHEET_GID = 293202487;
 
-/********** CONTACTS ************/
+/** ******** CONTACTS *********** */
 
 // TODO configure this via admin UI
 export const getSecondApproverEmail = (branchName: string) =>
@@ -71,7 +61,7 @@ export const getApprovalCcEmail = (branchName: string) =>
   branchName === "production" ? "ss12430@nyu.edu" : "rh3555@nyu.edu";
 //    : "media-commons-devs@itp.nyu.edu"; // Samantha
 
-/********** ROOMS ************/
+/** ******** ROOMS *********** */
 
 export type Purpose = "multipleRoom" | "motionCapture";
 

@@ -63,3 +63,5 @@ $RECYCLE.BIN/
 .firebase
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows
 
+
+app.yaml

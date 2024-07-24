@@ -17,7 +17,11 @@ import axios from "axios";
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { TableNames } from "@/components/src/policy";
 import { Tab, Table } from "react-bootstrap";
-import { fetchAllFutureDataFromCollection } from "@/components/src/server/db";
+import {
+  fetchAllFutureBooking,
+  fetchAllFutureBookingStatus,
+} from "@/components/src/server/db";
+import { co } from "@fullcalendar/core/internal-common";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -89,7 +93,7 @@ export const DatabaseProvider = ({
 
     console.log(
       "admin",
-      adminUsers.map((admin) => admin)
+      adminUsers.map((admin) => admin),
     );
     if (adminUsers.map((admin) => admin.email).includes(userEmail))
       return PagePermission.ADMIN;
@@ -121,8 +125,9 @@ export const DatabaseProvider = ({
   };
 
   const fetchBookings = async () => {
-    fetchAllFutureDataFromCollection(TableNames.BOOKING)
+    fetchAllFutureBooking(TableNames.BOOKING)
       .then((fetchedData) => {
+        console.log("fetchedData Booking", fetchedData);
         const bookings = fetchedData.map((item: any) => ({
           id: item.id,
           calendarEventId: item.calendarEventId,
@@ -169,8 +174,9 @@ export const DatabaseProvider = ({
   };
 
   const fetchBookingStatuses = async () => {
-    fetchAllFutureDataFromCollection(TableNames.BOOKING_STATUS)
+    fetchAllFutureBookingStatus(TableNames.BOOKING_STATUS)
       .then((fetchedData) => {
+        console.log("fetchedData booking statuses", fetchedData);
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
           calendarEventId: item.calendarEventId,
@@ -221,7 +227,7 @@ export const DatabaseProvider = ({
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
           email: item.email,
-          completedAt: item.completedAt,
+          createdAt: item.createdAt,
         }));
         setSafetyTrainedUsers(filtered);
       })
@@ -242,8 +248,17 @@ export const DatabaseProvider = ({
   };
 
   const fetchLiaisonUsers = async () => {
-    const response = await axios.get("/api/liaisons", {});
-    setLiaisonUsers(response.data);
+    fetchAllDataFromCollection(TableNames.LIAISONS_PROD)
+      .then((fetchedData) => {
+        const filtered = fetchedData.map((item: any) => ({
+          id: item.id,
+          email: item.email,
+          department: item.department,
+          createdAt: item.createdAt,
+        }));
+        setLiaisonUsers(filtered);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchRoomSettings = async () => {

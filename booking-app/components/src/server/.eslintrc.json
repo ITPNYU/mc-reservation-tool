@@ -1,9 +1,9 @@
 {
   "root": true,
-  "parser": "@babel/eslint-parser",
+  "parser": "@typescript-eslint/parser",
   "extends": ["airbnb-base"],
   "rules": {
-    "prettier/prettier": "error",
+    "quotes": ["error", "double"],
     "camelcase": "warn",
     "import/prefer-default-export": "warn",
     "import/no-extraneous-dependencies": "warn",
