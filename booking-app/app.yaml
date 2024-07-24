@@ -1,3 +1,0 @@
-runtime: nodejs20
-instance_class: F1
-service: default
