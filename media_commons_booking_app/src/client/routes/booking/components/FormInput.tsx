@@ -23,6 +23,8 @@ import { styled } from '@mui/system';
 import { useNavigate } from 'react-router';
 import useSubmitBooking from '../hooks/useSubmitBooking';
 
+//test
+
 const Section = ({ title, children }) => (
   <div style={{ marginBottom: '20px' }}>
     <Typography variant="h5" style={{ marginBottom: '8px' }}>
