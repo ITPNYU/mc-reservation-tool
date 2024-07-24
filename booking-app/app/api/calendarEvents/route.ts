@@ -1,29 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCalendarClient } from "@/lib/googleClient";
-import { updateEventPrefix } from "@/components/src/server/calendars";
+import {
+  insertEvent,
+  updateEventPrefix,
+} from "@/components/src/server/calendars";
 import { bookingContents } from "@/components/src/server/admin";
 import { BookingFormDetails } from "@/components/src/types";
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const calendarId = searchParams.get("calendarId");
-
-  if (!calendarId) {
-    return NextResponse.json({ error: "Invalid calendarId" }, { status: 400 });
-  }
-
-  try {
-    const events = await getCalendarEvents(calendarId);
-    console.log("aaaaa events", events);
-    return NextResponse.json(events);
-  } catch (error) {
-    console.error("Error fetching calendar events:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch calendar events" },
-      { status: 500 }
-    );
-  }
-}
 
 const getCalendarEvents = async (calendarId: string) => {
   const calendar = getCalendarClient();
@@ -33,7 +15,7 @@ const getCalendarEvents = async (calendarId: string) => {
   const threeMonthsFromNowISOString = threeMonthsFromNow.toISOString();
 
   const res = await calendar.events.list({
-    calendarId: calendarId,
+    calendarId,
     timeMin: now,
     timeMax: threeMonthsFromNowISOString,
     singleEvents: true,
@@ -42,7 +24,7 @@ const getCalendarEvents = async (calendarId: string) => {
 
   const events = res.data.items || [];
 
-  const formattedEvents = events.map((e) => ({
+  const formattedEvents = events.map(e => ({
     title: e.summary,
     start: e.start?.dateTime || e.start?.date,
     end: e.end?.dateTime || e.end?.date,
@@ -67,36 +49,47 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json(
       { error: "Missing required fields" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   try {
-    const event = await calendar.events.insert({
+    const event = await insertEvent({
       calendarId,
-      requestBody: {
-        summary: title,
-        description,
-        start: {
-          dateTime: new Date(startTime).toISOString(),
-        },
-        end: {
-          dateTime: new Date(endTime).toISOString(),
-        },
-        attendees: roomEmails.map((email: string) => ({ email })),
-        colorId: "8", // Gray
-      },
+      title,
+      description,
+      startTime,
+      endTime,
+      roomEmails,
     });
 
-    return NextResponse.json(
-      { calendarEventId: event.data.id },
-      { status: 200 }
-    );
+    return NextResponse.json({ calendarEventId: event.id }, { status: 200 });
   } catch (error) {
     console.error("Error adding event to calendar:", error);
     return NextResponse.json(
       { error: "Failed to add event to calendar" },
-      { status: 500 }
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const calendarId = searchParams.get("calendarId");
+
+  if (!calendarId) {
+    return NextResponse.json({ error: "Invalid calendarId" }, { status: 400 });
+  }
+
+  try {
+    const events = await getCalendarEvents(calendarId);
+    console.log("aaaaa events", events);
+    return NextResponse.json(events);
+  } catch (error) {
+    console.error("Error fetching calendar events:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch calendar events" },
+      { status: 500 },
     );
   }
 }
@@ -107,7 +100,7 @@ export async function PUT(req: NextRequest) {
   if (!calendarEventId || !newPrefix) {
     return NextResponse.json(
       { error: "Missing required fields" },
-      { status: 400 }
+      { status: 400 },
     );
   }
   const contents = await bookingContents(calendarEventId);
@@ -116,13 +109,13 @@ export async function PUT(req: NextRequest) {
     await updateEventPrefix(calendarEventId, newPrefix, contents);
     return NextResponse.json(
       { message: "Event updated successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error updating event:", error);
     return NextResponse.json(
       { error: "Failed to update event" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

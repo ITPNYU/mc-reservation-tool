@@ -13,8 +13,8 @@ import {
   updateDoc,
   where,
 } from "@firebase/firestore";
-import { db } from "./firebaseClient";
 import { TableNames } from "@/components/src/policy";
+import { db } from "./firebaseClient";
 
 export type AdminUserData = {
   email: string;
@@ -23,7 +23,7 @@ export type AdminUserData = {
 
 export const deleteDataFromFirestore = async (
   collectionName: string,
-  docId: string
+  docId: string,
 ) => {
   try {
     await deleteDoc(doc(db, collectionName, docId));
@@ -35,7 +35,7 @@ export const deleteDataFromFirestore = async (
 
 export const saveDataToFirestore = async (
   collectionName: string,
-  data: object
+  data: object,
 ) => {
   try {
     const docRef = await addDoc(collection(db, collectionName), data);
@@ -48,22 +48,22 @@ export const saveDataToFirestore = async (
 
 export const fetchAllDataFromCollection = async <T>(
   collectionName: TableNames,
-  queryConstraints: QueryConstraint[] = []
+  queryConstraints: QueryConstraint[] = [],
 ): Promise<T[]> => {
   const colRef = collection(db, collectionName);
   const q = query(colRef, ...queryConstraints);
   const snapshot = await getDocs(q);
   console.log("snapshot", snapshot.docs);
-  const data = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as unknown as T),
+  const data = snapshot.docs.map((document) => ({
+    id: document.id,
+    ...(document.data() as unknown as T),
   }));
   return data;
 };
 
 export const getDataByCalendarEventId = async <T>(
   collectionName: TableNames,
-  calendarEventId: string
+  calendarEventId: string,
 ) => {
   try {
     const colRef = collection(db, collectionName);
@@ -75,10 +75,9 @@ export const getDataByCalendarEventId = async <T>(
       const data = docSnap.data() as T;
       console.log("Document data:", data);
       return { id: docSnap.id, ...data };
-    } else {
-      console.log("No such document!");
-      return null;
     }
+    console.log("No such document!");
+    return null;
   } catch (error) {
     console.error("Error fetching document: ", error);
     return null;
@@ -88,7 +87,7 @@ export const getDataByCalendarEventId = async <T>(
 export const updateDataInFirestore = async (
   collectionName: string,
   docId: string,
-  updatedData: object
+  updatedData: object,
 ) => {
   try {
     const docRef = doc(db, collectionName, docId);

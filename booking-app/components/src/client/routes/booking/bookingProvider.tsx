@@ -61,14 +61,6 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     let isTrained = safetyTrainedUsers
       .map((user) => user.email)
       .includes(userEmail);
-    console.log("isTrained from tool", isTrained);
-    // if not on active list, check old list
-    if (!isTrained) {
-      isTrained = getOldSafetyTrainingEmails().some((rows) =>
-        rows.includes(userEmail)
-      );
-    }
-    console.log("isTrained from googlesheets", isTrained);
     setIsSafetyTrained(isTrained);
   }, [userEmail, safetyTrainedUsers]);
 

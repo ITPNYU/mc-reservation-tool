@@ -15,15 +15,13 @@ type LayoutProps = {
   children: React.ReactNode;
 };
 
-const RootLayout: React.FC<LayoutProps> = ({ children }) => {
-  return (
-    <html lang="en">
-      <head></head>
-      <body className={inter.className}>
-        <ClientProvider>{children}</ClientProvider>
-      </body>
-    </html>
-  );
-};
+const RootLayout: React.FC<LayoutProps> = ({ children }) => (
+  <html lang="en">
+    <head></head>
+    <body className={inter.className}>
+      <ClientProvider>{children}</ClientProvider>
+    </body>
+  </html>
+);
 
 export default RootLayout;

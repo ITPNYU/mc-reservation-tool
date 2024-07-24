@@ -1,6 +1,6 @@
-import ListTable from './ListTable';
-import React from 'react';
-import { TableNames } from '../../../policy';
+import ListTable from "./ListTable";
+import React from "react";
+import { TableNames } from "../../../policy";
 
 interface EmailField {
   email: string;

@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
-  const [calendarRefs, setCalendarRefs] = useState([]);
+  const [calendarRefs, setCalendarRefs] = useState<RoomSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkedRoomIds, setCheckedRoomIds] = useState<string[]>([]);
   const [checkedRooms, setCheckedRooms] = useState<RoomSetting[]>([]);
@@ -24,13 +24,14 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
 
   useEffect(() => {
     const refs = allRoomWithCalendarRefs;
+    //@ts-ignore
     setCalendarRefs(refs);
     setLoading(false);
   }, [allRooms]);
 
   useEffect(() => {
     const checked = allRooms.filter((room) =>
-      checkedRoomIds.includes(room.roomId.toString())
+      checkedRoomIds.includes(room.roomId.toString()),
     );
     console.log("checked", checked, checkedRoomIds, allRooms);
     setCheckedRooms(checked);
@@ -40,7 +41,9 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
   //  return <div>Loading...</div>;
   //}
 
-  const handleCheckboxChange = (event) => {
+  const handleCheckboxChange = (event: {
+    target: { value: any; checked: any };
+  }) => {
     const { value, checked } = event.target;
 
     const valuesArray = value.split(",");
@@ -57,7 +60,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
       setCheckedRoomIds((prev) => [...prev, ...valuesArray]);
     } else {
       setCheckedRoomIds((prev) =>
-        prev.filter((item) => !valuesArray.includes(item))
+        prev.filter((item) => !valuesArray.includes(item)),
       );
     }
   };

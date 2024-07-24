@@ -7,7 +7,7 @@ export async function GET() {
 
   try {
     const querySnapshot = await getDocs(collection(db, "adminUsers"));
-    data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Error getting documents:", error);
     return NextResponse.error();

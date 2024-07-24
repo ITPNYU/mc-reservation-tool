@@ -23,12 +23,12 @@ export const Calendars = ({
 }: CalendarProps) => {
   const [bookingTimeEvent, setBookingTimeEvent] = useState<DateSelectArg>();
 
-  const isOverlap = (info) => {
+  const isOverlap = (info: any) => {
     return selectedRooms.some((room, i) => {
       const calendarApi = room.calendarRef.current.getApi();
 
       const allEvents = calendarApi.getEvents();
-      return allEvents.some((event) => {
+      return allEvents.some((event: any) => {
         if (event.title.includes(TITLE_TAG)) return false;
         if (HIDING_STATUS.some((status) => event.title.includes(status)))
           return false;
@@ -60,10 +60,10 @@ export const Calendars = ({
     if (bookingTimeEvent) {
       const isConfirmed = window.confirm(
         `Confirming that you are requesting to book the following rooms: ${selectedRooms.map(
-          (room) => `${room.roomId} ${room.name}`
+          (room) => `${room.roomId} ${room.name}`,
         )}  starting at ${formatDate(
-          bookingTimeEvent.startStr
-        )} and ending at ${formatDate(bookingTimeEvent.endStr)}`
+          bookingTimeEvent.startStr,
+        )} and ending at ${formatDate(bookingTimeEvent.endStr)}`,
       );
       if (isConfirmed) handleSetDate(bookingTimeEvent);
     }
@@ -82,7 +82,7 @@ export const Calendars = ({
     allRooms.forEach((room) => {
       const roomApi = room.calendarRef.current.getApi();
       roomApi.unselect();
-      setBookingTimeEvent(null);
+      setBookingTimeEvent(undefined);
       roomApi.gotoDate(selectedDate);
     });
   };

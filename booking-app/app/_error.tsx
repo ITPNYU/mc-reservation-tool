@@ -1,5 +1,5 @@
-// pages/_error.tsx
 "use client";
+
 import React from "react";
 import { NextPageContext } from "next";
 
@@ -22,9 +22,24 @@ const ErrorPage: React.FC<ErrorProps> = ({ statusCode, message }) => {
   );
 };
 
-export async function getServerSideProps({ res, err }: NextPageContext) {
-  const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
-  const message = err ? err.message : "An error occurred";
+export function getServerSideProps({ res, err }: NextPageContext) {
+  let statusCode;
+  let message;
+
+  if (res) {
+    statusCode = res.statusCode;
+  } else if (err) {
+    statusCode = err.statusCode;
+  } else {
+    statusCode = 404;
+  }
+
+  if (err) {
+    message = err.message;
+  } else {
+    message = "An error occurred";
+  }
+
   return { props: { statusCode, message } };
 }
 
