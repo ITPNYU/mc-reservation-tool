@@ -3,6 +3,7 @@
 import { Inter } from "next/font/google";
 import "@/components/src/client/styles.css";
 import ClientProvider from "@/components/src/client/routes/components/ClientProvider";
+import { AuthProvider } from "@/components/src/client/routes/components/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,9 @@ const RootLayout: React.FC<LayoutProps> = ({ children }) => (
   <html lang="en">
     <head></head>
     <body className={inter.className}>
-      <ClientProvider>{children}</ClientProvider>
+      <AuthProvider>
+        <ClientProvider>{children}</ClientProvider>
+      </AuthProvider>
     </body>
   </html>
 );

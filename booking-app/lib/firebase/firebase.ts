@@ -23,7 +23,7 @@ export type AdminUserData = {
 
 export const deleteDataFromFirestore = async (
   collectionName: string,
-  docId: string,
+  docId: string
 ) => {
   try {
     await deleteDoc(doc(db, collectionName, docId));
@@ -35,7 +35,7 @@ export const deleteDataFromFirestore = async (
 
 export const saveDataToFirestore = async (
   collectionName: string,
-  data: object,
+  data: object
 ) => {
   try {
     const docRef = await addDoc(collection(db, collectionName), data);
@@ -48,7 +48,7 @@ export const saveDataToFirestore = async (
 
 export const fetchAllDataFromCollection = async <T>(
   collectionName: TableNames,
-  queryConstraints: QueryConstraint[] = [],
+  queryConstraints: QueryConstraint[] = []
 ): Promise<T[]> => {
   const colRef = collection(db, collectionName);
   const q = query(colRef, ...queryConstraints);
@@ -63,7 +63,7 @@ export const fetchAllDataFromCollection = async <T>(
 
 export const getDataByCalendarEventId = async <T>(
   collectionName: TableNames,
-  calendarEventId: string,
+  calendarEventId: string
 ) => {
   try {
     const colRef = collection(db, collectionName);
@@ -87,7 +87,7 @@ export const getDataByCalendarEventId = async <T>(
 export const updateDataInFirestore = async (
   collectionName: string,
   docId: string,
-  updatedData: object,
+  updatedData: object
 ) => {
   try {
     const docRef = doc(db, collectionName, docId);

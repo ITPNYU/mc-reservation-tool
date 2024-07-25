@@ -11,7 +11,7 @@ import {
   SafetyTraining,
   Settings,
 } from "../../../types";
-import React, { createContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, use, useEffect, useMemo, useState } from "react";
 
 import axios from "axios";
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
@@ -22,6 +22,10 @@ import {
   fetchAllFutureBookingStatus,
 } from "@/components/src/server/db";
 import { co } from "@fullcalendar/core/internal-common";
+import {
+  AuthProvider,
+  useAuth,
+} from "@/components/src/client/routes/components/AuthProvider";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -86,6 +90,7 @@ export const DatabaseProvider = ({
   >([]);
   const [settings, setSettings] = useState<Settings>({ reservationTypes: [] });
   const [userEmail, setUserEmail] = useState<string | undefined>();
+  const { user, loading } = useAuth();
 
   // page permission updates with respect to user email, admin list, PA list
   const pagePermission = useMemo<PagePermission>(() => {
@@ -93,7 +98,7 @@ export const DatabaseProvider = ({
 
     console.log(
       "admin",
-      adminUsers.map((admin) => admin),
+      adminUsers.map((admin) => admin)
     );
     if (adminUsers.map((admin) => admin.email).includes(userEmail))
       return PagePermission.ADMIN;
@@ -104,11 +109,7 @@ export const DatabaseProvider = ({
 
   useEffect(() => {
     // fetch most important tables first - determine page permissions
-    Promise.all([
-      fetchActiveUserEmail(),
-      fetchAdminUsers(),
-      fetchPaUsers(),
-    ]).then(() => {
+    Promise.all([fetchAdminUsers(), fetchPaUsers()]).then(() => {
       fetchBookings();
       fetchBookingStatuses();
       fetchSafetyTrainedUsers();
@@ -118,10 +119,13 @@ export const DatabaseProvider = ({
       fetchSettings();
     });
   }, []);
+  useEffect(() => {
+    fetchActiveUserEmail();
+  }, [user]);
 
   const fetchActiveUserEmail = () => {
-    //TODO: Use firebase auth to get user email
-    setUserEmail("rh3555@nyu.edu");
+    if (!user) return;
+    setUserEmail(user.email);
   };
 
   const fetchBookings = async () => {
