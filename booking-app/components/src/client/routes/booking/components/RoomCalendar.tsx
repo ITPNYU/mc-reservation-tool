@@ -39,7 +39,7 @@ export const RoomCalendar = ({
     console.log(
       "Fetching calendar events from:",
       process.env.CALENDAR_ENV,
-      "calendars",
+      "calendars"
     );
     fetchCalendarEvents(room.calendarId);
   }, []);
@@ -82,9 +82,12 @@ export const RoomCalendar = ({
   }
 
   const fetchCalendarEvents = async (calendarId: string) => {
-    const response = await axios.get("/api/calendarEvents", {
-      params: { calendarId: calendarId },
-    });
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
+      {
+        params: { calendarId: calendarId },
+      }
+    );
     const filteredEvents = response.data.filter((row: any) => {
       return !HIDING_STATUS.some((status) => row.title.includes(status));
     });

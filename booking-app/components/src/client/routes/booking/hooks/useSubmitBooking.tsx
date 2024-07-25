@@ -31,7 +31,7 @@ export default function useSubmitBooking(): [
     return [
       (_) =>
         new Promise((resolve, reject) =>
-          reject("Missing info for submitting booking"),
+          reject("Missing info for submitting booking")
         ),
       false,
     ];
@@ -48,19 +48,22 @@ export default function useSubmitBooking(): [
       return;
     }
 
-    const res = await fetch("/api/bookings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        selectedRooms: selectedRooms,
-        bookingCalendarInfo: bookingCalendarInfo,
-        liaisonUsers: liaisonUsers,
-        data: data,
-      }),
-    }).then((res) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/bookings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          selectedRooms: selectedRooms,
+          bookingCalendarInfo: bookingCalendarInfo,
+          liaisonUsers: liaisonUsers,
+          data: data,
+        }),
+      }
+    ).then((res) => {
       alert("Your request has been sent.");
       router.push("/");
       setLoading(false);
