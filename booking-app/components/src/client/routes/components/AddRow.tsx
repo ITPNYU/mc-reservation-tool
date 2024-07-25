@@ -25,7 +25,7 @@ export default function AddRow(props: Props) {
 
   const uniqueValues = useMemo<string[]>(
     () => rows.map((row) => row[props.columnNameToAddValue]),
-    [rows],
+    [rows]
   );
 
   const addValue = async () => {
@@ -33,7 +33,7 @@ export default function AddRow(props: Props) {
 
     if (uniqueValues.includes(valueToAdd)) {
       alert(
-        props.addDuplicateErrorMessage ?? "This value has already been added",
+        props.addDuplicateErrorMessage ?? "This value has already been added"
       );
       return;
     }
@@ -109,18 +109,21 @@ export default function AddRow(props: Props) {
       expectedAttendance: "3",
       mediaServices: "Checkout equipment",
     };
-    const res = await fetch("/api/bookings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: "rh3555@nyu.edu",
-        selectedRooms: selectedRooms,
-        bookingCalendarInfo: bookingCalendarInfo,
-        data: data,
-      }),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/bookings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: "rh3555@nyu.edu",
+          selectedRooms: selectedRooms,
+          bookingCalendarInfo: bookingCalendarInfo,
+          data: data,
+        }),
+      }
+    );
     setLoading(true);
     try {
       await saveDataToFirestore(tableName, {
