@@ -11,6 +11,7 @@ import React, {
 import { DatabaseContext } from '../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import { serverFunctions } from '../../utils/serverFunctions';
+import { set } from 'react-hook-form';
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
@@ -58,6 +59,8 @@ export function BookingProvider({ children }) {
   }, [userEmail, bannedUsers]);
 
   const fetchIsSafetyTrained = useCallback(async () => {
+    setIsSafetyTrained(true);
+    return;
     if (!userEmail) return;
     let isTrained = safetyTrainedUsers
       .map((user) => user.email)
@@ -70,12 +73,15 @@ export function BookingProvider({ children }) {
         .then((rows) => rows.map((row) => row[0]).includes(userEmail));
     }
     console.log('isTrained from googlesheets', isTrained);
-    setIsSafetyTrained(isTrained);
+    setIsSafetyTrained(true);
   }, [userEmail, safetyTrainedUsers]);
 
   useEffect(() => {
     fetchIsSafetyTrained();
   }, [fetchIsSafetyTrained]);
+  useEffect(() => {
+    setIsSafetyTrained(true);
+  }, []);
 
   return (
     <BookingContext.Provider

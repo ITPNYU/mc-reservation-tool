@@ -19,13 +19,13 @@ export default function Admin() {
 
   const adminEmails = useMemo<string[]>(
     () => adminUsers.map((user) => user.email),
-    [adminUsers],
+    [adminUsers]
   );
   const userHasPermission = pagePermission === PagePermission.ADMIN;
 
-  if (adminEmails.length === 0 || userEmail == null) {
-    return <Loading />;
-  }
+  //if (adminEmails.length === 0 || userEmail == null) {
+  //  return <Loading />;
+  //}
 
   return (
     <div className="m-10">

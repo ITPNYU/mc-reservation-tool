@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   const rooms = [
     {
-      roomId: 103,
+      resourceId: 103,
       name: "The Garage",
       capacity: 74,
       calendarIdDev:
@@ -13,7 +13,7 @@ async function main() {
       calendarIdProd: "c_oea6k9fs8p6nvsai6f25uiue1c@group.calendar.google.com",
     },
     {
-      roomId: 202,
+      resourceId: 202,
       name: "Lecture Hall",
       capacity: 210,
       calendarIdDev:
@@ -22,7 +22,7 @@ async function main() {
         "nyu.edu_qii7e5htheep643hq8m5mu3ngg@group.calendar.google.com",
     },
     {
-      roomId: 220,
+      resourceId: 220,
       name: "Black Box",
       capacity: 30,
       calendarIdDev:
@@ -30,7 +30,7 @@ async function main() {
       calendarIdProd: "c_dbn41lc126ghnl8f98gop59kfg@group.calendar.google.com",
     },
     {
-      roomId: 221,
+      resourceId: 221,
       name: "Ballroom A",
       capacity: 12,
       calendarIdDev:
@@ -39,7 +39,7 @@ async function main() {
         "nyu.edu_iif5nf5n543lav8tgka3td9u2s@group.calendar.google.com",
     },
     {
-      roomId: 222,
+      resourceId: 222,
       name: "Ballroom B",
       capacity: 12,
       calendarIdDev:
@@ -48,7 +48,7 @@ async function main() {
         "nyu.edu_0s1704spc5sqd5ra0epiks6r0o@group.calendar.google.com",
     },
     {
-      roomId: 223,
+      resourceId: 223,
       name: "Ballroom C",
       capacity: 12,
       calendarIdDev:
@@ -57,7 +57,7 @@ async function main() {
         "nyu.edu_pkci0d2mp33rhpied80126cot4@group.calendar.google.com",
     },
     {
-      roomId: 224,
+      resourceId: 224,
       name: "Ballroom D",
       capacity: 12,
       calendarIdDev:
@@ -66,7 +66,7 @@ async function main() {
         "nyu.edu_u29cf5805g3qviu36tucn76ihk@group.calendar.google.com",
     },
     {
-      roomId: 230,
+      resourceId: 230,
       name: "Audio Lab",
       capacity: 13,
       calendarIdDev:
@@ -74,7 +74,7 @@ async function main() {
       calendarIdProd: "c_us27q4ttapcgdt9dc38lfsnn9s@group.calendar.google.com",
     },
     {
-      roomId: 233,
+      resourceId: 233,
       name: "Co-Lab",
       capacity: 50,
       calendarIdDev:
@@ -82,7 +82,7 @@ async function main() {
       calendarIdProd: "c_s93e1dmilqo8ol6cd9ugh64bl4@group.calendar.google.com",
     },
     {
-      roomId: 260,
+      resourceId: 260,
       name: "Post Production Lab",
       capacity: 20,
       calendarIdDev:
@@ -90,7 +90,7 @@ async function main() {
       calendarIdProd: "c_fdq6oqq965ge7k3gv6k2epsme0@group.calendar.google.com",
     },
     {
-      roomId: 1201,
+      resourceId: 1201,
       name: "Seminar Room",
       capacity: 100,
       calendarIdDev:
@@ -103,7 +103,7 @@ async function main() {
   for (const room of rooms) {
     const createdRoom = await prisma.room.create({
       data: {
-        roomId: room.roomId,
+        resourceId: room.resourceId,
         name: room.name,
         capacity: room.capacity,
         calendarIdDev: room.calendarIdDev, // Assuming default values for missing properties

@@ -174,7 +174,7 @@ export const DatabaseProvider = ({ children }) => {
 
   const fetchRoomSettings = async () => {
     const settings = await serverFunctions
-      .getAllActiveSheetRows(TableNames.ROOMS)
+      .getAllActiveSheetRows(TableNames.RESOURCES)
       .then((rows) => {
         return JSON.parse(rows) as RoomSetting[];
       });
@@ -183,7 +183,7 @@ export const DatabaseProvider = ({ children }) => {
 
   const fetchBookingReservationTypes = async () => {
     const reservationTypes: ReservationType[] = await serverFunctions
-      .getAllActiveSheetRows(TableNames.RESERVATION_TYPES)
+      .getAllActiveSheetRows(TableNames.BOOKING_TYPES)
       .then((rows) => JSON.parse(rows));
     setSettings((prev) => ({
       ...prev,

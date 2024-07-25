@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "seed": "node prisma/seed.mjs"
+    "seed": "node prisma/seed.mjs",
+    "deploy:prod": "next build && gcloud app deploy app.production.yaml",
+    "deploy:staging": "next build && gcloud app deploy app.staging.yaml",
+    "deploy:dev": "next build && gcloud app deploy app.yaml"
   },
   "dependencies": {
     "@firebase/firestore": "^4.6.4",

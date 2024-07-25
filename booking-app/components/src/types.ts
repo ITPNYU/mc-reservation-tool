@@ -14,7 +14,7 @@ export type Inputs = {
   sponsorEmail: string;
   title: string;
   description: string;
-  reservationType: string;
+  bookingType: string;
   attendeeAffiliation: string;
   roomSetup: string;
   setupDetails: string;
@@ -45,13 +45,13 @@ export type Booking = Inputs & {
   email: string;
   startDate: any;
   endDate: any;
-  roomId: number;
+  resourceId: number;
 };
 
 export type BookingFormDetails = Booking & {
-  approvalUrl: string;
-  bookingToolUrl: string;
-  rejectUrl: string;
+  approvedUrl: string;
+  bookingAppUrl: string;
+  declinedUrl: string;
   headerMessage?: string;
 };
 
@@ -60,8 +60,8 @@ export type BookingStatus = {
   email: string;
   requestedAt: Timestamp;
   firstApprovedAt: Timestamp;
-  secondApprovedAt: Timestamp;
-  rejectedAt: Timestamp;
+  finalApprovedAt: Timestamp;
+  declinedAt: Timestamp;
   canceledAt: Timestamp;
   checkedInAt: Timestamp;
   noShowedAt: Timestamp;
@@ -73,7 +73,7 @@ export enum BookingStatusLabel {
   CHECKED_IN = "CHECKED-IN",
   NO_SHOW = "NO-SHOW",
   PRE_APPROVED = "PRE-APPROVED",
-  REJECTED = "REJECTED",
+  DECLINED = "DECLINED",
   REQUESTED = "REQUESTED",
   UNKNOWN = "UNKNOWN",
 }
@@ -88,7 +88,7 @@ export enum Department {
   ALT = "ALT",
   GAMES = "Game Center",
   IDM = "IDM",
-  ITP = "ITP / IMA / Low Res",
+  ITP = "ITP/IMA",
   MARL = "MARL",
   MUSIC_TECH = "Music Tech",
   RECORDED_MUSIC = "Recorded Music",
@@ -114,7 +114,7 @@ export enum PagePermission {
 }
 
 export type ReservationType = {
-  reservationType: string;
+  bookingType: string;
   createdAt: Timestamp;
 };
 
@@ -125,8 +125,8 @@ export enum Role {
   ADMIN_STAFF = "Admin/Staff",
 }
 
-export type RoomSetting = {
-  roomId: string;
+export type ResourceSetting = {
+  resourceId: string;
   name: string;
   capacity: number;
   calendarId?: any;
@@ -139,5 +139,5 @@ export type SafetyTraining = {
 };
 
 export type Settings = {
-  reservationTypes: ReservationType[];
+  bookingTypes: ReservationType[];
 };

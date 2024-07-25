@@ -42,14 +42,14 @@ const FormInput = ({ handleParentSubmit }) => {
       attendeeAffiliation: "",
       department,
       roomSetup: "no",
-      reservationType: "",
+      bookingType: "",
     },
     mode: "onBlur",
   });
   const [checklist, setChecklist] = useState(false);
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
-  const roomNumber = selectedRooms.map((room) => room.roomId);
+  const roomNumber = selectedRooms.map((room) => room.resourceId);
 
   const maxCapacity = selectedRooms.reduce((sum, room) => {
     return sum + room.capacity;
@@ -350,26 +350,26 @@ const FormInput = ({ handleParentSubmit }) => {
       </div>
       <div className="mb-6">
         <label
-          htmlFor="reservationType"
+          htmlFor="bookingType"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           Reservation Type
         </label>
-        {errors.reservationType && (
-          <ErrorMessage errors={errors.reservationType.message} />
+        {errors.bookingType && (
+          <ErrorMessage errors={errors.bookingType.message} />
         )}
         <div className="flex items-center mb-4">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[600px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register("reservationType", {
+            {...register("bookingType", {
               required: true,
               validate: (value) => value !== "",
             })}
           >
             <option value="">Select option</option>
-            {settings.reservationTypes.map((value, idx) => (
-              <option value={value.reservationType} key={idx}>
-                {value.reservationType}
+            {settings.bookingTypes.map((value, idx) => (
+              <option value={value.bookingType} key={idx}>
+                {value.bookingType}
               </option>
             ))}
           </select>

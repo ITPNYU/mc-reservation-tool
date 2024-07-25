@@ -66,7 +66,7 @@
     </div>
     <div class="container">
       <h2>Room Reservation Request</h2>
-      <p>Room Number: {{ contents.roomId }}</p>
+      <p>Room Number: {{ contents.resourceId }}</p>
 
       <p>First name: {{ contents.firstName }}</p>
       <p>Last name: {{ contents.lastName }}</p>
@@ -85,7 +85,7 @@
       <p>Sponsor Email: {{ contents.sponsorEmail }}</p>
       <p>Reservation Title: {{ contents.title }}</p>
       <p>Reservation Description: {{ contents.description }}</p>
-      <p>Reservation Type: {{ contents.reservationType }}</p>
+      <p>Reservation Type: {{ contents.bookingType }}</p>
       <p>Expected Attendance: {{ contents.expectedAttendance }}</p>
       <p>Attendee Affiliations: {{ contents.attendeeAffiliation }}</p>
       <p>
@@ -104,9 +104,9 @@
         Chartfield for Hiring Security?: {{ contents.chartFieldForSecurity }}
       </p>
 
-      <a href="{{ approvalUrl }}" target="_blank" class="button">Approve</a>
-      <a href="{{ rejectUrl }}" target="_blank" class="button-red">Reject</a>
-      <a href="{{ contents.bookingToolUrl }}" target="_blank" class="button"
+      <a href="{{ approvedUrl }}" target="_blank" class="button">Approve</a>
+      <a href="{{ declinedUrl }}" target="_blank" class="button-red">Reject</a>
+      <a href="{{ contents.bookingAppUrl }}" target="_blank" class="button"
         >Open Booking Tool</a
       >
     </div>

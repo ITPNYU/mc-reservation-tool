@@ -3,12 +3,12 @@ import { getCalendarClient } from "@/lib/googleClient";
 import { inviteUserToCalendarEvent } from "@/components/src/server/calendars";
 
 export async function POST(request: NextRequest) {
-  const { calendarEventId, guestEmail, roomId } = await request.json();
+  const { calendarEventId, guestEmail, resourceId } = await request.json();
   try {
     await inviteUserToCalendarEvent(
       calendarEventId,
       guestEmail,
-      parseInt(roomId, 10),
+      parseInt(resourceId, 10),
     );
     return NextResponse.json({ calendarEventId }, { status: 200 });
   } catch (error) {

@@ -2,19 +2,19 @@ import React, { useEffect, useState } from "react";
 
 import { Calendars } from "./Calendars";
 import { DateSelectArg } from "@fullcalendar/core";
-import { RoomSetting } from "../../../../types";
+import { ResourceSetting } from "../../../../types";
 import { SelectRooms } from "./SelectRooms";
 
 interface Props {
-  allRooms: RoomSetting[];
-  handleSetDate: (x: DateSelectArg, y: RoomSetting[]) => void;
+  allRooms: ResourceSetting[];
+  handleSetDate: (x: DateSelectArg, y: ResourceSetting[]) => void;
 }
 
 export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
-  const [calendarRefs, setCalendarRefs] = useState<RoomSetting[]>([]);
+  const [calendarRefs, setCalendarRefs] = useState<ResourceSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkedRoomIds, setCheckedRoomIds] = useState<string[]>([]);
-  const [checkedRooms, setCheckedRooms] = useState<RoomSetting[]>([]);
+  const [checkedRooms, setCheckedRooms] = useState<ResourceSetting[]>([]);
   const [showMotionCaptureModal, setShowMotionCaptureModal] = useState(false);
   const [hasModalBeenShown, setHasModalBeenShown] = useState(false);
 
@@ -31,7 +31,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
 
   useEffect(() => {
     const checked = allRooms.filter((room) =>
-      checkedRoomIds.includes(room.roomId.toString()),
+      checkedRoomIds.includes(room.resourceId.toString())
     );
     console.log("checked", checked, checkedRoomIds, allRooms);
     setCheckedRooms(checked);
@@ -60,7 +60,7 @@ export const MultipleCalendars = ({ allRooms, handleSetDate }: Props) => {
       setCheckedRoomIds((prev) => [...prev, ...valuesArray]);
     } else {
       setCheckedRoomIds((prev) =>
-        prev.filter((item) => !valuesArray.includes(item)),
+        prev.filter((item) => !valuesArray.includes(item))
       );
     }
   };

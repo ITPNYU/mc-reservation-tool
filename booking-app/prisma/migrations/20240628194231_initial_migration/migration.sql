@@ -1,20 +1,20 @@
 -- CreateTable
 CREATE TABLE `Room` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `roomId` INTEGER NOT NULL,
+    `resourceId` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `capacity` VARCHAR(191) NOT NULL,
     `calendarIdDev` VARCHAR(191) NOT NULL,
     `calendarIdProd` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `Room_roomId_key`(`roomId`),
+    UNIQUE INDEX `Room_resourceId_key`(`resourceId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Booking` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `roomId` INTEGER NOT NULL,
+    `resourceId` INTEGER NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `startDate` DATETIME(3) NOT NULL,
     `endDate` DATETIME(3) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `Booking` (
     `sponsorEmail` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NOT NULL,
-    `reservationType` VARCHAR(191) NOT NULL,
+    `bookingType` VARCHAR(191) NOT NULL,
     `expectedAttendance` INTEGER NOT NULL,
     `attendeeAffiliation` VARCHAR(191) NOT NULL,
     `roomSetup` VARCHAR(191) NOT NULL,
@@ -54,8 +54,8 @@ CREATE TABLE `BookingStatus` (
     `email` VARCHAR(191) NOT NULL,
     `requestedAt` DATETIME(3) NOT NULL,
     `firstApprovedAt` DATETIME(3) NOT NULL,
-    `secondApprovedAt` DATETIME(3) NOT NULL,
-    `rejectedAt` DATETIME(3) NOT NULL,
+    `finalApprovedAt` DATETIME(3) NOT NULL,
+    `declinedAt` DATETIME(3) NOT NULL,
     `canceledAt` DATETIME(3) NOT NULL,
     `checkedInAt` DATETIME(3) NOT NULL,
     `noShowedAt` DATETIME(3) NOT NULL,
@@ -116,11 +116,11 @@ CREATE TABLE `Department` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `reservationType` (
+CREATE TABLE `bookingType` (
     `name` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `reservationType_name_key`(`name`)
+    UNIQUE INDEX `bookingType_name_key`(`name`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable

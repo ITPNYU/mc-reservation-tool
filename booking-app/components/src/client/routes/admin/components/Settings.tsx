@@ -12,20 +12,16 @@ export default function Settings() {
   return (
     <>
       <AddRow
-        columnNameToAddValue="reservationType"
+        columnNameToAddValue="bookingType"
         label="Reservation Type"
-        tableName={TableNames.RESERVATION_TYPES}
-        rows={
-          settings.reservationTypes as unknown as { [key: string]: string }[]
-        }
+        tableName={TableNames.BOOKING_TYPES}
+        rows={settings.bookingTypes as unknown as { [key: string]: string }[]}
         rowsRefresh={reloadReservationTypes}
       />
       <ListTable
-        columnNameToRemoveBy="reservationType"
-        tableName={TableNames.RESERVATION_TYPES}
-        rows={
-          settings.reservationTypes as unknown as { [key: string]: string }[]
-        }
+        columnNameToRemoveBy="bookingType"
+        tableName={TableNames.BOOKING_TYPES}
+        rows={settings.bookingTypes as unknown as { [key: string]: string }[]}
         rowsRefresh={reloadReservationTypes}
         columnFormatters={{ createdAt: formatDate }}
       />

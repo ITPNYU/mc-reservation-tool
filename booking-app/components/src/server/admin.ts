@@ -1,3 +1,4 @@
+import { Timestamp } from "@firebase/firestore";
 import {
   ActiveSheetBookingStatusColumns,
   TableNames,
@@ -8,30 +9,29 @@ import {
   BookingStatus,
   BookingStatusLabel,
 } from "../types";
-import { approvalUrl, getBookingToolDeployUrl, rejectUrl } from "./ui";
+import { approvedUrl, getBookingToolDeployUrl, declinedUrl } from "./ui";
 
-import { Timestamp } from "@firebase/firestore";
 import {
   getDataByCalendarEventId,
   updateDataInFirestore,
 } from "@/lib/firebase/firebase";
 
-export const bookingContents = (id: string) => {
-  return getDataByCalendarEventId(TableNames.BOOKING, id)
+export const bookingContents = (id: string) =>
+  getDataByCalendarEventId(TableNames.BOOKING, id)
     .then((bookingObj) => {
-      const updatedBookingObj = Object.assign({}, bookingObj, {
+      const updatedBookingObj = {
+        ...bookingObj,
         headerMessage: "This is a request email for final approval.",
-        approvalUrl: approvalUrl(id),
-        bookingToolUrl: getBookingToolDeployUrl(),
-        rejectUrl: rejectUrl(id),
-      });
+        approvedUrl: approvedUrl(id),
+        bookingAppUrl: getBookingToolDeployUrl(),
+        declinedUrl: declinedUrl(id),
+      };
       return updatedBookingObj as BookingFormDetails;
     })
     .catch((error) => {
       console.error("Error fetching booking contents:", error);
       throw error;
     });
-};
 export const updateDataByCalendarEventId = async (
   collectionName: TableNames,
   calendarEventId: string,
@@ -53,15 +53,15 @@ const firstApprove = (id: string) => {
   });
 };
 
-const secondApprove = (id: string) => {
+const finalApprove = (id: string) => {
   updateDataByCalendarEventId(TableNames.BOOKING_STATUS, id, {
-    secondApprovedAt: Timestamp.now(),
+    finalApprovedAt: Timestamp.now(),
   });
 };
 
 export const approveInstantBooking = (id: string) => {
   firstApprove(id);
-  secondApprove(id);
+  finalApprove(id);
   approveEvent(id);
 };
 
@@ -80,7 +80,7 @@ export const approveBooking = async (id: string) => {
 
   // if already first approved, then this is a second approve
   if (firstApproveDateRange !== null) {
-    secondApprove(id);
+    finalApprove(id);
     approveEvent(id);
   } else {
     firstApprove(id);
@@ -151,9 +151,9 @@ export const sendBookingDetailEmail = async (
   console.log("contents", contents);
   const formData = {
     templateName: "booking_detail",
-    contents: contents,
+    contents,
     targetEmail: email,
-    status: status,
+    status,
     eventTitle: contents.title,
     bodyMessage: "",
   };
@@ -173,7 +173,7 @@ export const approveEvent = async (id: string) => {
     console.error("Booking status not found for calendar event id: ", id);
     return;
   }
-  //@ts-ignore
+  // @ts-ignore
   const guestEmail = doc.email;
 
   // for user
@@ -190,7 +190,7 @@ export const approveEvent = async (id: string) => {
   sendConfirmationEmail(
     id,
     BookingStatusLabel.APPROVED,
-    `This is a confirmation email.`
+    "This is a confirmation email."
   );
   const formDataForCalendarEvents = {
     calendarEventId: id,
@@ -206,9 +206,9 @@ export const approveEvent = async (id: string) => {
 
   const contents = await bookingContents(id);
   const formData = {
-    guestEmail: guestEmail,
+    guestEmail,
     calendarEventId: id,
-    roomId: contents.roomId,
+    resourceId: contents.resourceId,
   };
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/inviteUser`,
@@ -228,15 +228,15 @@ export const reject = async (id: string) => {
   });
 
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
-  //@ts-ignore
+  // @ts-ignore
   const guestEmail = doc ? doc.email : null;
   const headerMessage =
-    "Your reservation request for Media Commons has been rejected. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
+    "Your reservation request for Media Commons has been declined. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
   sendBookingDetailEmail(
     id,
     guestEmail,
     headerMessage,
-    BookingStatusLabel.REJECTED
+    BookingStatusLabel.DECLINED
   );
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
@@ -247,7 +247,7 @@ export const reject = async (id: string) => {
       },
       body: JSON.stringify({
         calendarEventId: id,
-        newPrefix: BookingStatusLabel.REJECTED,
+        newPrefix: BookingStatusLabel.DECLINED,
       }),
     }
   );
@@ -258,7 +258,7 @@ export const cancel = async (id: string) => {
     [ActiveSheetBookingStatusColumns.CANCELLED_DATE]: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
-  //@ts-ignore
+  // @ts-ignore
   const guestEmail = doc ? doc.email : null;
   const headerMessage =
     "Your reservation request for Media Commons has been cancelled. For detailed reasons regarding this decision, please contact us at mediacommons.reservations@nyu.edu.";
@@ -271,7 +271,7 @@ export const cancel = async (id: string) => {
   sendConfirmationEmail(
     id,
     BookingStatusLabel.CANCELED,
-    `This is a cancelation email.`
+    "This is a cancelation email."
   );
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,
@@ -293,7 +293,7 @@ export const checkin = async (id: string) => {
     [ActiveSheetBookingStatusColumns.CHECKED_IN_DATE]: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
-  //@ts-ignore
+  // @ts-ignore
   const guestEmail = doc ? doc.email : null;
 
   const headerMessage =
@@ -324,7 +324,7 @@ export const noShow = async (id: string) => {
     [ActiveSheetBookingStatusColumns.NO_SHOWED_DATE]: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
-  //@ts-ignore
+  // @ts-ignore
   const guestEmail = doc ? doc.email : null;
 
   const headerMessage =
@@ -338,7 +338,7 @@ export const noShow = async (id: string) => {
   sendConfirmationEmail(
     id,
     BookingStatusLabel.NO_SHOW,
-    `This is a no show email.`
+    "This is a no show email."
   );
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/calendarEvents`,

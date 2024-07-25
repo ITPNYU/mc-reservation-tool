@@ -4,7 +4,7 @@ import {
   BookingFormDetails,
   BookingStatusLabel,
   Inputs,
-  RoomSetting,
+  ResourceSetting,
 } from "../../../../types";
 import { INSTANT_APPROVAL_ROOMS, TableNames } from "../../../../policy";
 import { useContext, useMemo, useState } from "react";

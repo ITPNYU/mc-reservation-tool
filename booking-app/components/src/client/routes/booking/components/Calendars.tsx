@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react";
 import { CalendarDatePicker } from "./CalendarDatePicker";
 import { DateSelectArg } from "@fullcalendar/core";
 import { RoomCalendar } from "./RoomCalendar";
-import { RoomSetting } from "../../../../types";
+import { ResourceSetting } from "../../../../types";
 import { formatDate } from "../../../utils/date";
 import { HIDING_STATUS } from "../../../../policy";
 
 type CalendarProps = {
-  allRooms: RoomSetting[];
-  selectedRooms: RoomSetting[];
+  allRooms: ResourceSetting[];
+  selectedRooms: ResourceSetting[];
   handleSetDate: (x: DateSelectArg) => void;
   refs?: any[];
 };
@@ -60,10 +60,10 @@ export const Calendars = ({
     if (bookingTimeEvent) {
       const isConfirmed = window.confirm(
         `Confirming that you are requesting to book the following rooms: ${selectedRooms.map(
-          (room) => `${room.roomId} ${room.name}`,
+          (room) => `${room.resourceId} ${room.name}`
         )}  starting at ${formatDate(
-          bookingTimeEvent.startStr,
-        )} and ending at ${formatDate(bookingTimeEvent.endStr)}`,
+          bookingTimeEvent.startStr
+        )} and ending at ${formatDate(bookingTimeEvent.endStr)}`
       );
       if (isConfirmed) handleSetDate(bookingTimeEvent);
     }

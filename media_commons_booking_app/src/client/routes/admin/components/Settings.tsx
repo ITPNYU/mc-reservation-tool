@@ -14,7 +14,7 @@ export default function Settings() {
       <AddRow
         columnNameToAddValue="reservationType"
         label="Reservation Type"
-        tableName={TableNames.RESERVATION_TYPES}
+        tableName={TableNames.BOOKING_TYPES}
         rows={
           settings.reservationTypes as unknown as { [key: string]: string }[]
         }
@@ -22,7 +22,7 @@ export default function Settings() {
       />
       <ListTable
         columnNameToRemoveBy="reservationType"
-        tableName={TableNames.RESERVATION_TYPES}
+        tableName={TableNames.BOOKING_TYPES}
         rows={
           settings.reservationTypes as unknown as { [key: string]: string }[]
         }

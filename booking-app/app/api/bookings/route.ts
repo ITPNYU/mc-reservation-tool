@@ -16,9 +16,9 @@ import { sendHTMLEmail } from "@/app/lib/sendHTMLEmail";
 import { toFirebaseTimestampFromString } from "@/components/src/client/utils/date";
 import { DateSelectArg } from "fullcalendar";
 import {
-  approvalUrl,
+  approvedUrl,
   getBookingToolDeployUrl,
-  rejectUrl,
+  declinedUrl,
 } from "@/components/src/server/ui";
 import { approveInstantBooking } from "@/components/src/server/admin";
 
@@ -32,13 +32,13 @@ export async function POST(request: NextRequest) {
   const { department } = data;
   const [room, ...otherRooms] = selectedRooms;
   const selectedRoomIds = selectedRooms.map(
-    (r: { roomId: number }) => r.roomId,
+    (r: { resourceId: number }) => r.resourceId,
   );
   const otherRoomIds = otherRooms.map(
     (r: { calendarId: string }) => r.calendarId,
   );
 
-  const calendarId = await getRoomCalendarId(room.roomId);
+  const calendarId = await getRoomCalendarId(room.resourceId);
   console.log("calendarId", calendarId);
   if (calendarId == null) {
     console.error("ROOM CALENDAR ID NOT FOUND");
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
   console.log({
     calendarEventId,
-    roomId: selectedRoomIds.join(", "),
+    resourceId: selectedRoomIds.join(", "),
     email,
     startDate: bookingCalendarInfo.startStr,
     endDate: bookingCalendarInfo.endStr,
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
   await saveDataToFirestore(TableNames.BOOKING, {
     calendarEventId,
-    roomId: selectedRoomIds.join(", "),
+    resourceId: selectedRoomIds.join(", "),
     email,
     startDate: toFirebaseTimestampFromString(bookingCalendarInfo.startStr),
     endDate: toFirebaseTimestampFromString(bookingCalendarInfo.endStr),
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         templateName: "approval_email",
         contents: {
           ...contents,
-          roomId: contents.roomId.toString(),
+          resourceId: contents.resourceId.toString(),
         },
         targetEmail: recipient,
         status: BookingStatusLabel.REQUESTED,
@@ -138,13 +138,13 @@ export async function POST(request: NextRequest) {
   } else {
     const userEventInputs: BookingFormDetails = {
       calendarEventId,
-      roomId: selectedRoomIds.join(", "),
+      resourceId: selectedRoomIds.join(", "),
       email,
       startDate: bookingCalendarInfo?.startStr,
       endDate: bookingCalendarInfo?.endStr,
-      approvalUrl,
-      rejectUrl,
-      bookingToolUrl: getBookingToolDeployUrl(),
+      approvedUrl,
+      declinedUrl,
+      bookingAppUrl: getBookingToolDeployUrl(),
       headerMessage: "This is a request email for first approval.",
       ...data,
     };

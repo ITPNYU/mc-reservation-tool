@@ -4,7 +4,7 @@ import handlebars, { templates } from "handlebars";
 import { getGmailClient } from "@/lib/googleClient";
 import { BookingStatusLabel } from "@/components/src/types";
 import { app } from "firebase-admin";
-import { approvalUrl, rejectUrl } from "@/components/src/server/ui";
+import { approvedUrl, declinedUrl } from "@/components/src/server/ui";
 
 interface BookingFormDetails {
   [key: string]: string;
@@ -38,8 +38,8 @@ export const sendHTMLEmail = async (params: SendHTMLEmailParams) => {
     status,
     body,
     contents,
-    approvalUrl: approvalUrl(contents.calendarEventId),
-    rejectUrl: rejectUrl(contents.calendarEventId),
+    approvedUrl: approvedUrl(contents.calendarEventId),
+    declinedUrl: declinedUrl(contents.calendarEventId),
   });
 
   const messageParts = [

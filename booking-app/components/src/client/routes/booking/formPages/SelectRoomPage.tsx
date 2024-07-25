@@ -4,7 +4,7 @@ import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
 import { DateSelectArg } from "@fullcalendar/core";
 import { MultipleCalendars } from "../components/MultipleCalendars";
-import { RoomSetting } from "../../../../types";
+import { ResourceSetting } from "../../../../types";
 import { SAFETY_TRAINING_REQUIRED_ROOM } from "../../../../policy";
 import { useRouter } from "next/navigation";
 
@@ -26,10 +26,10 @@ export default function SelectRoomPage() {
     "department",
     department,
     "selectedRooms",
-    selectedRooms,
+    selectedRooms
   );
 
-  const handleSetDate = (info: DateSelectArg, rooms: RoomSetting[]) => {
+  const handleSetDate = (info: DateSelectArg, rooms: ResourceSetting[]) => {
     console.log("handle set date", info, rooms, selectedRooms);
 
     setBookingCalendarInfo(info);
@@ -37,7 +37,7 @@ export default function SelectRoomPage() {
     console.log("selectedRooms", selectedRooms);
     console.log("rooms", rooms);
     //const requiresSafetyTraining = rooms.some((room) =>
-    //  SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
+    //  SAFETY_TRAINING_REQUIRED_ROOM.includes(room.resourceId)
     //);
     //if (userEmail && !isSafetyTrained && requiresSafetyTraining) {
     //  alert("You have to take safety training before booking!");
@@ -53,7 +53,7 @@ export default function SelectRoomPage() {
       "department",
       department,
       "selectedRooms",
-      selectedRooms,
+      selectedRooms
     );
 
     setTimeout(() => {

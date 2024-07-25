@@ -4,9 +4,7 @@ import { TableNames } from "@/components/src/policy";
 
 export async function GET(req: NextRequest) {
   try {
-    const fetchedData = await fetchAllDataFromCollection(
-      TableNames.LIAISONS_PROD,
-    );
+    const fetchedData = await fetchAllDataFromCollection(TableNames.LIAISONS);
     const filtered = fetchedData.map((item: any) => ({
       id: item.id,
       email: item.email,

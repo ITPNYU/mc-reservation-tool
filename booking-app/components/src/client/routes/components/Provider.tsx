@@ -7,7 +7,7 @@ import {
   PaUser,
   PagePermission,
   ReservationType,
-  RoomSetting,
+  ResourceSetting,
   SafetyTraining,
   Settings,
 } from "../../../types";
@@ -35,7 +35,7 @@ export interface DatabaseContextType {
   liaisonUsers: LiaisonType[];
   pagePermission: PagePermission;
   paUsers: PaUser[];
-  roomSettings: RoomSetting[];
+  roomSettings: ResourceSetting[];
   safetyTrainedUsers: SafetyTraining[];
   settings: Settings;
   userEmail: string | undefined;
@@ -60,7 +60,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   paUsers: [],
   roomSettings: [],
   safetyTrainedUsers: [],
-  settings: { reservationTypes: [] },
+  settings: { bookingTypes: [] },
   userEmail: undefined,
   reloadAdminUsers: async () => {},
   reloadBannedUsers: async () => {},
@@ -84,11 +84,11 @@ export const DatabaseProvider = ({
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
   const [paUsers, setPaUsers] = useState<PaUser[]>([]);
-  const [roomSettings, setRoomSettings] = useState<RoomSetting[]>([]);
+  const [roomSettings, setResourceSettings] = useState<ResourceSetting[]>([]);
   const [safetyTrainedUsers, setSafetyTrainedUsers] = useState<
     SafetyTraining[]
   >([]);
-  const [settings, setSettings] = useState<Settings>({ reservationTypes: [] });
+  const [settings, setSettings] = useState<Settings>({ bookingTypes: [] });
   const [userEmail, setUserEmail] = useState<string | undefined>();
   const { user, loading } = useAuth();
 
@@ -115,7 +115,7 @@ export const DatabaseProvider = ({
       fetchSafetyTrainedUsers();
       fetchBannedUsers();
       fetchLiaisonUsers();
-      fetchRoomSettings();
+      fetchResourceSettings();
       fetchSettings();
     });
   }, []);
@@ -138,7 +138,7 @@ export const DatabaseProvider = ({
           email: item.email,
           startDate: item.startDate,
           endDate: item.endDate,
-          roomId: item.roomId,
+          resourceId: item.resourceId,
           user: item.user,
           room: item.room,
           startTime: item.startTime,
@@ -157,7 +157,7 @@ export const DatabaseProvider = ({
           sponsorEmail: item.sponsorEmail,
           title: item.title,
           description: item.description,
-          reservationType: item.reservationType,
+          bookingType: item.bookingType,
           attendeeAffiliation: item.attendeeAffiliation,
           roomSetup: item.roomSetup,
           setupDetails: item.setupDetails,
@@ -187,8 +187,8 @@ export const DatabaseProvider = ({
           email: item.email,
           requestedAt: item.requestedAt,
           firstApprovedAt: item.firstApprovedAt,
-          secondApprovedAt: item.secondApprovedAt,
-          rejectedAt: item.rejectedAt,
+          finalApprovedAt: item.finalApprovedAt,
+          declinedAt: item.declinedAt,
           canceledAt: item.canceledAt,
           checkedInAt: item.checkedInAt,
           noShowedAt: item.checkedInAt,
@@ -252,7 +252,7 @@ export const DatabaseProvider = ({
   };
 
   const fetchLiaisonUsers = async () => {
-    fetchAllDataFromCollection(TableNames.LIAISONS_PROD)
+    fetchAllDataFromCollection(TableNames.LIAISONS)
       .then((fetchedData) => {
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
@@ -265,32 +265,32 @@ export const DatabaseProvider = ({
       .catch((error) => console.error("Error fetching data:", error));
   };
 
-  const fetchRoomSettings = async () => {
-    fetchAllDataFromCollection(TableNames.ROOMS)
+  const fetchResourceSettings = async () => {
+    fetchAllDataFromCollection(TableNames.RESOURCES)
       .then((fetchedData) => {
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
-          roomId: item.roomId,
+          resourceId: item.resourceId,
           name: item.name,
           capacity: item.capacity,
           calendarId: item.calendarId,
         }));
-        setRoomSettings(filtered);
+        setResourceSettings(filtered);
       })
       .catch((error) => console.error("Error fetching data:", error));
   };
 
   const fetchBookingReservationTypes = async () => {
-    fetchAllDataFromCollection(TableNames.RESERVATION_TYPES)
+    fetchAllDataFromCollection(TableNames.BOOKING_TYPES)
       .then((fetchedData) => {
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
-          reservationType: item.reservationType,
+          bookingType: item.bookingType,
           createdAt: item.createdAt,
         }));
         setSettings((prev) => ({
           ...prev,
-          reservationTypes: filtered as ReservationType[],
+          bookingTypes: filtered as ReservationType[],
         }));
       })
       .catch((error) => console.error("Error fetching data:", error));

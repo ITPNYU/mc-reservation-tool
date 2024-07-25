@@ -5,28 +5,25 @@ import { BookingStatusLabel, DevBranch } from "./types";
 export const ACTIVE_SHEET_ID = "1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68";
 
 export enum TableNames {
-  ADMINS = "admin_users",
-  BANNED = "banned_users",
+  ADMINS = "usersAdmin",
+  BANNED = "usersBanned",
   BOOKING = "bookings",
-  BOOKING_STATUS = "bookingStatus",
-  LIAISONS_DEV = "liaisonsDev",
-  LIAISONS_PROD = "liaisonsProd",
-  LIAISONS_STAGING = "liaisonsStaging",
-  PAS = "pa_users",
-  RESERVATION_TYPES = "reservationTypes",
-  ROOMS = "rooms",
-  SAFETY_TRAINING = "safety_training_users",
-  SETTINGS = "settings",
+  BOOKING_STATUS = "bookingStatuses",
+  LIAISONS = "usersLiaison",
+  PAS = "usersPa",
+  BOOKING_TYPES = "bookingTypes",
+  RESOURCES = "resources",
+  SAFETY_TRAINING = "usersSafetyTraining",
 }
 
 export function getLiaisonTableName() {
   switch (process.env.BRANCH_NAME as DevBranch) {
     case "development":
-      return TableNames.LIAISONS_DEV;
+      return TableNames.LIAISONS;
     case "staging":
-      return TableNames.LIAISONS_STAGING;
+      return TableNames.LIAISONS;
     default:
-      return TableNames.LIAISONS_PROD;
+      return TableNames.LIAISONS;
   }
 }
 export enum ActiveSheetBookingStatusColumns {
@@ -80,5 +77,5 @@ export const INSTANT_APPROVAL_ROOMS = [221, 222, 223, 224, 233];
 export const HIDING_STATUS = [
   BookingStatusLabel.NO_SHOW,
   BookingStatusLabel.CANCELED,
-  BookingStatusLabel.REJECTED,
+  BookingStatusLabel.DECLINED,
 ];

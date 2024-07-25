@@ -1,4 +1,4 @@
-import { Department, Role, RoomSetting } from "../../../types";
+import { Department, Role, ResourceSetting } from "../../../types";
 import React, {
   createContext,
   useCallback,
@@ -18,11 +18,11 @@ export interface BookingContextType {
   isBanned: boolean;
   isSafetyTrained: boolean;
   role: Role | undefined;
-  selectedRooms: RoomSetting[];
+  selectedRooms: ResourceSetting[];
   setBookingCalendarInfo: (x: DateSelectArg) => void;
   setDepartment: (x: Department) => void;
   setRole: (x: Role) => void;
-  setSelectedRooms: (x: RoomSetting[]) => void;
+  setSelectedRooms: (x: ResourceSetting[]) => void;
 }
 
 export const BookingContext = createContext<BookingContextType>({
@@ -35,7 +35,7 @@ export const BookingContext = createContext<BookingContextType>({
   setBookingCalendarInfo: (x: DateSelectArg) => {},
   setDepartment: (x: Department) => {},
   setRole: (x: Role) => {},
-  setSelectedRooms: (x: RoomSetting[]) => {},
+  setSelectedRooms: (x: ResourceSetting[]) => {},
 });
 
 export function BookingProvider({ children }: { children: React.ReactNode }) {
@@ -47,7 +47,7 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [department, setDepartment] = useState<Department>();
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
-  const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
+  const [selectedRooms, setSelectedRooms] = useState<ResourceSetting[]>([]);
 
   const isBanned = useMemo<boolean>(() => {
     if (!userEmail) return false;

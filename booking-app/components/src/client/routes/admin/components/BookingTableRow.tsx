@@ -31,7 +31,7 @@ export default function BookingTableRow({
         {...{ setOptimisticStatus, isAdminView, isUserView }}
       />
       <td className="px-2 py-4 w-28">{optimisticStatus ?? status}</td>
-      <td className="px-2 py-4 w-36">{booking.roomId}</td>
+      <td className="px-2 py-4 w-36">{booking.resourceId}</td>
       <td scope="row" className="px-2 py-4 w-40 text-gray-900 dark:text-white">
         <div className="pl-3 w-full">
           <div className="flex flex-col">
@@ -66,7 +66,7 @@ export default function BookingTableRow({
       <td className="px-2 py-4 w-20">{booking.sponsorEmail}</td>
       <td className="px-2 py-4 w-52 break-all">{booking.title}</td>
       <td className="px-2 py-4 w-60 break-all">{booking.description}</td>
-      <td className="px-2 py-4 w-60 break-all">{booking.reservationType}</td>
+      <td className="px-2 py-4 w-60 break-all">{booking.bookingType}</td>
       <td className="px-2 py-4 w-20">{booking.expectedAttendance}</td>
       <td className="px-2 py-4 w-20">{booking.attendeeAffiliation}</td>
       <td className="px-2 py-4 w-40">

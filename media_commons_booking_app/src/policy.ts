@@ -17,16 +17,14 @@ export function getLiaisonTableName() {
 }
 
 export enum TableNames {
-  ADMINS = 'admin_users',
-  BANNED = 'banned_users',
+  ADMINS = 'usersAdmin',
+  BANNED = 'usersBanned',
   BOOKING = 'bookings',
-  BOOKING_STATUS = 'bookingStatus',
-  LIAISONS_DEV = 'liaisonsDev',
-  LIAISONS_PROD = 'liaisonsProd',
-  LIAISONS_STAGING = 'liaisonsStaging',
-  PAS = 'pa_users',
+  BOOKING_STATUS = 'bookingStatuses',
+  LIAISONS = 'usersLiaison',
+  PAS = 'usersPa',
   RESERVATION_TYPES = 'reservationTypes',
-  ROOMS = 'rooms',
+  RESOURCES = 'resources',
   SAFETY_TRAINING = 'safety_training_users',
   SETTINGS = 'settings',
 }

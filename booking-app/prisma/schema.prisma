@@ -16,7 +16,7 @@ datasource db {
 
 model Room {
   id    Int     @id @default(autoincrement())
-  roomId Int @unique
+  resourceId Int @unique
   name  String
   capacity Int
   calendarIdDev String
@@ -25,7 +25,7 @@ model Room {
 
 model Booking {
   id    Int     @id @default(autoincrement())
-  roomId Int
+  resourceId Int
   email String
   startDate	DateTime
   endDate DateTime
@@ -42,7 +42,7 @@ model Booking {
   sponsorEmail String
   title String
   description String
-  reservationType String
+  bookingType String
   expectedAttendance Int
   attendeeAffiliation	 String
   roomSetup	 String
@@ -63,8 +63,8 @@ model BookingStatus {
   email String
   requestedAt	DateTime
   firstApprovedAt		DateTime
-  secondApprovedAt		DateTime
-  rejectedAt		DateTime
+  finalApprovedAt		DateTime
+  declinedAt		DateTime
   canceledAt		DateTime
   checkedInAt		DateTime
   noShowedAt		DateTime
@@ -106,7 +106,7 @@ model Department {
   liaisons Liaison[]
 }
 
-model reservationType {
+model bookingType {
   name String @unique
   createdAt DateTime
 }

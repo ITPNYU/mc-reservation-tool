@@ -59,7 +59,7 @@ export const getCalendarEvents = (calendarId: string) => {
 };
 
 const getAllRoomCalendarIds = (): string[] => {
-  const rows = getAllActiveSheetRows(TableNames.ROOMS);
+  const rows = getAllActiveSheetRows(TableNames.RESOURCES);
   const ids = JSON.parse(rows).map((room: RoomSetting) =>
     process.env.CALENDAR_ENV === 'production'
       ? room.calendarIdProd

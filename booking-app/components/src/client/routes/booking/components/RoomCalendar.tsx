@@ -1,7 +1,7 @@
 import {
   BookingStatusLabel,
   CalendarEvent,
-  RoomSetting,
+  ResourceSetting,
 } from "../../../../types";
 import React, { useEffect, useState } from "react";
 
@@ -17,11 +17,11 @@ import axios from "axios";
 const TITLE_TAG = "[Click to Delete]";
 
 interface Props {
-  allRooms: RoomSetting[];
+  allRooms: ResourceSetting[];
   bookingTimeEvent: DateSelectArg | null;
   isOverlap: (x: DateSelectArg) => boolean;
-  room: RoomSetting;
-  selectedRooms: RoomSetting[];
+  room: ResourceSetting;
+  selectedRooms: ResourceSetting[];
   setBookingTimeEvent: (x: DateSelectArg | null) => void;
 }
 
@@ -164,7 +164,7 @@ export const RoomCalendar = ({
       } ${!selectedRooms.includes(room) && "hidden"}`}
     >
       {selectedRooms.includes(room)}
-      {room.roomId} {room.name}
+      {room.resourceId} {room.name}
       <FullCalendar
         ref={room.calendarRef}
         height="100%"

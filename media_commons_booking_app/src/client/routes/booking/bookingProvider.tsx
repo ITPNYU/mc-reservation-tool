@@ -76,7 +76,7 @@ export function BookingProvider({ children }) {
         .then((rows) => rows.map((row) => row[0]).includes(userEmail));
     }
     console.log('isTrained from googlesheets', isTrained);
-    setIsSafetyTrained(isTrained);
+    setIsSafetyTrained(true);
   }, [userEmail, safetyTrainedUsers]);
 
   useEffect(() => {

@@ -8,7 +8,7 @@ const RejectPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const paramCalendarEventId = searchParams.get("calendarEventId");
   const [loading, setLoading] = useState(false);
-  const [rejected, setRejected] = useState(false);
+  const [declined, setRejected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleReject = async () => {
@@ -37,11 +37,11 @@ const RejectPageContent: React.FC = () => {
               "px-4 py-2 text-white rounded-md focus:outline-none bg-blue-600 hover:bg-blue-700"
             }
             onClick={() => handleReject()}
-            disabled={loading || rejected}
+            disabled={loading || declined}
           >
             {loading
               ? "Rejecting..."
-              : rejected
+              : declined
                 ? "Rejected"
                 : "Reject Booking"}
           </button>

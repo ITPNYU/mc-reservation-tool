@@ -1,14 +1,20 @@
-import { BookingFormDetails, BookingStatusLabel, RoomSetting } from "../types";
+import { endAt, sum, Timestamp, where } from "@firebase/firestore";
+import {
+  BookingFormDetails,
+  BookingStatusLabel,
+  ResourceSetting,
+} from "../types";
 
 import { TableNames } from "../policy";
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 import { getCalendarClient } from "@/lib/googleClient";
-import { endAt, sum, Timestamp, where } from "@firebase/firestore";
 
-export const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
-  const queryConstraints = [where("roomId", "==", roomId)];
+export const getRoomCalendarIds = async (
+  resourceId: number
+): Promise<string[]> => {
+  const queryConstraints = [where("resourceId", "==", resourceId)];
   const rooms = await fetchAllDataFromCollection(
-    TableNames.ROOMS,
+    TableNames.RESOURCES,
     queryConstraints
   );
   console.log(`Rooms: ${rooms}`);
@@ -16,21 +22,20 @@ export const getRoomCalendarIds = async (roomId: number): Promise<string[]> => {
 };
 
 export const getRoomCalendarId = async (
-  roomId: number
+  resourceId: number
 ): Promise<string | null> => {
-  const queryConstraints = [where("roomId", "==", roomId)];
+  const queryConstraints = [where("resourceId", "==", resourceId)];
   const rooms = await fetchAllDataFromCollection(
-    TableNames.ROOMS,
+    TableNames.RESOURCES,
     queryConstraints
   );
   if (rooms.length > 0) {
-    const room = rooms[0] as RoomSetting;
+    const room = rooms[0] as ResourceSetting;
     console.log(`Room: ${JSON.stringify(room)}`);
     return room.calendarId;
-  } else {
-    console.log("No matching room found.");
-    return null;
   }
+  console.log("No matching room found.");
+  return null;
 };
 
 const patchCalendarEvent = async (
@@ -46,18 +51,18 @@ const patchCalendarEvent = async (
     ...body,
   };
   await calendar.events.patch({
-    calendarId: calendarId,
-    eventId: eventId,
-    requestBody: requestBody,
+    calendarId,
+    eventId,
+    requestBody,
   });
 };
 
 export const inviteUserToCalendarEvent = async (
   calendarEventId: string,
   guestEmail: string,
-  roomId: number
+  resourceId: number
 ) => {
-  const roomCalendarIds = await getRoomCalendarIds(roomId);
+  const roomCalendarIds = await getRoomCalendarIds(resourceId);
   const calendar = getCalendarClient();
 
   for (const roomCalendarId of roomCalendarIds) {
@@ -73,7 +78,7 @@ export const inviteUserToCalendarEvent = async (
         const attendees = event.data.attendees || [];
         attendees.push({ email: guestEmail });
         await patchCalendarEvent(event, roomCalendarId, calendarEventId, {
-          attendees: attendees,
+          attendees,
         });
 
         console.log(
@@ -97,7 +102,7 @@ const bookingContentsToDescription = (bookingContents: BookingFormDetails) => {
     listItem("Description", bookingContents.description),
     listItem("Expected Attendance", bookingContents.expectedAttendance),
     bookingContents.roomSetup === "yes" &&
-      "**" + listItem("Room Setup", bookingContents.setupDetails) + "**",
+      `**${listItem("Room Setup", bookingContents.setupDetails)}**`,
     listItem("Title", bookingContents.title),
     bookingContents.mediaServices.length > 0 &&
       listItem("Media Services", bookingContents.mediaServices),
@@ -110,7 +115,7 @@ const bookingContentsToDescription = (bookingContents: BookingFormDetails) => {
       listItem("Hire Security", bookingContents.hireSecurity),
     "</ul><h3>Cancellation Policy</h3>",
   ];
-  //@ts-ignore
+  // @ts-ignore
   description = description.concat(...items);
   return description;
 };
@@ -156,9 +161,9 @@ export const updateEventPrefix = async (
   bookingContents: BookingFormDetails
 ) => {
   const roomCalendarIds = await getRoomCalendarIds(
-    typeof bookingContents.roomId == "string"
-      ? parseInt(bookingContents.roomId, 10)
-      : bookingContents.roomId
+    typeof bookingContents.resourceId === "string"
+      ? parseInt(bookingContents.resourceId, 10)
+      : bookingContents.resourceId
   );
   console.log(`Room Calendar Ids: ${roomCalendarIds}`);
   console.log("bookingContents", bookingContents);
@@ -186,7 +191,7 @@ export const updateEventPrefix = async (
 
         await patchCalendarEvent(event, roomCalendarId, calendarEventId, {
           summary: newTitle,
-          description: description,
+          description,
         });
 
         console.log(

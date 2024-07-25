@@ -13,8 +13,8 @@ export const getBookingToolDeployUrl = () => {
   }
 };
 
-export const approvalUrl = (calendarEventId: string) =>
+export const approvedUrl = (calendarEventId: string) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/approve?calendarEventId=${calendarEventId}`;
 
-export const rejectUrl = (calendarEventId: string) =>
+export const declinedUrl = (calendarEventId: string) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/reject?calendarEventId=${calendarEventId}`;
