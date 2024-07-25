@@ -33,9 +33,21 @@ const Section = ({ title, children }) => (
 
 export default function FormInput() {
   const { userEmail, settings } = useContext(DatabaseContext);
+<<<<<<< HEAD
   const { role, department, selectedRooms, bookingCalendarInfo, setFormData } =
     useContext(BookingContext);
   const navigate = useNavigate();
+=======
+  const {
+    role,
+    department,
+    selectedRooms,
+    bookingCalendarInfo,
+    formData,
+    setFormData,
+  } = useContext(BookingContext);
+  const router = useRouter();
+>>>>>>> d53fb22 (Apply new ui)
   const registerEvent = useSubmitBooking();
 
   const {
@@ -116,7 +128,7 @@ export default function FormInput() {
     // }
     setFormData(data);
     registerEvent(data);
-    navigate('/book/confirmation');
+    router.push('/book/confirmation');
   };
 
   return (

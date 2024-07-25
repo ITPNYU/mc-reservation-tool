@@ -18,7 +18,7 @@ const StickyScroll = styled(Box)`
 
 export const Header = () => {
   const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -32,9 +32,9 @@ export const Header = () => {
   const goBack = (() => {
     switch (location.pathname) {
       case '/book/selectRoom':
-        return () => navigate('/book/role');
+        return () => router.push('/book/role');
       case '/book/form':
-        return () => navigate('/book/selectRoom');
+        return () => router.push('/book/selectRoom');
       default:
         return () => {};
     }
@@ -43,7 +43,7 @@ export const Header = () => {
   const goNext = (() => {
     switch (location.pathname) {
       case '/book/selectRoom':
-        return () => navigate('/book/form');
+        return () => router.push('/book/form');
       default:
         return () => {};
     }

@@ -5,7 +5,6 @@ import React, { useContext } from 'react';
 import { BookingContext } from '../bookingProvider';
 import Dropdown from '../components/Dropdown';
 import { styled } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
 
 const Center = styled(Box)`
   width: 100%;
@@ -28,14 +27,14 @@ export default function UserRolePage() {
   const { role, department, setDepartment, setRole } =
     useContext(BookingContext);
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleNextClick = () => {
     if (!role || !department) {
       alert('Please make sure all fields are selected.');
       return;
     }
-    navigate('/book/selectRoom');
+    router.push('/book/selectRoom');
   };
 
   return (

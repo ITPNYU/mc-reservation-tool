@@ -20,6 +20,9 @@ const nextConfig = {
     GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
   },
+  compiler: {
+    styledComponents: true,
+  },
 };
 
 export default nextConfig;

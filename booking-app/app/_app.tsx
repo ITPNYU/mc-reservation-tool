@@ -1,18 +1,31 @@
-// components/Layout.tsx
-
-import NavBar from "@/components/src/client/routes/booking/components/NavBar";
+import "../styles.css";
+import { Metadata } from "next";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import { DatabaseProvider } from "@/components/src/client/routes/components/Provider";
-import React from "react";
+import theme from "./theme/theme";
 
-type LayoutProps = {
-  children: React.ReactNode;
+export const metadata: Metadata = {
+  title: "Your App Name",
+  description: "Your app description",
 };
 
-const Layout: React.FC<LayoutProps> = ({ children }) => (
-  <DatabaseProvider>
-    <NavBar />
-    {children}
-  </DatabaseProvider>
-);
-
-export default Layout;
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  console.log("theme", theme);
+  return (
+    <html lang="en">
+      <body>
+        <DatabaseProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </ThemeProvider>
+        </DatabaseProvider>
+      </body>
+    </html>
+  );
+}

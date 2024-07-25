@@ -41,7 +41,7 @@ const envTitle = (() => {
 })();
 
 export default function NavBar() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { pagePermission, userEmail } = useContext(DatabaseContext);
   const [selectedView, setSelectedView] = useState<PagePermission>(
     PagePermission.BOOKING
@@ -55,19 +55,19 @@ export default function NavBar() {
 
   const handleClickHome = () => {
     setSelectedView(PagePermission.BOOKING);
-    navigate('/');
+    router.push('/');
   };
 
   useEffect(() => {
     switch (selectedView) {
       case PagePermission.BOOKING:
-        navigate('/');
+        router.push('/');
         break;
       case PagePermission.PA:
-        navigate('/pa');
+        router.push('/pa');
         break;
       case PagePermission.ADMIN:
-        navigate('/admin');
+        router.push('/admin');
         break;
     }
   }, [selectedView]);
@@ -99,7 +99,7 @@ export default function NavBar() {
     if (selectedView === PagePermission.BOOKING) {
       return (
         <Button
-          onClick={() => navigate('/book')}
+          onClick={() => router.push('/book')}
           variant="outlined"
           sx={{ height: '40px', marginRight: 2 }}
         >

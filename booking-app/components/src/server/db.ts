@@ -3,7 +3,7 @@ import { TableNames } from "../policy";
 import { Timestamp, where } from "@firebase/firestore";
 
 export const fetchAllFutureBooking = async <T>(
-  collectionName: TableNames,
+  collectionName: TableNames
 ): Promise<T[]> => {
   const now = Timestamp.now();
   const futureQueryConstraints = [where("startDate", ">", now)];
@@ -11,7 +11,7 @@ export const fetchAllFutureBooking = async <T>(
 };
 
 export const fetchAllFutureBookingStatus = async <T>(
-  collectionName: TableNames,
+  collectionName: TableNames
 ): Promise<T[]> => {
   const now = Timestamp.now();
   const futureQueryConstraints = [where("requestedAt", ">", now)];
@@ -51,7 +51,7 @@ export const getOldSafetyTrainingEmails = () => {
 
 export const liaisons = async () => {
   const fetchedData = await fetchAllDataFromCollection(
-    TableNames.LIAISONS_PROD,
+    TableNames.LIAISONS_PROD
   );
   const filtered = fetchedData.map((item: any) => ({
     id: item.id,

@@ -1,110 +1,47 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from 'react';
 
-import { DatabaseContext } from "../../components/Provider";
-import EmailListTable from "../../components/EmailListTable";
-import Loading from "../../../utils/Loading";
-import { formatDate } from "../../../utils/date";
-import { getLiaisonTableName } from "../../../../policy";
-// This is a wrapper for google.script.run that lets us use promises.
-import { saveDataToFirestore } from "@/lib/firebase/firebase";
-import { Timestamp } from "@firebase/firestore";
+import AddRow from '../../components/AddRow';
+import { Box } from '@mui/material';
+import { DatabaseContext } from '../../components/Provider';
+import { Department } from '../../../../types';
+import Dropdown from '../../booking/components/Dropdown';
+import ListTable from '../../components/ListTable';
+import { formatDate } from '../../../utils/date';
+import { getLiaisonTableName } from '../../../../policy';
 
-interface AddLiaisonFormProps {
-  liaisonEmails: string[];
-  reloadLiaisonEmails: () => void;
-}
+const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
+  const [department, setDepartment] = useState('');
 
-const AddLiaisonForm: React.FC<AddLiaisonFormProps> = ({
-  liaisonEmails,
-  reloadLiaisonEmails,
-}) => {
-  const [email, setEmail] = useState<string>("");
-  const [department, setDepartment] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const addLiaisonUser = async () => {
-    if (email === "" || department === "") {
-      alert("Please fill in all the fields");
-      return;
-    }
-
-    if (liaisonEmails.includes(email)) {
-      alert("This user is already registered");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await saveDataToFirestore(getLiaisonTableName(), {
-        email: email,
-        department: department,
-        createdAt: Timestamp.now(),
-      });
-      await reloadLiaisonEmails();
-    } catch (ex) {
-      console.error(ex);
-      alert("Failed to add user");
-    } finally {
-      setLoading(false);
-      setEmail("");
-    }
-  };
+  const departmentDropdown = useMemo(
+    () => (
+      <Box width="200px" marginLeft={1}>
+        <Dropdown
+          value={department}
+          updateValue={setDepartment}
+          options={Object.values(Department)}
+          placeholder="Choose a Department"
+        />
+      </Box>
+    ),
+    [department]
+  );
 
   return (
-    <div className="mt-10 mr-10 ml-10">
-      <form className="flex items-center">
-        <div className="mb-6 mr-6">
-          <label
-            htmlFor="email"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            value={email}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="name@nyu.edu"
-            required
-          />
-        </div>
-        <div className="mr-6">
-          <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[200px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            onChange={(e) => {
-              setDepartment(e.target.value);
-            }}
-            value={department}
-          >
-            <option value="" disabled>
-              Select option
-            </option>
-            <option value="ALT">ALT</option>
-            <option value="GameCenter">Game Center</option>
-            <option value="IDM">IDM</option>
-            <option value="ITP / IMA / Low Res">ITP / IMA / Low Res</option>
-            <option value="MARL">MARL</option>
-            <option value="Music Tech">Music Tech</option>
-            <option value="Recorded Music">Recorded Music</option>
-            <option value="others">Other Group</option>
-          </select>
-        </div>
-        {loading ? (
-          <Loading />
-        ) : (
-          <button
-            type="button"
-            onClick={addLiaisonUser}
-            className="h-[40px] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Add User
-          </button>
-        )}
-      </form>
-    </div>
+    <AddRow
+      addDuplicateErrorMessage="This user+department is already registered"
+      addFailedErrorMessage="Failed to add user as liaison"
+      columnNameUniqueValue="email"
+      inputPlaceholder="Add email"
+      tableName={getLiaisonTableName()}
+      rows={liaisonEmails}
+      rowsRefresh={reloadLiaisonEmails}
+      title="Department Liaisons"
+      extra={{
+        components: [departmentDropdown],
+        values: [department],
+        updates: [setDepartment],
+      }}
+    />
   );
 };
 
@@ -113,21 +50,22 @@ export const Liaisons = () => {
 
   const liaisonEmails = useMemo<string[]>(
     () => liaisonUsers.map((user) => user.email),
-    [liaisonUsers],
+    [liaisonUsers]
   );
 
   return (
-    <>
-      <AddLiaisonForm
-        liaisonEmails={liaisonEmails}
-        reloadLiaisonEmails={reloadLiaisonUsers}
-      />
-      <EmailListTable
-        tableName={getLiaisonTableName()}
-        userList={liaisonUsers}
-        userListRefresh={reloadLiaisonUsers}
-        columnFormatters={{ createdAt: formatDate }}
-      />
-    </>
+    <ListTable
+      tableName={getLiaisonTableName()}
+      columnNameToRemoveBy="email"
+      rows={liaisonUsers as unknown as { [key: string]: string }[]}
+      rowsRefresh={reloadLiaisonUsers}
+      topRow={
+        <AddLiaisonForm
+          liaisonEmails={liaisonEmails}
+          reloadLiaisonEmails={reloadLiaisonUsers}
+        />
+      }
+      columnFormatters={{ createdAt: formatDate }}
+    />
   );
 };

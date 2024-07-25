@@ -14,7 +14,6 @@ import {
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { TableNames, getLiaisonTableName } from '../../../policy';
 
-import { serverFunctions } from '../../utils/serverFunctions';
 import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 
 export interface DatabaseContextType {

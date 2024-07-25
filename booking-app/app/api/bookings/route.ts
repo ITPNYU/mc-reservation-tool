@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  getRoomCalendarId,
-  insertEvent,
-} from "@/components/src/server/calendars";
-import {
   Booking,
   BookingFormDetails,
   BookingStatusLabel,
@@ -13,7 +9,6 @@ import { INSTANT_APPROVAL_ROOMS, TableNames } from "@/components/src/policy";
 import { Timestamp } from "@firebase/firestore";
 import { firstApproverEmails } from "@/components/src/server/db";
 import { sendHTMLEmail } from "@/app/lib/sendHTMLEmail";
-import { toFirebaseTimestampFromString } from "@/components/src/client/utils/date";
 import { DateSelectArg } from "fullcalendar";
 import {
   approvalUrl,
@@ -21,6 +16,11 @@ import {
   rejectUrl,
 } from "@/components/src/server/ui";
 import { approveInstantBooking } from "@/components/src/server/admin";
+import {
+  getRoomCalendarId,
+  insertEvent,
+} from "@/components/src/server/calendars";
+import { toFirebaseTimestampFromString } from "@/components/src/client/utils/date";
 
 export async function POST(request: NextRequest) {
   const { email, selectedRooms, bookingCalendarInfo, data } =

@@ -1,15 +1,27 @@
 import "../styles.css";
-
+import { Metadata } from "next";
+import CssBaseline from "@mui/material/CssBaseline";
 import { DatabaseProvider } from "./components/Provider";
-import NavBar from "./components/navBar";
-import React from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "../theme";
 
-export default function Root() {
+export const metadata = {
+  title: "Your App Name",
+  description: "Your app description",
+};
+
+export default function RootLayout({ children }) {
+  console.log("theme", theme);
   return (
-    <DatabaseProvider>
-      <NavBar />
-
-      {/* This is where child route content renders, i.e. the subpages */}
-    </DatabaseProvider>
+    <html lang="en">
+      <body>
+        <DatabaseProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </ThemeProvider>
+        </DatabaseProvider>
+      </body>
+    </html>
   );
 }

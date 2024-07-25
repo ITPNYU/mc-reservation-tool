@@ -1,8 +1,20 @@
-// @ts-ignore
+/********** GOOGLE SHEETS ************/
+
 import { BookingStatusLabel, DevBranch } from "./types";
 
 /** ACTIVE master Google Sheet  */
 export const ACTIVE_SHEET_ID = "1MnWbn6bvNyMiawddtYYx0tRW4NMgvugl0I8zBO3sy68";
+
+export function getLiaisonTableName() {
+  switch (process.env.BRANCH_NAME as DevBranch) {
+    case "development":
+      return TableNames.LIAISONS_DEV;
+    case "staging":
+      return TableNames.LIAISONS_STAGING;
+    default:
+      return TableNames.LIAISONS_PROD;
+  }
+}
 
 export enum TableNames {
   ADMINS = "admin_users",
@@ -19,16 +31,6 @@ export enum TableNames {
   SETTINGS = "settings",
 }
 
-export function getLiaisonTableName() {
-  switch (process.env.BRANCH_NAME as DevBranch) {
-    case "development":
-      return TableNames.LIAISONS_DEV;
-    case "staging":
-      return TableNames.LIAISONS_STAGING;
-    default:
-      return TableNames.LIAISONS_PROD;
-  }
-}
 export enum ActiveSheetBookingStatusColumns {
   CALENDAR_ID = 0,
   EMAIL = 1,
@@ -41,6 +43,14 @@ export enum ActiveSheetBookingStatusColumns {
   NO_SHOWED_DATE = 8,
 }
 
+export enum ActiveSheetRoomsColumns {
+  ROOM_ID = 0,
+  NAME = 1,
+  CAPACITY = 2,
+  CALENDAR_ID = 3,
+  CALENDAR_ID_PROD = 4,
+}
+
 /** Old safety training Google Sheet */
 export const OLD_SAFETY_TRAINING_SHEET_ID =
   "1Debe5qF-2qXJhqP0AMy5etEvwAPd3mNFiTswytsbKxQ";
@@ -50,18 +60,20 @@ export const SECOND_OLD_SAFETY_TRAINING_SHEET_ID =
   "1TZYBrX5X6TXM07V3OMTOnVWF8qRmWnTzh27zacrQHh0";
 export const SECOND_OLD_SAFETY_TRAINING_SHEET_GID = 293202487;
 
-/** ******** CONTACTS *********** */
+/********** CONTACTS ************/
 
 // TODO configure this via admin UI
 export const getSecondApproverEmail = (branchName: string) =>
-  "media-commons-devs@itp.nyu.edu"; // Jhanele
+  branchName === "development"
+    ? "media-commons-devs@itp.nyu.edu"
+    : "jg5626@nyu.edu"; // Jhanele
 
 export const getApprovalCcEmail = (branchName: string) =>
-  "media-commons-devs@itp.nyu.edu"; // Samantha
+  branchName === "development"
+    ? "media-commons-devs@itp.nyu.edu"
+    : "ss12430@nyu.edu"; // Samantha
 
-/** ******** ROOMS *********** */
-
-export type Purpose = "multipleRoom" | "motionCapture";
+/********** ROOMS ************/
 
 export const SAFETY_TRAINING_REQUIRED_ROOM = [
   "103",
@@ -72,11 +84,26 @@ export const SAFETY_TRAINING_REQUIRED_ROOM = [
   "224",
   "230",
 ];
+export const INSTANT_APPROVAL_ROOMS = ["221", "222", "223", "224", "233"];
+export const CHECKOUT_EQUIPMENT_ROOMS = [
+  "103",
+  "220",
+  "221",
+  "222",
+  "223",
+  "224",
+  "230",
+  "233",
+  "260",
+];
+export const CAMPUS_MEDIA_SERVICES_ROOMS = ["202", "1201"];
+export const LIGHTING_DMX_ROOMS = ["220", "221", "222", "223", "224"];
+export const MOCAP_ROOMS = ["221", "222"];
 
-export const INSTANT_APPROVAL_ROOMS = [221, 222, 223, 224, 233];
-
-export const HIDING_STATUS = [
+export const CALENDAR_HIDE_STATUS = [
   BookingStatusLabel.NO_SHOW,
   BookingStatusLabel.CANCELED,
   BookingStatusLabel.REJECTED,
 ];
+
+export const STORAGE_KEY_BOOKING = "mediaCommonsDevBooking";

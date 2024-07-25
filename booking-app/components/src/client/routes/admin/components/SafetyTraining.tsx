@@ -9,21 +9,14 @@ import { formatDate } from "../../../utils/date";
 export default function SafetyTrainedUsers() {
   const { safetyTrainedUsers, reloadSafetyTrainedUsers } =
     useContext(DatabaseContext);
-  console.log("safetyTrainedUsers", safetyTrainedUsers);
 
   return (
-    <>
-      <AddEmail
-        tableName={TableNames.SAFETY_TRAINING}
-        userList={safetyTrainedUsers}
-        userListRefresh={reloadSafetyTrainedUsers}
-      />
-      <EmailListTable
-        columnFormatters={{ createdAt: formatDate }}
-        tableName={TableNames.SAFETY_TRAINING}
-        userList={safetyTrainedUsers}
-        userListRefresh={reloadSafetyTrainedUsers}
-      />
-    </>
+    <EmailListTable
+      columnFormatters={{ createdAt: formatDate }}
+      tableName={TableNames.SAFETY_TRAINING}
+      title="Safety Trained Users"
+      userList={safetyTrainedUsers}
+      userListRefresh={reloadSafetyTrainedUsers}
+    />
   );
 }

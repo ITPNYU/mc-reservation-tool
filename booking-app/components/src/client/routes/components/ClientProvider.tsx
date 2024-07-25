@@ -3,7 +3,6 @@
 
 import React from "react";
 import { DatabaseProvider } from "@/components/src/client/routes/components/Provider";
-import NavBar from "../booking/components/NavBar";
 import { BookingProvider } from "../booking/bookingProvider";
 
 type ClientProviderProps = {
@@ -14,10 +13,7 @@ type ClientProviderProps = {
 const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
   return (
     <DatabaseProvider>
-      <BookingProvider>
-        <NavBar />
-        {children}
-      </BookingProvider>
+      <BookingProvider>{children}</BookingProvider>
     </DatabaseProvider>
   );
 };

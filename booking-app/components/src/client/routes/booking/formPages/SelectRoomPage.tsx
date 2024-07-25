@@ -1,77 +1,38 @@
-import React, { useContext, useState } from "react";
+import { Box, Stack, Typography } from '@mui/material';
+import React, { useContext, useState } from 'react';
 
-import { BookingContext } from "../bookingProvider";
-import { DatabaseContext } from "../../components/Provider";
-import { DateSelectArg } from "@fullcalendar/core";
-import { MultipleCalendars } from "../components/MultipleCalendars";
-import { RoomSetting } from "../../../../types";
-import { SAFETY_TRAINING_REQUIRED_ROOM } from "../../../../policy";
-import { useRouter } from "next/navigation";
+import { BookingContext } from '../bookingProvider';
+import { CalendarDatePicker } from '../components/CalendarDatePicker';
+import CalendarVerticalResource from '../components/CalendarVerticalResource';
+import { DatabaseContext } from '../../components/Provider';
+import Grid from '@mui/material/Unstable_Grid2';
+import { SelectRooms } from '../components/SelectRooms';
 
 export default function SelectRoomPage() {
-  const router = useRouter();
   const { roomSettings, userEmail } = useContext(DatabaseContext);
-  const {
-    isBanned,
-    isSafetyTrained,
-    role,
-    department,
-    selectedRooms,
-    setBookingCalendarInfo,
-    setSelectedRooms,
-  } = useContext(BookingContext);
-  console.log(
-    "role",
-    role,
-    "department",
-    department,
-    "selectedRooms",
-    selectedRooms,
-  );
-
-  const handleSetDate = (info: DateSelectArg, rooms: RoomSetting[]) => {
-    console.log("handle set date", info, rooms, selectedRooms);
-
-    setBookingCalendarInfo(info);
-    setSelectedRooms(rooms);
-    console.log("selectedRooms", selectedRooms);
-    console.log("rooms", rooms);
-    //const requiresSafetyTraining = rooms.some((room) =>
-    //  SAFETY_TRAINING_REQUIRED_ROOM.includes(room.roomId)
-    //);
-    //if (userEmail && !isSafetyTrained && requiresSafetyTraining) {
-    //  alert("You have to take safety training before booking!");
-    //  return;
-    //}
-    //if (userEmail && isBanned) {
-    //  alert("You are banned");
-    //  return;
-    //}
-    console.log(
-      "role",
-      role,
-      "department",
-      department,
-      "selectedRooms",
-      selectedRooms,
-    );
-
-    setTimeout(() => {
-      router.push("/book/form");
-    }, 0);
-  };
+  const { selectedRooms, setSelectedRooms } = useContext(BookingContext);
+  const [date, setDate] = useState<Date>(new Date());
 
   return (
-    <div className="p-4 w-full">
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-        {" "}
-        Select room and view calendar
-      </h3>
-      <MultipleCalendars
-        key="calendars"
-        allRooms={roomSettings}
-        handleSetDate={handleSetDate}
-      />
-    </div>
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid container>
+        <Grid width={330}>
+          <Stack spacing={2}>
+            <CalendarDatePicker handleChange={setDate} />
+            <Box paddingLeft="24px">
+              <Typography fontWeight={500}>Spaces</Typography>
+              <SelectRooms
+                allRooms={roomSettings}
+                selected={selectedRooms}
+                setSelected={setSelectedRooms}
+              />
+            </Box>
+          </Stack>
+        </Grid>
+        <Grid paddingRight={2} flex={1}>
+          <CalendarVerticalResource rooms={selectedRooms} dateView={date} />
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

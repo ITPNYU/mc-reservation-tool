@@ -1,49 +1,72 @@
-import React, { useContext } from "react";
-
+import { useCallback, useContext, useState } from "react";
 import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
-import FormInput from "../components/FormInput";
-import { Inputs } from "../../../../types";
-import Loading from "../../../utils/Loading";
 import { useRouter } from "next/navigation";
-import useSubmitBooking from "../hooks/useSubmitBooking";
+import { Inputs } from "../../../../types";
 
-export default function UserSectionPage() {
+export default function useSubmitBooking() {
   const router = useRouter();
-  const { userEmail, setUserEmail } = useContext(DatabaseContext);
-  const { bookingCalendarInfo } = useContext(BookingContext);
+  const { liaisonUsers, userEmail, reloadBookings, reloadBookingStatuses } =
+    useContext(DatabaseContext);
+  const { bookingCalendarInfo, department, role, selectedRooms } =
+    useContext(BookingContext);
+  const [loading, setLoading] = useState(false);
 
-  const [registerEvent, loading] = useSubmitBooking();
+  const registerEvent = useCallback(
+    async (data: Inputs) => {
+      if (!department || !role) {
+        console.error("Missing info for submitting booking");
+        return;
+      }
 
-  const handleSubmit = async (data: Inputs) => {
-    if (!bookingCalendarInfo) return;
-    if (!userEmail && data.missingEmail) {
-      setUserEmail(data.missingEmail);
-    }
-    registerEvent(data);
-  };
+      setLoading(true);
+      const email = userEmail || data.missingEmail;
+      if (
+        !bookingCalendarInfo ||
+        !bookingCalendarInfo.startStr ||
+        !bookingCalendarInfo.endStr
+      ) {
+        setLoading(false);
+        return;
+      }
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  return (
-    <div className="px-60">
-      <button
-        key="backToCalendar"
-        disabled={!bookingCalendarInfo}
-        onClick={() => {
-          router.push("/book/selectRoom");
-        }}
-        className={`px-4 py-2 text-white rounded-md focus:outline-none ${
-          bookingCalendarInfo
-            ? "bg-blue-600 hover:bg-blue-700"
-            : "bg-gray-300 pointer-events-none"
-        }`}
-      >
-        Back to Calendar
-      </button>
-      <FormInput handleParentSubmit={handleSubmit} />
-    </div>
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/bookings`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            selectedRooms,
+            bookingCalendarInfo,
+            liaisonUsers,
+            data,
+          }),
+        });
+        alert("Your request has been sent.");
+        router.push("/");
+        reloadBookings();
+        reloadBookingStatuses();
+      } catch (error) {
+        console.error("Error submitting booking:", error);
+        alert("An error occurred while submitting your booking.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      bookingCalendarInfo,
+      selectedRooms,
+      liaisonUsers,
+      userEmail,
+      router,
+      reloadBookings,
+      reloadBookingStatuses,
+      department,
+      role,
+    ]
   );
+
+  return registerEvent;
 }

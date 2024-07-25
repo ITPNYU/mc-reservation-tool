@@ -19,7 +19,7 @@ const BottomRow = styled(Table)({
 });
 
 export default function BookMoreButton() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const theme = useTheme();
 
   return (
@@ -28,7 +28,7 @@ export default function BookMoreButton() {
         <TableRow>
           <TableCell sx={{ padding: '4px', borderBottom: 'none' }}>
             <Button
-              onClick={() => navigate('/book')}
+              onClick={() => router.push('/book')}
               variant="text"
               sx={{
                 background: theme.palette.primary[50],

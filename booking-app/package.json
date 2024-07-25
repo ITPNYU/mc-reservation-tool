@@ -11,16 +11,21 @@
     "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
+    "@emotion/styled": "^11.13.0",
     "@firebase/firestore": "^4.6.4",
     "@fullcalendar/core": "^6.1.14",
     "@fullcalendar/daygrid": "^6.1.14",
     "@fullcalendar/google-calendar": "^6.1.14",
     "@fullcalendar/react": "^6.1.14",
+    "@fullcalendar/resource-timegrid": "^6.1.15",
+    "@mui/icons-material": "^5.16.5",
+    "@mui/x-date-pickers": "^7.11.1",
     "@prisma/client": "^5.16.1",
     "@typescript-eslint/typescript-estree": "^7.16.0",
     "axios": "^1.7.2",
     "bootstrap": "^5.3.3",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.4",
     "firebase-admin": "^12.2.0",
@@ -35,6 +40,7 @@
     "react-dom": "^18",
     "react-firebase-hooks": "^5.1.1",
     "react-hook-form": "^7.52.0",
+    "styled-components": "^6.1.12",
     "tailwind-datepicker-react": "^1.4.3"
   },
   "devDependencies": {
@@ -42,6 +48,7 @@
     "@types/node": "^20.14.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/styled-components": "^5.1.34",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.57.0",
