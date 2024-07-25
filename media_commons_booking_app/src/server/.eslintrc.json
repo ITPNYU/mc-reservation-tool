@@ -2,18 +2,22 @@
   "root": true,
   "parser": "@babel/eslint-parser",
   "extends": ["airbnb-base", "plugin:prettier/recommended"],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "googleappsscript"],
+  "env": {
+    "googleappsscript/googleappsscript": true
+  },
   "rules": {
     "prettier/prettier": "error",
     "camelcase": "warn",
     "import/prefer-default-export": "warn",
     "import/no-extraneous-dependencies": "warn",
-    "prefer-object-spread": "warn",
-    "spaced-comment":"off"
+    "prefer-object-spread": "warn"
   },
-  "parserOptions": {
-    "babelOptions": {
-      "configFile": "./dev/.babelrc"
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"]
+      }
     }
   }
 }
