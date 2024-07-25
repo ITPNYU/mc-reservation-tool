@@ -65,3 +65,8 @@ $RECYCLE.BIN/
 
 
 app.yaml
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
