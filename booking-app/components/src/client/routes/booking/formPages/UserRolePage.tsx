@@ -1,14 +1,22 @@
 "use client";
 import { Department, Role } from "../../../../types";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { BookingContext } from "../bookingProvider";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../components/AuthProvider";
 
 export default function UserRolePage() {
   const { role, department, setDepartment, setRole } =
     useContext(BookingContext);
   const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/forbidden");
+    }
+  }, []);
 
   const handleNextClick = () => {
     console.log("role", role, "department", department);
