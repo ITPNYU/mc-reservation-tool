@@ -1,38 +1,62 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-   "main": "app.js",
-  "scripts": {
-    "start": "node app.js"
+  "name": "react-google-apps-script",
+  "version": "2.1.1",
+  "description": "Starter project for using React with Google Apps Script",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enuchi/React-Google-Apps-Script.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "test:integration": "jest --forceExit test/local-development.test",
+    "test:integration:extended": "cross-env IS_EXTENDED=true jest --forceExit test/local-development.test",
+    "login": "clasp login",
+    "setup": "rimraf .clasp.json && mkdirp dist && clasp create --type sheets --title \"My React Project\" --rootDir ./dist && mv ./dist/.clasp.json ./.clasp.json && rimraf dist",
+    "open": "clasp open --addon",
+    "setup:https": "mkdirp certs && mkcert -key-file ./certs/key.pem -cert-file ./certs/cert.pem localhost 127.0.0.1",
+    "build:local": "cross-env NODE_ENV=development CALENDAR_ENV=development BRANCH_NAME=development webpack",
+    "build:dev": "cross-env NODE_ENV=production CALENDAR_ENV=development BRANCH_NAME=development webpack --mode=production",
+    "build:staging": "cross-env NODE_ENV=production CALENDAR_ENV=development BRANCH_NAME=staging webpack --mode=production",
+    "build": "cross-env NODE_ENV=production CALENDAR_ENV=production BRANCH_NAME=production webpack --mode=production",
+    "deploy:local": "rimraf dist && npm run build:local && npx clasp push",
+    "deploy:dev": "rimraf dist && npm run build:dev && npx clasp push",
+    "deploy:staging": "rimraf dist && npm run build:staging && npx clasp push",
+    "deploy": "rimraf dist && npm run build && npx clasp push",
+    "serve": "cross-env NODE_ENV=development CALENDAR_ENV=development BRANCH_NAME=development webpack serve",
+    "start": "npm run deploy:local && npm run serve"
+  },
+  "keywords": [
+    "react",
+    "google",
+    "apps",
+    "script",
+    "sheets"
+  ],
+  "author": "Elisha Nuchi",
+  "license": "MIT",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
   "dependencies": {
-<<<<<<< HEAD
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@fullcalendar/core": "^6.1.14",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/google-calendar": "^6.1.8",
     "@fullcalendar/interaction": "^6.1.8",
     "@fullcalendar/react": "^6.1.8",
-    "@fullcalendar/resource": "^6.1.14",
-    "@fullcalendar/resource-timegrid": "^6.1.14",
+    "@fullcalendar/resource-timeline": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.8",
-    "@mui/icons-material": "^5.15.19",
-    "@mui/material": "^5.15.19",
-    "@mui/x-date-pickers": "^7.7.0",
-    "dayjs": "^1.11.11",
+    "@mui/material": "^5.11.11",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.4.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.2",
     "react-router": "^6.22.3",
     "react-router-dom": "^6.22.3",
     "react-transition-group": "^4.4.2",
-    "react-use-websocket": "^4.8.1",
+    "tailwind-datepicker-react": "^1.4.2",
     "tailwindcss": "^3.1.6"
   },
   "devDependencies": {
@@ -58,7 +82,6 @@
     "@types/react": "^18.2.67",
     "autoprefixer": "10.4.5",
     "aws-sdk": "^2.1106.0",
-    "axios": "^1.7.2",
     "babel-loader": "^8.2.5",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-transform-es3-member-expression-literals": "^6.22.0",
@@ -102,14 +125,8 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.3",
     "ts-loader": "^9.3.0",
-    "ts-node": "^10.9.2",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.2",
-    "yargs": "^17.7.2"
-=======
-    "body-parser": "^1.20.2",
-    "express": "^4.19.2"
->>>>>>> 4feb512 (Add express server)
+    "webpack-dev-server": "^4.9.2"
   }
 }
