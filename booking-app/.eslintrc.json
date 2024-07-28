@@ -27,6 +27,7 @@
     "prettier/prettier": "error",
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": "off",
+    "no-use-before-define": "off",
     "import/extensions": [
       "error",
       "ignorePackages",

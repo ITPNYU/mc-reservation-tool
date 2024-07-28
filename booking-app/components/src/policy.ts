@@ -54,10 +54,10 @@ export const SECOND_OLD_SAFETY_TRAINING_SHEET_GID = 293202487;
 
 // TODO configure this via admin UI
 export const getSecondApproverEmail = (branchName: string) =>
-  branchName === "media-commons-devs@itp.nyu.edu"; // Jhanele
+  "media-commons-devs@itp.nyu.edu"; // Jhanele
 
 export const getApprovalCcEmail = (branchName: string) =>
-  branchName === "media-commons-devs@itp.nyu.edu"; // Samantha
+  "media-commons-devs@itp.nyu.edu"; // Samantha
 
 /** ******** ROOMS *********** */
 
