@@ -4,13 +4,13 @@ import { initializeFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDdFBW-MHSbBCHg-6TLBgJUmp1hacx7Vr8",
-  authDomain: "flowing-mantis-389917.firebaseapp.com",
-  projectId: "flowing-mantis-389917",
-  storageBucket: "flowing-mantis-389917.appspot.com",
-  messagingSenderId: "289027705740",
-  appId: "1:289027705740:web:31820e33df9be4d65d24a9",
-  measurementId: "G-B2TH2J5RFR",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 const app = initializeApp(firebaseConfig);
 export const db = initializeFirestore(
@@ -19,7 +19,7 @@ export const db = initializeFirestore(
     experimentalForceLongPolling: true,
     experimentalAutoDetectLongPolling: false,
   },
-  "media-commons1"
+  process.env.NEXT_PUBLIC_DATABASE_NAME
 );
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
