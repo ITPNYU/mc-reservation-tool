@@ -1,0 +1,10 @@
+runtime: nodejs20
+instance_class: F1
+service: staging
+
+env_variables:
+  NEXT_PUBLIC_BRANCH_NAME: "staging"
+
+handlers:
+  - url: /(.*)
+    script: auto
