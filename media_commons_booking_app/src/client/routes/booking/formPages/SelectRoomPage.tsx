@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
 import { BookingContext } from '../bookingProvider';
 import { CalendarDatePicker } from '../components/CalendarDatePicker';
@@ -7,11 +7,22 @@ import CalendarVerticalResource from '../components/CalendarVerticalResource';
 import { DatabaseContext } from '../../components/Provider';
 import Grid from '@mui/material/Unstable_Grid2';
 import { SelectRooms } from '../components/SelectRooms';
+import { WALK_IN_ROOMS } from '../../../../policy';
 
-export default function SelectRoomPage() {
-  const { roomSettings, userEmail } = useContext(DatabaseContext);
+interface Props {
+  isWalkIn?: boolean;
+}
+
+export default function SelectRoomPage({ isWalkIn = false }: Props) {
+  const { roomSettings } = useContext(DatabaseContext);
   const { selectedRooms, setSelectedRooms } = useContext(BookingContext);
   const [date, setDate] = useState<Date>(new Date());
+
+  const roomsToShow = useMemo(() => {
+    return !isWalkIn
+      ? roomSettings
+      : roomSettings.filter((room) => WALK_IN_ROOMS.includes(room.roomId));
+  }, [roomSettings]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -22,7 +33,7 @@ export default function SelectRoomPage() {
             <Box paddingLeft="24px">
               <Typography fontWeight={500}>Spaces</Typography>
               <SelectRooms
-                allRooms={roomSettings}
+                allRooms={roomsToShow}
                 selected={selectedRooms}
                 setSelected={setSelectedRooms}
               />

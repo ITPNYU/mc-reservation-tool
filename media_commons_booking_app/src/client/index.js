@@ -12,6 +12,7 @@ import React from 'react';
 import Root from './routes/root';
 import SelectRoomPage from './routes/booking/formPages/SelectRoomPage';
 import UserRolePage from './routes/booking/formPages/UserRolePage';
+import WalkInLandingPage from './routes/pa/walkin/WalkInLandingPage';
 import { createRoot } from 'react-dom/client';
 
 const router = createMemoryRouter([
@@ -55,6 +56,24 @@ const router = createMemoryRouter([
           {
             path: '/book',
             element: <LandingPage />,
+          },
+        ],
+      },
+      {
+        path: '/walkIn',
+        element: <BookingForm />,
+        children: [
+          {
+            path: '/walkIn/selectRoom',
+            element: <SelectRoomPage isWalkIn={true} />,
+          },
+          {
+            path: '/walkIn/role',
+            element: <UserRolePage isWalkIn={true} />,
+          },
+          {
+            path: '/walkIn',
+            element: <WalkInLandingPage />,
           },
         ],
       },

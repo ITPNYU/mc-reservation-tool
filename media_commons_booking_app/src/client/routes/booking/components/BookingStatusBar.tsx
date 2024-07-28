@@ -1,13 +1,6 @@
-import {
-  Alert,
-  AlertColor,
-  Box,
-  Button,
-  Tooltip,
-  useTheme,
-} from '@mui/material';
+import { Alert, AlertColor, Box, Button, Tooltip } from '@mui/material';
 import { Check, ChevronLeft, ChevronRight } from '@mui/icons-material';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 
 import { BookingContext } from '../bookingProvider';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -25,7 +18,6 @@ export default function BookingStatusBar(props: Props) {
   const { bookingCalendarInfo, selectedRooms, isBanned, needsSafetyTraining } =
     useContext(BookingContext);
   const isOverlap = useCalculateOverlap();
-  const theme = useTheme();
 
   const showAlert =
     isBanned ||

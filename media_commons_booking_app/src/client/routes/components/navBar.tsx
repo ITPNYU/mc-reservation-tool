@@ -110,7 +110,11 @@ export default function NavBar() {
 
     if (pagePermission !== PagePermission.BOOKING) {
       return (
-        <Button variant="outlined" sx={{ height: '40px', marginRight: 2 }}>
+        <Button
+          onClick={() => navigate('/walkIn')}
+          variant="outlined"
+          sx={{ height: '40px', marginRight: 2 }}
+        >
           Walk In
         </Button>
       );

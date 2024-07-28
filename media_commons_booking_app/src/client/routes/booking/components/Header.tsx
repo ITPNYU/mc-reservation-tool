@@ -25,7 +25,7 @@ export const Header = () => {
     threshold: 100,
   });
 
-  if (location.pathname === '/book') {
+  if (location.pathname === '/book' || location.pathname === '/walkIn') {
     return null;
   }
 

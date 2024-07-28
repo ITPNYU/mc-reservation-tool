@@ -24,7 +24,11 @@ const Container = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.custom.border}`,
 }));
 
-export default function UserRolePage() {
+interface Props {
+  isWalkIn?: boolean;
+}
+
+export default function UserRolePage({ isWalkIn = false }: Props) {
   const { role, department, setDepartment, setRole } =
     useContext(BookingContext);
 
@@ -35,7 +39,7 @@ export default function UserRolePage() {
       alert('Please make sure all fields are selected.');
       return;
     }
-    navigate('/book/selectRoom');
+    navigate(isWalkIn ? '/walkIn/selectRoom' : '/book/selectRoom');
   };
 
   return (

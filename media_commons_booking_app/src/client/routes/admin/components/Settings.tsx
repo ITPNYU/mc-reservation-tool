@@ -8,7 +8,6 @@ import { Liaisons } from './Liaisons';
 import { PAUsers } from './PAUsers';
 import ReservationTypes from './ReservationTypes';
 import SafetyTrainedUsers from './SafetyTraining';
-import { TableNames } from '../../../../policy';
 
 const tabs = [
   { label: 'Safety Training', id: 'safetyTraining' },
@@ -21,11 +20,12 @@ const tabs = [
 
 export default function Settings() {
   const [tab, setTab] = useState('safetyTraining');
+
   return (
     <Grid container marginTop={4} spacing={2}>
       <Grid xs={2}>
         <Stack
-          divider={<Divider sx={{ borderColor: '#21212154' }} />}
+          divider={<Divider sx={{ borderColor: '#21212114' }} />}
           sx={{ border: '1px solid #21212114', borderRadius: '4px' }}
         >
           {tabs.map((tab) => (
