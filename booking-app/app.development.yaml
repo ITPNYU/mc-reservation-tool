@@ -1,0 +1,10 @@
+runtime: nodejs20
+instance_class: F1
+service: development
+
+env_variables:
+  NEXT_PUBLIC_BRANCH_NAME: "development"
+
+handlers:
+  - url: /(.*)
+    script: auto
