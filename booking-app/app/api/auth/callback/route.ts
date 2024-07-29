@@ -12,16 +12,6 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  try {
-    const { tokens } = await oauth2Client.getToken(code);
-    // トークンをセッションに保存するか、フロントエンドに返す
-    // ここではフロントエンドにトークンを返す例を示します
-    return NextResponse.json(tokens, { status: 200 });
-  } catch (error) {
-    console.error("Error getting tokens:", error);
-    return NextResponse.json(
-      { error: "Failed to get tokens" },
-      { status: 500 },
-    );
-  }
+  const { tokens } = await oauth2Client.getToken(code);
+  return NextResponse.json(tokens, { status: 200 });
 }

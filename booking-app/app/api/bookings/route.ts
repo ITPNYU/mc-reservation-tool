@@ -43,16 +43,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  console.log({
-    calendarId,
-    title: `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(", ")} ${department} ${data.title}`,
-    description:
-      "Your reservation is not yet confirmed. The coordinator will review and finalize your reservation within a few days.",
-    startTime: bookingCalendarInfo.startStr,
-    endTime: bookingCalendarInfo.endStr,
-    roomEmails: otherRoomIds,
-  });
-
   const event = await insertEvent({
     calendarId,
     title: `[${BookingStatusLabel.REQUESTED}] ${selectedRoomIds.join(", ")} ${department} ${data.title}`,
@@ -63,15 +53,6 @@ export async function POST(request: NextRequest) {
     roomEmails: otherRoomIds,
   });
   const calendarEventId = event.id;
-
-  console.log({
-    calendarEventId,
-    roomId: selectedRoomIds.join(", "),
-    email,
-    startDate: bookingCalendarInfo.startStr,
-    endDate: bookingCalendarInfo.endStr,
-    ...data,
-  });
 
   await saveDataToFirestore(TableNames.BOOKING, {
     calendarEventId,
@@ -88,6 +69,7 @@ export async function POST(request: NextRequest) {
   });
 
   const firstApprovers = await firstApproverEmails(department);
+  console.log("firstApprovers", firstApprovers);
   const sendApprovalEmail = async (
     recipients: string[],
     contents: BookingFormDetails,

@@ -71,7 +71,6 @@ const Empty = styled(Box)(({ theme }) => ({
 
 export default function CalendarVerticalResource({ rooms, dateView }: Props) {
   const theme = useTheme();
-  console.log("custom!!!!!!!!!", theme.palette);
 
   const {
     bookingCalendarInfo,

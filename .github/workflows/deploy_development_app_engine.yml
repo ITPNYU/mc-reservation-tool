@@ -1,12 +1,9 @@
 name: Deploy DEVELOPMENT to App Engine
-
 on:
   push:
     branches:
       - main
-      - app_engine
       - app_engine_new_ui
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: "18.17.1"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
@@ -29,7 +26,6 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-
       - name: Create .env file
         run: |
           cd booking-app
@@ -57,17 +53,17 @@ jobs:
           echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> .env.production
           echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}" >> .env.production
 
-      - name: Install dependencies
-        run: |
-          cd booking-app
-          npm ci
-
       - name: Build
         run: |
           cd booking-app
           npm run build
 
+      - name: Run App Engine diagnostics
+        run: |
+          cd booking-app
+          gcloud components update
+
       - name: Deploy to App Engine
         run: |
           cd booking-app
-          gcloud app deploy app.development.yaml --verbosity=debug --quiet
+          gcloud app deploy app.development.yaml --project=${{ secrets.GCP_PROJECT_ID }} --quiet --verbosity=debug

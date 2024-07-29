@@ -9,19 +9,14 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
-    console.log(
-      "Fetching calendar events from:",
-      process.env.CALENDAR_ENV,
-      "calendars"
-    );
-
-    const fakeEvents = getFakeEvents();
-
+    //TODO: Fix this after getting title from prodcalendars
     Promise.all(allRooms.map(fetchRoomCalendarEvents)).then((results) =>
       setEvents(
-        [...fakeEvents, ...results.flat()].filter(
+        [...results.flat()].filter(
           (event) =>
-            !CALENDAR_HIDE_STATUS.some((status) => event.title.includes(status))
+            !CALENDAR_HIDE_STATUS.some((status) =>
+              event?.title?.includes(status)
+            )
         )
       )
     );
@@ -36,7 +31,9 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
       }
     );
     const filteredEvents = response.data.filter((row: any) => {
-      return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
+      return !CALENDAR_HIDE_STATUS.some((status) =>
+        row?.title?.includes(status)
+      );
     });
     setEvents(filteredEvents);
     const rowsWithResourceIds = filteredEvents.map((row) => ({
