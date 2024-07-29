@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - app_engine
+      - app_engine_new_ui
 
 jobs:
   deploy:

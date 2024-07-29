@@ -6,8 +6,8 @@ import { DatabaseProvider } from "@/components/src/client/routes/components/Prov
 import theme from "./theme/theme";
 
 export const metadata: Metadata = {
-  title: "Your App Name",
-  description: "Your app description",
+  title: "Booking App",
+  description: "Booking App",
 };
 
 export default function RootLayout({
