@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, BookingStatusLabel } from '../../../types';
+import { Booking, BookingStatus, BookingStatusLabel } from "../../../types";
 
 export default function getBookingStatus(
   booking: Booking,
@@ -39,13 +39,13 @@ export default function getBookingStatus(
       return label;
     }
 
-    if (bookingStatusMatch.rejectedAt !== '') {
+    if (bookingStatusMatch.rejectedAt !== undefined) {
       return BookingStatusLabel.REJECTED;
-    } else if (bookingStatusMatch.secondApprovedAt !== '') {
+    } else if (bookingStatusMatch.secondApprovedAt !== undefined) {
       return BookingStatusLabel.APPROVED;
-    } else if (bookingStatusMatch.firstApprovedAt !== '') {
+    } else if (bookingStatusMatch.firstApprovedAt !== undefined) {
       return BookingStatusLabel.PRE_APPROVED;
-    } else if (bookingStatusMatch.requestedAt !== '') {
+    } else if (bookingStatusMatch.requestedAt !== "") {
       return BookingStatusLabel.REQUESTED;
     } else {
       return BookingStatusLabel.UNKNOWN;

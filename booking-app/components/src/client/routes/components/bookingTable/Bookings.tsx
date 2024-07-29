@@ -1,22 +1,22 @@
-import { Booking, BookingRow, BookingStatusLabel } from '../../../../types';
-import { Box, TableCell } from '@mui/material';
+import { Booking, BookingRow, BookingStatusLabel } from "../../../../types";
+import { Box, TableCell } from "@mui/material";
 import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
-} from 'react';
-import SortableTableCell, { COMPARATORS } from './SortableTableCell';
-import Table, { TableEmpty } from '../Table';
+} from "react";
+import SortableTableCell, { COMPARATORS } from "./SortableTableCell";
+import Table, { TableEmpty } from "../Table";
 
-import BookMoreButton from './BookMoreButton';
-import BookingTableFilters from './BookingTableFilters';
-import BookingTableRow from './BookingTableRow';
-import { DatabaseContext } from '../Provider';
-import Loading from '../Loading';
-import MoreInfoModal from './MoreInfoModal';
-import getBookingStatus from '../../hooks/getBookingStatus';
+import BookMoreButton from "./BookMoreButton";
+import BookingTableFilters from "./BookingTableFilters";
+import BookingTableRow from "./BookingTableRow";
+import { DatabaseContext } from "../Provider";
+import Loading from "../Loading";
+import MoreInfoModal from "./MoreInfoModal";
+import getBookingStatus from "../../hooks/getBookingStatus";
 
 interface BookingsProps {
   isAdminView?: boolean;
@@ -40,8 +40,8 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const [modalData, setModalData] = useState<BookingRow>(null);
   const [statusFilters, setStatusFilters] = useState([]);
-  const [orderBy, setOrderBy] = useState<keyof BookingRow>('startDate');
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [orderBy, setOrderBy] = useState<keyof BookingRow>("startDate");
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     reloadBookingStatuses();
@@ -79,7 +79,7 @@ export const Bookings: React.FC<BookingsProps> = ({
 
     // column sorting
     const comparator = COMPARATORS[orderBy];
-    const coeff = order === 'asc' ? 1 : -1;
+    const coeff = order === "asc" ? 1 : -1;
     comparator != null && filtered.sort((a, b) => coeff * comparator(a, b));
 
     // status chip filters
@@ -102,10 +102,10 @@ export const Bookings: React.FC<BookingsProps> = ({
       return (
         <Box
           sx={{
-            color: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            justifyContent: 'flex-start',
-            paddingLeft: '16px',
+            color: "rgba(0,0,0,0.6)",
+            display: "flex",
+            justifyContent: "flex-start",
+            paddingLeft: "16px",
           }}
         >
           Your Bookings
@@ -134,7 +134,7 @@ export const Bookings: React.FC<BookingsProps> = ({
         <TableEmpty>
           {isUserView
             ? "You don't have any reservations"
-            : 'No active reservations found'}
+            : "No active reservations found"}
         </TableEmpty>
       );
     }
@@ -142,8 +142,8 @@ export const Bookings: React.FC<BookingsProps> = ({
 
   const createSortHandler = useCallback(
     (property: keyof Booking) => (_: React.MouseEvent<unknown>) => {
-      const isAsc = orderBy === property && order === 'asc';
-      setOrder(isAsc ? 'desc' : 'asc');
+      const isAsc = orderBy === property && order === "asc";
+      setOrder(isAsc ? "desc" : "asc");
       setOrderBy(property);
     },
     [order, orderBy]
@@ -193,7 +193,7 @@ export const Bookings: React.FC<BookingsProps> = ({
       <Table
         {...{ columns, topRow }}
         sx={{
-          borderRadius: isUserView ? '0px' : '',
+          borderRadius: isUserView ? "0px" : "",
         }}
       >
         {filteredRows.map((row) => (

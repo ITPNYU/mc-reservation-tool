@@ -30,6 +30,12 @@ const AlertHeader = styled(Alert)(({ theme }) => ({
 export default function BookingSelection() {
   const { selectedRooms, bookingCalendarInfo } = useContext(BookingContext);
 
+  if (
+    bookingCalendarInfo?.startStr == undefined ||
+    bookingCalendarInfo?.endStr == undefined
+  ) {
+    return null;
+  }
   return (
     <Box sx={{ paddingBottom: "24px" }} width="100%">
       <AlertHeader color="info" icon={<Event />} sx={{ marginBottom: 3 }}>

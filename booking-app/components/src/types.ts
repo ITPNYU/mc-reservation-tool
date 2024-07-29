@@ -1,3 +1,5 @@
+import { Timestamp } from "@firebase/firestore";
+
 export type AdminUser = {
   email: string;
   createdAt: string;
@@ -20,7 +22,6 @@ export type Booking = Inputs & {
   startDate: string;
   endDate: string;
   roomId: string;
-  devBranch: string;
 };
 
 // used for Booking table rows that show status
@@ -39,8 +40,8 @@ export type BookingStatus = {
   calendarEventId: string;
   email: string;
   requestedAt: string;
-  firstApprovedAt: string;
-  secondApprovedAt: string;
+  firstApprovedAt: Timestamp;
+  secondApprovedAt: Timestamp;
   rejectedAt: string;
   canceledAt: string;
   checkedInAt: string;
@@ -141,7 +142,7 @@ export enum PagePermission {
 
 export type ReservationType = {
   reservationType: string;
-  dateAdded: string;
+  createdAt: string;
 };
 
 export enum Role {
@@ -161,7 +162,7 @@ export type RoomSetting = {
 
 export type SafetyTraining = {
   email: string;
-  completedAt: string;
+  createdAt: string;
 };
 
 export type Settings = {

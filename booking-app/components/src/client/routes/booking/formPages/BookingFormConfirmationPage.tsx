@@ -5,7 +5,7 @@ import { BookingContext } from "../bookingProvider";
 import { Event } from "@mui/icons-material";
 import Loading from "../../components/Loading";
 import { styled } from "@mui/system";
-import { useNavigate } from "react-router";
+import { useRouter } from "next/navigation";
 
 const Centered = styled(Box)`
   position: relative;

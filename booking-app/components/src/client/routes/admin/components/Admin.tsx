@@ -1,18 +1,18 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from "react";
 
-import { Bookings } from '../../components/bookingTable/Bookings';
-import { Box } from '@mui/material';
-import { CenterLoading } from '../../components/Loading';
-import { DatabaseContext } from '../../components/Provider';
-import { PagePermission } from '../../../../types';
-import Settings from './Settings';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
+import { Bookings } from "../../components/bookingTable/Bookings";
+import { Box } from "@mui/material";
+import { CenterLoading } from "../../components/Loading";
+import { DatabaseContext } from "../../components/Provider";
+import { PagePermission } from "../../../../types";
+import Settings from "./Settings";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 
 // This is a wrapper for google.script.run that lets us use promises.
 
 export default function Admin() {
-  const [tab, setTab] = useState('bookings');
+  const [tab, setTab] = useState("bookings");
   const { adminUsers, pagePermission, userEmail } = useContext(DatabaseContext);
 
   const adminEmails = useMemo<string[]>(
@@ -20,6 +20,8 @@ export default function Admin() {
     [adminUsers]
   );
   const userHasPermission = pagePermission === PagePermission.ADMIN;
+  console.log("adminEmails", adminEmails);
+  console.log("userEmail", userEmail);
 
   if (adminEmails.length === 0 || userEmail == null) {
     return <CenterLoading />;
@@ -40,8 +42,8 @@ export default function Admin() {
             <Tab value="bookings" label="Bookings" />
             <Tab value="settings" label="Settings" />
           </Tabs>
-          {tab === 'bookings' && <Bookings isAdminView={true} />}
-          {tab === 'settings' && <Settings />}
+          {tab === "bookings" && <Bookings isAdminView={true} />}
+          {tab === "settings" && <Settings />}
         </div>
       )}
     </Box>

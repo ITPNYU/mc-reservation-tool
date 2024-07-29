@@ -25,9 +25,6 @@ import { toFirebaseTimestampFromString } from "@/components/src/client/utils/dat
 export async function POST(request: NextRequest) {
   const { email, selectedRooms, bookingCalendarInfo, data } =
     await request.json();
-  console.log("email", email);
-  console.log("selectedRooms", selectedRooms);
-  console.log("bookingCalendarInfo", bookingCalendarInfo);
   console.log("data", data);
   const { department } = data;
   const [room, ...otherRooms] = selectedRooms;
@@ -39,9 +36,7 @@ export async function POST(request: NextRequest) {
   );
 
   const calendarId = await getRoomCalendarId(room.roomId);
-  console.log("calendarId", calendarId);
   if (calendarId == null) {
-    console.error("ROOM CALENDAR ID NOT FOUND");
     return NextResponse.json(
       { result: "error", message: "ROOM CALENDAR ID NOT FOUND" },
       { status: 500 },
@@ -122,7 +117,7 @@ export async function POST(request: NextRequest) {
     const duration = endDate.toMillis() - startDate.toMillis();
     return (
       duration <= 3.6e6 * 4 && // <= 4 hours
-      selectedRoomIds.every(r => INSTANT_APPROVAL_ROOMS.includes(Number(r))) &&
+      selectedRoomIds.every(r => INSTANT_APPROVAL_ROOMS.includes(r)) &&
       data.catering === "no" &&
       data.hireSecurity === "no" &&
       data.mediaServices.length === 0 &&

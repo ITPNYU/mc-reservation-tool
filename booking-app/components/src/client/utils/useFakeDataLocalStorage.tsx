@@ -1,16 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
-import { STORAGE_KEY_BOOKING } from '../../policy';
-import useWebSocket from 'react-use-websocket';
+import { STORAGE_KEY_BOOKING } from "../../policy";
+//@ts-ignore
+import useWebSocket from "react-use-websocket";
 
 export default function useFakeDataLocalStorage(
   setBookings,
   setBookingStatuses
 ) {
   const { lastMessage } = useWebSocket(
-    'ws://localhost:3001',
+    "ws://localhost:3001",
     { shouldReconnect: (closeEvent) => false },
-    process.env.BRANCH_NAME === 'development'
+    process.env.BRANCH_NAME === "development"
   );
   const hasUpdated = useRef(false);
 
@@ -19,16 +20,16 @@ export default function useFakeDataLocalStorage(
       return;
     }
 
-    if (lastMessage.data.startsWith('ADD:')) {
+    if (lastMessage.data.startsWith("ADD:")) {
       const fakeBookings = localStorage.getItem(STORAGE_KEY_BOOKING);
-      const data = lastMessage.data.substring('ADD:'.length);
+      const data = lastMessage.data.substring("ADD:".length);
       if (fakeBookings == null) {
         initialize(data);
       } else {
         update(data);
       }
     }
-    console.log('FROM SERVER:', lastMessage);
+    console.log("FROM SERVER:", lastMessage);
   }, [lastMessage]);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function useFakeDataLocalStorage(
     if (
       existingFakeData != null &&
       hasUpdated.current === false &&
-      process.env.BRANCH_NAME === 'development'
+      process.env.BRANCH_NAME === "development"
     ) {
       const json = JSON.parse(existingFakeData);
 
@@ -62,7 +63,7 @@ export default function useFakeDataLocalStorage(
   const initialize = (data: string) => {
     localStorage.setItem(STORAGE_KEY_BOOKING, data);
     const json = JSON.parse(data);
-    if (process.env.BRANCH_NAME === 'development') {
+    if (process.env.BRANCH_NAME === "development") {
       setBookings((prev) => [...prev, ...json.bookingRows]);
       setBookingStatuses((prev) => [...prev, ...json.bookingStatusRows]);
     }
@@ -80,7 +81,7 @@ export default function useFakeDataLocalStorage(
       existingFakeData.bookingStatusRows.concat(json.bookingStatusRows);
     localStorage.setItem(STORAGE_KEY_BOOKING, JSON.stringify(existingFakeData));
 
-    if (process.env.BRANCH_NAME === 'development') {
+    if (process.env.BRANCH_NAME === "development") {
       setBookings((prev) => [...prev, ...json.bookingRows]);
       setBookingStatuses((prev) => [...prev, ...json.bookingStatusRows]);
     }

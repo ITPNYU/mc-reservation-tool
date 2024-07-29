@@ -31,6 +31,7 @@ export interface DatabaseContextType {
   adminUsers: AdminUser[];
   bannedUsers: Ban[];
   bookings: Booking[];
+  bookingsLoading: boolean;
   bookingStatuses: BookingStatus[];
   liaisonUsers: LiaisonType[];
   pagePermission: PagePermission;
@@ -54,6 +55,7 @@ export const DatabaseContext = createContext<DatabaseContextType>({
   adminUsers: [],
   bannedUsers: [],
   bookings: [],
+  bookingsLoading: true,
   bookingStatuses: [],
   liaisonUsers: [],
   pagePermission: PagePermission.BOOKING,
@@ -80,6 +82,7 @@ export const DatabaseProvider = ({
 }) => {
   const [bannedUsers, setBannedUsers] = useState<Ban[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState<boolean>(true);
   const [bookingStatuses, setBookingStatuses] = useState<BookingStatus[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [liaisonUsers, setLiaisonUsers] = useState<LiaisonType[]>([]);
@@ -108,19 +111,24 @@ export const DatabaseProvider = ({
   }, [userEmail, adminUsers, paUsers]);
 
   useEffect(() => {
-    // fetch most important tables first - determine page permissions
-    Promise.all([fetchAdminUsers(), fetchPaUsers()]).then(() => {
-      fetchBookings();
-      fetchBookingStatuses();
+    if (!bookingsLoading) {
       fetchSafetyTrainedUsers();
       fetchBannedUsers();
       fetchLiaisonUsers();
       fetchRoomSettings();
       fetchSettings();
-    });
-  }, []);
+    }
+    // refresh booking data every 10s;
+    const intervalId = setInterval(() => {
+      fetchBookings();
+      fetchBookingStatuses();
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, [bookingsLoading]);
   useEffect(() => {
     fetchActiveUserEmail();
+    fetchAdminUsers();
+    setBookingsLoading(false);
   }, [user]);
 
   const fetchActiveUserEmail = () => {
@@ -314,6 +322,7 @@ export const DatabaseProvider = ({
         safetyTrainedUsers,
         settings,
         userEmail,
+        bookingsLoading,
         reloadAdminUsers: fetchAdminUsers,
         reloadBannedUsers: fetchBannedUsers,
         reloadBookings: fetchBookings,

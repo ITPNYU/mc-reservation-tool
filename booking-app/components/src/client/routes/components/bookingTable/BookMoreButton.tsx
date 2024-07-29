@@ -10,7 +10,7 @@ import {
 import { Add } from "@mui/icons-material";
 import React from "react";
 import { styled } from "@mui/system";
-import { useNavigate } from "react-router";
+import { useRouter } from "next/navigation";
 
 const BottomRow = styled(Table)({
   borderTop: "none",

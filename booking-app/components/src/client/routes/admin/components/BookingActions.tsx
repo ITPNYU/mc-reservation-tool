@@ -13,7 +13,7 @@ import {
   checkin,
   noShow,
   reject,
-} from "@/components/src/server";
+} from "@/components/src/server/admin";
 
 interface Props {
   calendarEventId: string;
@@ -104,23 +104,33 @@ export default function BookingActions({
       confirmation: true,
     },
     [Actions.NO_SHOW]: {
-      action: noShow(calendarEventId),
+      action: async () => {
+        await noShow(calendarEventId);
+      },
       optimisticNextStatus: BookingStatusLabel.NO_SHOW,
     },
     [Actions.CHECK_IN]: {
-      action: checkin(calendarEventId),
+      action: async () => {
+        await checkin(calendarEventId);
+      },
       optimisticNextStatus: BookingStatusLabel.CHECKED_IN,
     },
     [Actions.FIRST_APPROVE]: {
-      action: approveBooking(calendarEventId),
+      action: async () => {
+        await approveBooking(calendarEventId);
+      },
       optimisticNextStatus: BookingStatusLabel.PRE_APPROVED,
     },
     [Actions.SECOND_APPROVE]: {
-      action: () => approveBooking(calendarEventId),
+      action: async () => {
+        await approveBooking(calendarEventId);
+      },
       optimisticNextStatus: BookingStatusLabel.APPROVED,
     },
     [Actions.REJECT]: {
-      action: () => reject(calendarEventId),
+      action: async () => {
+        await reject(calendarEventId);
+      },
       optimisticNextStatus: BookingStatusLabel.REJECTED,
       confirmation: true,
     },
@@ -158,7 +168,7 @@ export default function BookingActions({
       return [];
     }
 
-    let options = [];
+    let options: Actions[] = [];
     if (status === BookingStatusLabel.REQUESTED) {
       options.push(Actions.FIRST_APPROVE);
     } else if (status === BookingStatusLabel.PRE_APPROVED) {

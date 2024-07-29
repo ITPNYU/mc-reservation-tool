@@ -25,7 +25,8 @@ export const bookingContents = (id: string) => {
         bookingToolUrl: getBookingToolDeployUrl(),
         rejectUrl: rejectUrl(id),
       });
-      return updatedBookingObj as BookingFormDetails;
+
+      return updatedBookingObj as unknown as BookingFormDetails;
     })
     .catch((error) => {
       console.error("Error fetching booking contents:", error);

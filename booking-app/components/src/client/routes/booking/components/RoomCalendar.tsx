@@ -11,8 +11,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import googleCalendarPlugin from "@fullcalendar/google-calendar";
 import interactionPlugin from "@fullcalendar/interaction"; // for selectable
 import timeGridPlugin from "@fullcalendar/timegrid"; // a plugin!
-import { HIDING_STATUS } from "../../../../policy";
 import axios from "axios";
+import { CALENDAR_HIDE_STATUS } from "../../../../policy";
 
 const TITLE_TAG = "[Click to Delete]";
 
@@ -89,7 +89,7 @@ export const RoomCalendar = ({
       }
     );
     const filteredEvents = response.data.filter((row: any) => {
-      return !HIDING_STATUS.some((status) => row.title.includes(status));
+      return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
     });
     setEvents(filteredEvents);
   };
