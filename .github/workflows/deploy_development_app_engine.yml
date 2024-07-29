@@ -60,6 +60,44 @@ jobs:
           for var in NEXT_PUBLIC_FIREBASE_API_KEY NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN NEXT_PUBLIC_FIREBASE_PROJECT_ID NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID NEXT_PUBLIC_FIREBASE_APP_ID NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID; do
             echo "$var length: ${#var}"
           done
+      - name: Check .env.production file
+        run: |
+          cd booking-app
+          echo "Checking .env.production file..."
+
+          # ファイルの行数
+          echo "Number of lines: $(wc -l < .env.production)"
+
+          # 空でない行の数
+          echo "Number of non-empty lines: $(grep -cv '^$' .env.production)"
+
+          # '='を含む行の数（通常の環境変数の数）
+          echo "Number of lines with '=': $(grep -c '=' .env.production)"
+
+          # 各環境変数の存在確認（値は表示しない）
+          echo "Checking for specific environment variables:"
+          for var in NEXT_PUBLIC_FIREBASE_API_KEY NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN FIREBASE_PROJECT_ID GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET; do
+            if grep -q "^$var=" .env.production; then
+              echo "- $var is present"
+            else
+              echo "- $var is missing"
+            fi
+          done
+
+          # 各行の形式チェック（KEY=VALUE の形式になっているか）
+          echo "Checking format of each line:"
+          while IFS= read -r line; do
+            if [[ ! "$line" =~ ^[A-Z_]+=.+$ ]] && [[ -n "$line" ]]; then
+              echo "Warning: Line does not match expected format: ${line:0:10}..."
+            fi
+          done < .env.production
+
+          # 特定の環境変数の値の長さを表示（値自体は表示しない）
+          echo "Checking lengths of specific variables:"
+          for var in NEXT_PUBLIC_FIREBASE_API_KEY GOOGLE_CLIENT_ID FIREBASE_PRIVATE_KEY; do
+            value=$(grep "^$var=" .env.production | cut -d'=' -f2-)
+            echo "- $var length: ${#value}"
+          done
       - name: Install dependencies
         run: |
           cd booking-app
