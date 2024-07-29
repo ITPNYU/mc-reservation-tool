@@ -10,7 +10,6 @@ automatic_scaling:
 env_variables:
   NEXT_PUBLIC_BRANCH_NAME: "development"
   NODE_OPTIONS: "--max-old-space-size=4096"
-  GOOGLE_NODE_RUN_SCRIPTS: ""
 
 build_env_variables:
   NODE_OPTIONS: "--max-old-space-size=4096"

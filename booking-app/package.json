@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "seed": "node prisma/seed.mjs",
-    "gcp-build": ""
+    "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
     "@emotion/styled": "^11.13.0",
