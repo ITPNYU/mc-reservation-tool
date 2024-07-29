@@ -12,10 +12,13 @@ import { DatabaseContext } from '../components/Provider';
 import { DateSelectArg } from '@fullcalendar/core';
 import { serverFunctions } from '../../utils/serverFunctions';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../policy';
 =======
 import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 >>>>>>> 4300bf5 (send test booking data to server to react)
+=======
+>>>>>>> 4f4998e (show fake data for table testing)
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
@@ -58,8 +61,6 @@ export function BookingProvider({ children }) {
   const [role, setRole] = useState<Role>();
   const [needsSafetyTraining, setNeedsSafetyTraining] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
-
-  useFakeDataLocalStorage();
 
   const isBanned = useMemo<boolean>(() => {
     console.log('userEmail', userEmail);

@@ -68,4 +68,5 @@ axios
   .catch((error) => console.error(error));
 
 // Usage:
-// npx tsx testData [number]
+// start test server: cd test && npm run start
+// npx tsx testData [number] [any args]
