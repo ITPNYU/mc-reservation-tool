@@ -32,6 +32,14 @@ export default function BookingForm({ children }: BookingFormProps) {
       "DEPLOY MODE ENVIRONMENT:",
       process.env.NEXT_PUBLIC_FIREBASE_APP_ID
     );
+    console.log(
+      "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID:",
+      process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    );
+    console.log(
+      "NEXT_PUBLIC_DATABASE_NAME:",
+      process.env.NEXT_PUBLIC_DATABASE_NAME
+    );
   }, []);
 
   return (
