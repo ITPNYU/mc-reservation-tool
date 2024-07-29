@@ -64,4 +64,4 @@ jobs:
       - name: Deploy to App Engine
         run: |
           cd booking-app
-          gcloud app deploy app.development.yaml --project=${{ secrets.GCP_PROJECT_ID }} --quiet --verbosity=debug
+          gcloud app deploy app.development.yaml --project=${{ secrets.GCP_PROJECT_ID }} --quiet
