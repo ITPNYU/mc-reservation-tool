@@ -99,7 +99,8 @@ const bookingContentsToDescription = (bookingContents: BookingFormDetails) => {
     bookingContents.roomSetup === "yes" &&
       "**" + listItem("Room Setup", bookingContents.setupDetails) + "**",
     listItem("Title", bookingContents.title),
-    bookingContents.mediaServices.length > 0 &&
+    bookingContents.mediaServices &&
+      bookingContents.mediaServices.length > 0 &&
       listItem("Media Services", bookingContents.mediaServices),
     bookingContents.mediaServicesDetails.length > 0 &&
       listItem("Media Services Details", bookingContents.mediaServicesDetails),
