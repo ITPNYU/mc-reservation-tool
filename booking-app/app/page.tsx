@@ -2,9 +2,9 @@
 
 "use client";
 
-import LandingPage from "@/components/src/client/routes/booking/formPages/LandingPage";
+import MyBookingsPage from "@/components/src/client/routes/myBookings/myBookingsPage";
 import React from "react";
 
-const HomePage: React.FC = () => <LandingPage />;
+const HomePage: React.FC = () => <MyBookingsPage />;
 
 export default HomePage;
