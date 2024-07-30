@@ -235,13 +235,40 @@ The included sample app allows inserting/activating/deleting sheets through a si
 
 The included sample app has five menu items that demonstrate how to load pages in various dialogs and sidebars. Sample implementations using different component libraries are included.
 
+- `Sheet Editor` - This is a basic app that opens in a dialog window that demonstrates how to select, create and delete sheets in a Google Sheets documents through server calls. It uses vanilla React with no component library.
+- `Sheet Editor (Boostrap)` - The same basic app is included but styled with the Bootstrap library using [`react-bootstrap`](https://react-bootstrap.github.io/). The bootstrap example also contains an example of a page built with typescript (see below).
+- `Sheet Editor (MUI)` - A similar example using [`Material UI`](https://mui.com/).
+- `Sheet Editor (Tailwind CSS)` - Another example, using [`Tailwind`](https://tailwindcss.com/)
+- `About me` - This is just a simple page that demonstrates the use of a sidebar dialog.
+
 Access the dialogs through the new menu item that appears. You may need to refresh the spreadsheet and approve the app's permissions the first time you use it.
+
+Note that if you are choosing to use one framework, for example `Tailwind`, for your project, it is advisable to remove the dependencies for the other component libraries.
+
+<details>
+  <summary>Here are some steps to take to clean up the repo if you are only using a single library</summary>
+
+1. Uninstall unneeded dependencies (`npm uninstall react-bootstrap ...` etc.)
+
+2. Remove the unneeded menu bar items from the server code.
+
+3. Remove the unneeded client code.
+
+4. Update the `clientEntrypoints` in the [webpack config file](./webpack.config.js) to only target the relevant apps.
+
+<br/>
+
+</details>
+
+</br>
 
 ### [New!] Typescript
 
 This project now supports typescript!
 
 To use, simply use a typescript extension in either the client code (.ts/.tsx) or the server code (.ts), and your typescript file will compile to the proper format.
+
+For client-side code, see [FormInput.tsx in the Bootstrap demo](./src/client/dialog-demo-bootstrap/components/FormInput.tsx) for an example file. Note that it is okay to have a mix of javascript and typescript, as seen in the Bootstrap demo.
 
 To use typescript in server code, just change the file extension to .ts. The server-side code already utilizes type definitions for Google Apps Script APIs.
 

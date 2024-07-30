@@ -7,6 +7,7 @@ import {
 } from '../../../types';
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -18,6 +19,7 @@ import { DateSelectArg } from '@fullcalendar/core';
 import { SAFETY_TRAINING_REQUIRED_ROOM } from '../../../policy';
 import fetchCalendarEvents from './hooks/fetchCalendarEvents';
 import { serverFunctions } from '../../utils/serverFunctions';
+import useFakeDataLocalStorage from '../../utils/useFakeDataLocalStorage';
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
@@ -47,6 +49,7 @@ export const BookingContext = createContext<BookingContextType>({
   formData: undefined,
   hasShownMocapModal: false,
   isBanned: false,
+  needsSafetyTraining: false,
   isSafetyTrained: true,
   needsSafetyTraining: false,
   role: undefined,
@@ -72,11 +75,13 @@ export function BookingProvider({ children }) {
   const [hasShownMocapModal, setHasShownMocapModal] = useState(false);
   const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
+  const [needsSafetyTraining, setNeedsSafetyTraining] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const existingCalendarEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
+    console.log('userEmail', userEmail);
     if (!userEmail) return false;
     return bannedUsers
       .map((bannedUser) => bannedUser.email)
@@ -92,24 +97,25 @@ export function BookingProvider({ children }) {
     return isStudent && roomRequiresSafetyTraining && !isSafetyTrained;
   }, [selectedRooms, role, isSafetyTrained]);
 
-  useEffect(() => {
-    const fetchIsSafetyTrained = async () => {
-      if (!userEmail) return;
-      let isTrained = safetyTrainedUsers
-        .map((user) => user.email)
-        .includes(userEmail);
-      console.log('isTrained from tool', isTrained);
-      // if not on active list, check old list
-      if (!isTrained) {
-        isTrained = await serverFunctions
-          .getOldSafetyTrainingEmails()
-          .then((rows) => rows.map((row) => row[0]).includes(userEmail));
-      }
-      console.log('isTrained from googlesheets', isTrained);
-      setIsSafetyTrained(isTrained);
-    };
-    fetchIsSafetyTrained();
+  const fetchIsSafetyTrained = useCallback(async () => {
+    if (!userEmail) return;
+    let isTrained = safetyTrainedUsers
+      .map((user) => user.email)
+      .includes(userEmail);
+    console.log('isTrained from tool', isTrained);
+    // if not on active list, check old list
+    if (!isTrained) {
+      isTrained = await serverFunctions
+        .getOldSafetyTrainingEmails()
+        .then((rows) => rows.map((row) => row[0]).includes(userEmail));
+    }
+    console.log('isTrained from googlesheets', isTrained);
+    setIsSafetyTrained(isTrained);
   }, [userEmail, safetyTrainedUsers]);
+
+  useEffect(() => {
+    fetchIsSafetyTrained();
+  }, [fetchIsSafetyTrained]);
 
   return (
     <BookingContext.Provider

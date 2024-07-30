@@ -18,7 +18,7 @@ const Centered = styled(Box)`
 
 export default function BookingFormConfirmationPage() {
   const { submitting } = useContext(BookingContext);
-  const navigate = useNavigate();
+  const router = useRouter();
   const theme = useTheme();
 
   // don't submit form via useEffect here b/c it submits twice in development strict mode
@@ -67,7 +67,7 @@ export default function BookingFormConfirmationPage() {
         }}
       >
         <Button
-          onClick={() => navigate('/')}
+          onClick={() => router.push('/')}
           variant="text"
           sx={{
             background: theme.palette.primary[50],

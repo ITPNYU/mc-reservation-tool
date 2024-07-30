@@ -49,15 +49,6 @@ const FullCalendarWrapper = styled(Box)({
   '.fc-timegrid-event-harness': {
     left: '0% !important',
   },
-
-  '.fc-bg-event': {
-    background: 'none',
-  },
-
-  '.disabled div': {
-    background: '#55555569',
-    border: 'none',
-  },
 });
 
 const Empty = styled(Box)(({ theme }) => ({
@@ -69,6 +60,7 @@ const Empty = styled(Box)(({ theme }) => ({
 }));
 
 export default function CalendarVerticalResource({ rooms, dateView }: Props) {
+  const [newEvents, setNewEvents] = useState<CalendarEvent[]>([]);
   const {
     bookingCalendarInfo,
     existingCalendarEvents,
@@ -81,7 +73,6 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       rooms.map((room) => ({
         id: room.roomId,
         title: `${room.roomId} ${room.name}`,
-        index: Number(room.roomId),
       })),
     [rooms]
   );
@@ -95,46 +86,23 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
     api.gotoDate(dateView);
   }, [dateView]);
 
-  const newEvents = useMemo(() => {
+  useEffect(() => {
     if (bookingCalendarInfo == null) {
-      return [];
+      setNewEvents([]);
+      return;
     }
 
-    return rooms.map((room, index) => ({
+    const newRoomEvents = rooms.map((room, index) => ({
       start: bookingCalendarInfo.startStr,
       end: bookingCalendarInfo.endStr,
-      id: room.roomId + bookingCalendarInfo.startStr,
+      id: Date.now().toString(),
       resourceId: room.roomId,
       title: NEW_TITLE_TAG,
-      overlap: true,
+      overlap: false,
       url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
     }));
+    setNewEvents(newRoomEvents);
   }, [bookingCalendarInfo, rooms]);
-
-  const blockPastTimes = useMemo(() => {
-    const blocks = rooms.map((room) => {
-      const today = new Date();
-      const start = new Date();
-      start.setHours(9);
-      start.setMinutes(0);
-      today.setHours(
-        today.getMinutes() > 30 ? today.getHours() + 1 : today.getHours()
-      );
-      today.setMinutes(today.getMinutes() <= 30 ? 30 : 0);
-      today.setSeconds(0);
-      today.setMilliseconds(0);
-      return {
-        start: start.toISOString(),
-        end: today.toISOString(),
-        id: room.roomId + 'bg',
-        resourceId: room.roomId,
-        overlap: false,
-        display: 'background',
-        classNames: ['disabled'],
-      };
-    });
-    return blocks;
-  }, [rooms]);
 
   const handleEventSelect = (selectInfo: DateSelectArg) => {
     setBookingCalendarInfo(selectInfo);
@@ -148,10 +116,6 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
     api.unselect();
     setBookingCalendarInfo(selectInfo);
     return true;
-  };
-
-  const handleSelectOverlap = (el) => {
-    return el.overlap;
   };
 
   const handleEventClick = (info: EventClickArg) => {
@@ -183,11 +147,9 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
         selectable={true}
         select={handleEventSelect}
         selectAllow={handleEventSelecting}
-        selectOverlap={handleSelectOverlap}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         resources={resources}
-        resourceOrder={'index'}
-        events={[...blockPastTimes, ...existingCalendarEvents, ...newEvents]}
+        events={[...existingCalendarEvents, ...newEvents]}
         eventContent={CalendarEventBlock}
         eventClick={function (info) {
           info.jsEvent.preventDefault();

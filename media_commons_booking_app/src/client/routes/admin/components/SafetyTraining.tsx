@@ -11,12 +11,18 @@ export default function SafetyTrainedUsers() {
     useContext(DatabaseContext);
 
   return (
-    <EmailListTable
-      columnFormatters={{ completedAt: formatDate }}
-      tableName={TableNames.SAFETY_TRAINING}
-      title="Safety Trained Users"
-      userList={safetyTrainedUsers}
-      userListRefresh={reloadSafetyTrainedUsers}
-    />
+    <>
+      <AddEmail
+        tableName={TableNames.SAFETY_TRAINING}
+        userList={safetyTrainedUsers}
+        userListRefresh={reloadSafetyTrainedUsers}
+      />
+      <EmailListTable
+        columnFormatters={{ completedAt: formatDate }}
+        tableName={TableNames.SAFETY_TRAINING}
+        userList={safetyTrainedUsers}
+        userListRefresh={reloadSafetyTrainedUsers}
+      />
+    </>
   );
 }

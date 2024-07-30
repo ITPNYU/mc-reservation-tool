@@ -213,6 +213,13 @@ const DynamicCdnWebpackPluginConfig = {
           version: packageVersion,
           url: `https://unpkg.com/react-transition-group@${packageVersion}/dist/react-transition-group${packageSuffix}`,
         };
+      case 'react-bootstrap':
+        return {
+          name: packageName,
+          var: 'ReactBootstrap',
+          version: packageVersion,
+          url: `https://unpkg.com/react-bootstrap@${packageVersion}/dist/react-bootstrap${packageSuffix}`,
+        };
       case '@mui/material':
         return {
           name: packageName,
@@ -294,7 +301,7 @@ const clientConfigs = clientEntrypoints.map((clientEntrypoint) => {
       }),
       new HtmlWebpackPlugin({
         template: clientEntrypoint.template,
-        filename: `${clientEntrypoint.filename}${isProd ? '' : '-impl'}.html`,
+        filename: `${clientEntrypoint.filename}${isProd ? '' : ''}.html`,
         inlineSource: '^/.*(js|css)$', // embed all js and css inline, exclude packages from dynamic cdn insertion
         scriptLoading: 'blocking',
         inject: 'body',
@@ -312,9 +319,6 @@ const devServer = {
   hot: true,
   port: PORT,
   server: 'https',
-  client: {
-    logging: 'warn',
-  },
 };
 
 if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {

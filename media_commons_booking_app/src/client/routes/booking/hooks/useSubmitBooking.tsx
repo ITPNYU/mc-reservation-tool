@@ -26,7 +26,7 @@ export default function useSubmitBooking(): (x: Inputs) => Promise<void> {
   } = useContext(BookingContext);
   const { isAutoApproval } = useCheckAutoApproval();
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const firstApprovers = useMemo(
     () =>

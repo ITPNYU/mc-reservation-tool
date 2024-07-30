@@ -69,8 +69,6 @@ export default function CalendarEventBlock(eventInfo: EventContentArg) {
     return backgroundColor;
   };
 
-  const hideTitle = isNew && index !== 0 && !isOneColumn;
-
   return (
     <Block
       bgcolor={backgroundColor()}
@@ -78,7 +76,7 @@ export default function CalendarEventBlock(eventInfo: EventContentArg) {
       isLast={isLast}
       isFirst={index === 0}
     >
-      {!hideTitle && <b>{title}</b>}
+      <b>{isNew && index !== 0 && !isOneColumn ? '' : title}</b>
       {isNew && isLast && (
         <CloseButton>
           <Close />

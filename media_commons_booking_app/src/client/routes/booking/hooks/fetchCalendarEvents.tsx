@@ -2,7 +2,7 @@ import { Booking, CalendarEvent, RoomSetting } from '../../../../types';
 import { CALENDAR_HIDE_STATUS, STORAGE_KEY_BOOKING } from '../../../../policy';
 import { useEffect, useState } from 'react';
 
-import getBookingStatus from '../../hooks/getBookingStatus';
+import getBookingStatus from '../../admin/hooks/getBookingStatus';
 import { serverFunctions } from '../../../utils/serverFunctions';
 
 export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
@@ -35,10 +35,14 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
     const rows = await serverFunctions.getCalendarEvents(calendarId);
     const rowsWithResourceIds = rows.map((row) => ({
       ...row,
-      id: room.roomId + row.start,
+      id: room.roomId,
       resourceId: room.roomId,
     }));
     return rowsWithResourceIds;
+    // const filteredEvents = rowsWithResourceIds.filter((row) => {
+    //   return !CALENDAR_HIDE_STATUS.some((status) => row.title.includes(status));
+    // });
+    // return filteredEvents;
   };
 
   const getFakeEvents: () => CalendarEvent[] = () => {

@@ -10,12 +10,18 @@ export const AdminUsers = () => {
   const { adminUsers, reloadAdminUsers } = useContext(DatabaseContext);
 
   return (
-    <EmailListTable
-      tableName={TableNames.ADMINS}
-      userList={adminUsers}
-      userListRefresh={reloadAdminUsers}
-      columnFormatters={{ createdAt: formatDate }}
-      title="Admin Users"
-    />
+    <>
+      <AddEmail
+        tableName={TableNames.ADMINS}
+        userList={adminUsers}
+        userListRefresh={reloadAdminUsers}
+      />
+      <EmailListTable
+        tableName={TableNames.ADMINS}
+        userList={adminUsers}
+        userListRefresh={reloadAdminUsers}
+        columnFormatters={{ createdAt: formatDate }}
+      />
+    </>
   );
 };

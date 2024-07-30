@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 
 import { AddCircleOutline } from '@mui/icons-material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
-import Loading from './Loading';
+import Loading from '../../utils/Loading';
 import { TableNames } from '../../../policy';
 import { serverFunctions } from '../../utils/serverFunctions';
 

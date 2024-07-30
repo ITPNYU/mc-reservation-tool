@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
-import { STORAGE_KEY_BOOKING } from '../../policy';
 import useWebSocket from 'react-use-websocket';
+
+export const STORAGE_KEY_BOOKING = 'mediaCommonsDevBooking';
 
 export default function useFakeDataLocalStorage(
   setBookings,
@@ -9,7 +10,7 @@ export default function useFakeDataLocalStorage(
 ) {
   const { lastMessage } = useWebSocket(
     'ws://localhost:3001',
-    { shouldReconnect: (closeEvent) => false },
+    { shouldReconnect: (closeEvent) => true },
     process.env.BRANCH_NAME === 'development'
   );
   const hasUpdated = useRef(false);

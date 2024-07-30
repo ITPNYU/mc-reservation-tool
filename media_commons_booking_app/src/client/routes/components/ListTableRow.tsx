@@ -1,8 +1,6 @@
-import { Button, IconButton, TableCell, TableRow } from '@mui/material';
 import React, { useState } from 'react';
 
-import { Delete } from '@mui/icons-material';
-import Loading from './Loading';
+import Loading from '../../utils/Loading';
 
 interface Props {
   columnFormatters?: { [key: string]: (value: string) => string };
@@ -56,19 +54,26 @@ export default function ListTableRow(props: Props) {
   }
 
   return (
-    <TableRow key={index}>
+    <tr
+      key={index}
+      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+    >
+      {/* all column values */}
       {columnNames.map((columnName, idx) => (
-        <TableCell key={idx}>
+        <td className="px-2 py-4 w-36" key={idx}>
           {columnFormatters[columnName]
             ? columnFormatters[columnName](row[columnName])
             : row[columnName]}
-        </TableCell>
+        </td>
       ))}
-      <TableCell align="right">
-        <IconButton onClick={onRemove}>
-          <Delete />
-        </IconButton>
-      </TableCell>
-    </TableRow>
+      <td className="px-2 py-4 w-36">
+        <button
+          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+          onClick={onRemove}
+        >
+          Remove
+        </button>
+      </td>
+    </tr>
   );
 }
