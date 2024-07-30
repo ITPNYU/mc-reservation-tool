@@ -36,7 +36,7 @@ export default function UserRolePage() {
 
   useEffect(() => {
     if (!user) {
-      router.push("/forbidden");
+      router.push("/signin");
     }
   }, []);
 

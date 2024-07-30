@@ -1,10 +1,17 @@
 "use client";
-
+import React from "react"; // Added this line
 import { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase/firebaseClient";
 import { useRouter } from "next/navigation";
+import { Box, Button, styled } from "@mui/material";
 
+const Center = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 const GoogleSignIn = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -13,13 +20,10 @@ const GoogleSignIn = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-
-      // nyu.edu ドメインのメールアドレスかチェック
       if (user.email?.endsWith("@nyu.edu")) {
         console.log("Google sign-in successful", user);
-        router.push("/"); // サインイン後のリダイレクト先
+        router.push("/");
       } else {
-        // nyu.edu ドメイン以外のユーザーをサインアウトさせる
         await auth.signOut();
         setError("Only nyu.edu email addresses are allowed.");
       }
@@ -31,10 +35,20 @@ const GoogleSignIn = () => {
 
   return (
     <div>
-      <button onClick={handleGoogleSignIn}>
-        Sign in with NYU Google Account
-      </button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <Center>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleGoogleSignIn}
+          sx={{
+            alignSelf: "center",
+            marginTop: 6,
+          }}
+        >
+          Sign in with NYU Google Account
+        </Button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </Center>
     </div>
   );
 };

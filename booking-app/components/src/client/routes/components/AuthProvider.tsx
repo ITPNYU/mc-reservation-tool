@@ -42,14 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const signedInUser = await signInWithGoogle();
           setUser(signedInUser);
         } catch (error) {
-          if (
-            error instanceof Error &&
-            error.message === "Only nyu.edu email addresses are allowed."
-          ) {
-            setError(error.message);
-          } else {
-            setError("Failed to sign in. Please try again.");
-          }
+          router.push("/signin");
         }
       }
       setLoading(false);
@@ -61,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [router]);
   useEffect(() => {
     if (error === "Only nyu.edu email addresses are allowed.") {
-      router.push("/forbidden");
+      router.push("/signin");
     }
   }, [error, router]);
 
