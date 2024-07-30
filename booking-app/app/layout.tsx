@@ -1,11 +1,19 @@
 // app/layout.tsx
 
-import { Inter } from "next/font/google";
 import "@/components/src/client/styles.css";
-import ClientProvider from "@/components/src/client/routes/components/ClientProvider";
-import { AuthProvider } from "@/components/src/client/routes/components/AuthProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+import { AuthProvider } from "@/components/src/client/routes/components/AuthProvider";
+import ClientProvider from "@/components/src/client/routes/components/ClientProvider";
+import CssBaseline from "@mui/material/CssBaseline";
+import { Roboto } from "next/font/google";
+import { ThemeProvider } from "@mui/material";
+import theme from "./theme/theme";
+
+const roboto = Roboto({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "Media commons booking app",
@@ -19,9 +27,14 @@ type LayoutProps = {
 const RootLayout: React.FC<LayoutProps> = ({ children }) => (
   <html lang="en">
     <head></head>
-    <body className={inter.className}>
+    <body className={roboto.className}>
       <AuthProvider>
-        <ClientProvider>{children}</ClientProvider>
+        <ClientProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </ThemeProvider>
+        </ClientProvider>
       </AuthProvider>
     </body>
   </html>

@@ -19,6 +19,7 @@
     "@fullcalendar/react": "^6.1.14",
     "@fullcalendar/resource-timegrid": "^6.1.15",
     "@mui/icons-material": "^5.16.5",
+    "@mui/material": "^5.16.5",
     "@mui/x-date-pickers": "^7.11.1",
     "@prisma/client": "^5.16.1",
     "@typescript-eslint/typescript-estree": "^7.16.0",
