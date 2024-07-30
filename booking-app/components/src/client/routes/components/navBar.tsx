@@ -34,12 +34,14 @@ const Divider = styled(Box)(({ theme }) => ({
 }));
 
 const envTitle = (() => {
-	const branch = process.env.NEXT_PUBLIC_BRANCH_NAME;
-	if (branch.toLowerCase() === "production") {
-		return "";
-	}
-	const branchTitle = branch.charAt(0).toUpperCase() + branch.slice(1);
-	return `[${branchTitle}]`;
+	// const branch = process.env.NEXT_PUBLIC_BRANCH_NAME;
+	// if (branch.toLowerCase() === "production") {
+	// 	return "";
+	// }
+	// TODO why is this env var undefined?
+	return "";
+	// const branchTitle = branch.charAt(0).toUpperCase() + branch.slice(1);
+	// return `[${branchTitle}]`;
 })();
 
 export default function NavBar() {
