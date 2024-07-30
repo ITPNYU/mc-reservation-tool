@@ -53,45 +53,6 @@ jobs:
           echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}" >> .env.production
           echo "NEXT_PUBLIC_DATABASE_NAME=${{ secrets.NEXT_PUBLIC_DATABASE_NAME }}" >> .env.production
 
-      - name: Preview environment variables
-        run: |
-          cd booking-app
-          echo "Previewing environment variables..."
-          for var in FIREBASE_TOKEN_URI FIREBASE_AUTH_PROVIDER_X509_CERT_URL FIREBASE_CLIENT_X509_CERT_URL NEXT_PUBLIC_BASE_URL FIREBASE_PROJECT_ID FIREBASE_PRIVATE_KEY_ID FIREBASE_PRIVATE_KEY FIREBASE_CLIENT_EMAIL FIREBASE_CLIENT_ID FIREBASE_AUTH_URI NEXT_PUBLIC_FIREBASE_API_KEY NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN NEXT_PUBLIC_FIREBASE_PROJECT_ID NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID NEXT_PUBLIC_FIREBASE_APP_ID NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID; do
-            echo "$var length: ${#var}"
-          done
-      - name: Check .env.production file
-        run: |
-          cd booking-app
-          echo "Checking .env.production file..."
-
-          echo "Number of lines: $(wc -l < .env.production)"
-
-          echo "Number of non-empty lines: $(grep -cv '^$' .env.production)"
-
-          echo "Number of lines with '=': $(grep -c '=' .env.production)"
-
-          echo "Checking for specific environment variables:"
-          for var in FIREBASE_TOKEN_URI FIREBASE_AUTH_PROVIDER_X509_CERT_URL GOOGLE_REFRESH_TOKEN GOOGLE_API_KEY FIREBASE_CLIENT_X509_CERT_URL NEXT_PUBLIC_BASE_URL FIREBASE_PROJECT_ID FIREBASE_PRIVATE_KEY_ID FIREBASE_PRIVATE_KEY FIREBASE_CLIENT_EMAIL FIREBASE_CLIENT_ID FIREBASE_AUTH_URI NEXT_PUBLIC_FIREBASE_API_KEY NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN NEXT_PUBLIC_FIREBASE_PROJECT_ID NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID NEXT_PUBLIC_FIREBASE_APP_ID NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID; do
-            if grep -q "^$var=" .env.production; then
-              echo "- $var is present"
-            else
-              echo "- $var is missing"
-            fi
-          done
-
-          echo "Checking format of each line:"
-          while IFS= read -r line; do
-            if [[ ! "$line" =~ ^[A-Z_]+=.+$ ]] && [[ -n "$line" ]]; then
-              echo "Warning: Line does not match expected format: ${line:0:10}..."
-            fi
-          done < .env.production
-
-          echo "Checking lengths of specific variables:"
-          for var in GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET GOOGLE_REDIRECT_URI GOOGLE_API_KEY FIREBASE_TOKEN_URI FIREBASE_AUTH_PROVIDER_X509_CERT_URL FIREBASE_CLIENT_X509_CERT_URL NEXT_PUBLIC_BASE_URL FIREBASE_PROJECT_ID FIREBASE_PRIVATE_KEY_ID FIREBASE_PRIVATE_KEY FIREBASE_CLIENT_EMAIL FIREBASE_CLIENT_ID FIREBASE_AUTH_URI NEXT_PUBLIC_FIREBASE_API_KEY NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN NEXT_PUBLIC_FIREBASE_PROJECT_ID NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID NEXT_PUBLIC_FIREBASE_APP_ID NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID; do
-            value=$(grep "^$var=" .env.production | cut -d'=' -f2-)
-            echo "- $var length: ${#value}"
-          done
       - name: Install dependencies
         run: |
           cd booking-app
