@@ -1,12 +1,13 @@
-name: Deploy STAGING to App Engine
+name: Deploy PRODUCTION to App Engine
 on:
   push:
     branches:
-      - staging
+      - production
+      - deploy_prod
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -64,4 +65,4 @@ jobs:
       - name: Deploy to App Engine
         run: |
           cd booking-app
-          gcloud app deploy app.staging.yaml --project=${{ secrets.GCP_PROJECT_ID }} --quiet
+          gcloud app deploy app.production.yaml --project=${{ secrets.GCP_PROJECT_ID }} --quiet
