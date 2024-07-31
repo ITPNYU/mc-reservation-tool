@@ -1,5 +1,7 @@
 import { Booking, BookingStatus, BookingStatusLabel } from "../../../types";
 
+import { Timestamp } from "@firebase/firestore";
+
 export default function getBookingStatus(
   booking: Booking,
   bookingStatuses: BookingStatus[]
@@ -11,8 +13,9 @@ export default function getBookingStatus(
 
     if (bookingStatusMatch === undefined) return BookingStatusLabel.UNKNOWN;
 
-    const timeStringtoDate = (time: string) =>
-      time.length > 0 ? new Date(time) : new Date(0);
+    const timeStringtoDate = (time: Timestamp) => {
+      return time != undefined ? time.toDate() : new Date(0);
+    };
 
     const checkedInTimestamp = timeStringtoDate(bookingStatusMatch.checkedInAt);
     const noShowTimestamp = timeStringtoDate(bookingStatusMatch.noShowedAt);
@@ -39,13 +42,13 @@ export default function getBookingStatus(
       return label;
     }
 
-    if (bookingStatusMatch.rejectedAt !== undefined) {
+    if (bookingStatusMatch.rejectedAt != undefined) {
       return BookingStatusLabel.REJECTED;
     } else if (bookingStatusMatch.secondApprovedAt !== undefined) {
       return BookingStatusLabel.APPROVED;
     } else if (bookingStatusMatch.firstApprovedAt !== undefined) {
       return BookingStatusLabel.PRE_APPROVED;
-    } else if (bookingStatusMatch.requestedAt !== "") {
+    } else if (bookingStatusMatch.requestedAt != undefined) {
       return BookingStatusLabel.REQUESTED;
     } else {
       return BookingStatusLabel.UNKNOWN;

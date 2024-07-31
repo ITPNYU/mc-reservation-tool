@@ -1,6 +1,7 @@
-import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
-import { TableNames } from "../policy";
 import { Timestamp, where } from "@firebase/firestore";
+
+import { TableNames } from "../policy";
+import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 
 export const fetchAllFutureBooking = async <T>(
   collectionName: TableNames
@@ -13,9 +14,9 @@ export const fetchAllFutureBooking = async <T>(
 export const fetchAllFutureBookingStatus = async <T>(
   collectionName: TableNames
 ): Promise<T[]> => {
-  const now = Timestamp.now();
-  const futureQueryConstraints = [where("requestedAt", ">", now)];
-  return fetchAllDataFromCollection<T>(collectionName, futureQueryConstraints);
+  // const now = Timestamp.now();
+  // const futureQueryConstraints = [where("requestedAt", ">", now)];
+  return fetchAllDataFromCollection<T>(collectionName);
 };
 
 export const getOldSafetyTrainingEmails = () => {

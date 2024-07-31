@@ -11,21 +11,21 @@ import {
   SafetyTraining,
   Settings,
 } from "../../../types";
+import {
+  AuthProvider,
+  useAuth,
+} from "@/components/src/client/routes/components/AuthProvider";
 import React, { createContext, use, useEffect, useMemo, useState } from "react";
-
-import axios from "axios";
-import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
-import { TableNames } from "@/components/src/policy";
 import { Tab, Table } from "react-bootstrap";
 import {
   fetchAllFutureBooking,
   fetchAllFutureBookingStatus,
 } from "@/components/src/server/db";
+
+import { TableNames } from "@/components/src/policy";
+import axios from "axios";
 import { co } from "@fullcalendar/core/internal-common";
-import {
-  AuthProvider,
-  useAuth,
-} from "@/components/src/client/routes/components/AuthProvider";
+import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -189,7 +189,6 @@ export const DatabaseProvider = ({
   const fetchBookingStatuses = async () => {
     fetchAllFutureBookingStatus(TableNames.BOOKING_STATUS)
       .then((fetchedData) => {
-        console.log("fetchedData booking statuses", fetchedData);
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
           calendarEventId: item.calendarEventId,

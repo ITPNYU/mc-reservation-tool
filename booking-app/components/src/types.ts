@@ -39,13 +39,13 @@ export type BookingFormDetails = Booking & {
 export type BookingStatus = {
   calendarEventId: string;
   email: string;
-  requestedAt: string;
+  requestedAt: Timestamp;
   firstApprovedAt: Timestamp;
   secondApprovedAt: Timestamp;
-  rejectedAt: string;
-  canceledAt: string;
-  checkedInAt: string;
-  noShowedAt: string;
+  rejectedAt: Timestamp;
+  canceledAt: Timestamp;
+  checkedInAt: Timestamp;
+  noShowedAt: Timestamp;
 };
 
 // the order here is the order these are displayed as table filters
