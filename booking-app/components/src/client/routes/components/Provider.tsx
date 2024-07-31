@@ -128,6 +128,7 @@ export const DatabaseProvider = ({
   useEffect(() => {
     fetchActiveUserEmail();
     fetchAdminUsers();
+    fetchPaUsers();
     setBookingsLoading(false);
   }, [user]);
 
