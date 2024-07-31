@@ -17,13 +17,11 @@ export const RoomDetails = styled(Grid)`
 `;
 
 const AlertHeader = styled(Alert)(({ theme }) => ({
-  //TODO: Fix later
-  //background: theme.palette.secondary.light,
+  background: theme.palette.secondary.light,
   marginBottom: 0,
 
   ".MuiAlert-icon": {
-    //TODO: Fix later
-    //color: theme.palette.primary.main,
+    color: theme.palette.primary.main,
   },
 }));
 
@@ -55,8 +53,8 @@ export default function BookingSelection() {
         <RoomDetails container>
           <label>Time:</label>
           <p>{`${formatTimeAmPm(
-            bookingCalendarInfo.startStr
-          )} - ${formatTimeAmPm(bookingCalendarInfo.endStr)}`}</p>
+            new Date(bookingCalendarInfo.startStr)
+          )} - ${formatTimeAmPm(new Date(bookingCalendarInfo.endStr))}`}</p>
         </RoomDetails>
       </AlertHeader>
       {/* <Typography variant={'h5'}>Your Request</Typography>

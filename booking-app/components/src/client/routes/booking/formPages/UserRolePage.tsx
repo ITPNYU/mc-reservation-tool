@@ -1,4 +1,5 @@
 "use client";
+
 import { Box, Button, Typography } from "@mui/material";
 import { Department, Role } from "../../../../types";
 import React, { useContext, useEffect } from "react";
@@ -6,8 +7,8 @@ import React, { useContext, useEffect } from "react";
 import { BookingContext } from "../bookingProvider";
 import Dropdown from "../components/Dropdown";
 import { styled } from "@mui/material/styles";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../../components/AuthProvider";
+import { useRouter } from "next/navigation";
 
 const Center = styled(Box)`
   width: 100%;
@@ -23,7 +24,6 @@ const Container = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   borderRadius: "4px",
-  //TODO: Fix later
   border: `1px solid ${theme.palette.divider}`,
 }));
 

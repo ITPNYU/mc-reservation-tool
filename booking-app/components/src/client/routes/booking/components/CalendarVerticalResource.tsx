@@ -65,8 +65,7 @@ const Empty = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   height: 500,
-  //TODO: Fix later
-  //color: theme.palette.custom.gray3",
+  color: theme.palette.custom.gray3,
 }));
 
 export default function CalendarVerticalResource({ rooms, dateView }: Props) {

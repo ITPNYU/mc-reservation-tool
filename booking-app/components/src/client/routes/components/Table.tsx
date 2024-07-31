@@ -13,8 +13,7 @@ import React from "react";
 import { styled } from "@mui/system";
 
 const TableCustom = styled(MuiTable)(({ theme }) => ({
-  //TODO: Fix later
-  //border: `1px solid ${theme.palette.custom.border}`,
+  border: `1px solid ${theme.palette.custom.border}`,
   borderCollapse: "separate",
   borderRadius: "0px 0px 4px 4px",
 
@@ -24,8 +23,7 @@ const TableCustom = styled(MuiTable)(({ theme }) => ({
 }));
 
 const ShadedHeader = styled(TableHead)(({ theme }) => ({
-  //TODO: Fix later
-  //backgroundColor: theme.palette.custom.gray,
+  backgroundColor: theme.palette.custom.gray,
 }));
 
 export const TableTopRow = styled(MuiTable)`
