@@ -5,11 +5,11 @@ import { DevBranch } from "../types";
 export const getBookingToolDeployUrl = () => {
   switch (process.env.BRANCH_NAME as DevBranch) {
     case "development":
-      return "https://sites.google.com/nyu.edu/media-commons-dev/";
+      return "https://development-dot-flowing-mantis-389917.uc.r.appspot.com/";
     case "staging":
-      return "https://sites.google.com/nyu.edu/media-commons-staging/";
+      return "https://staging-dot-flowing-mantis-389917.uc.r.appspot.com/";
     default:
-      return "https://sites.google.com/nyu.edu/media-commons-prod/";
+      return "https://flowing-mantis-389917.uc.r.appspot.com/";
   }
 };
 
