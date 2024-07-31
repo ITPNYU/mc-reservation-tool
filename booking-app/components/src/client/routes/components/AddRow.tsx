@@ -5,8 +5,8 @@ import { AddCircleOutline } from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import Loading from "./Loading";
 import { TableNames } from "../../../policy";
-import { saveDataToFirestore } from "../../../../../lib/firebase/firebase";
 import { Timestamp } from "@firebase/firestore";
+import { saveDataToFirestore } from "../../../../../lib/firebase/firebase";
 
 interface Props {
   addDuplicateErrorMessage?: string;
@@ -47,7 +47,7 @@ export default function AddRow(props: Props) {
     setLoading(true);
     try {
       await saveDataToFirestore(tableName, {
-        valueToAdd,
+        [props.columnNameUniqueValue]: valueToAdd,
         ...(extra?.values ?? []),
         createdAt: Timestamp.now(),
       });
