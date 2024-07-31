@@ -19,8 +19,8 @@ export type Ban = {
 export type Booking = Inputs & {
   calendarEventId: string;
   email: string;
-  startDate: string;
-  endDate: string;
+  startDate: Timestamp;
+  endDate: Timestamp;
   roomId: string;
 };
 

@@ -19,8 +19,8 @@ export const formatDate = (oldDate: any) => {
   return format(date, "yyyy-MM-dd hh:mm a");
 };
 
-export const formatDateTable = (d: string) => {
-  const date = new Date(d);
+export const formatDateTable = (date: Date) => {
+  // const date = new Date(d);
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const day = date.getDate().toString().padStart(2, "0");
   const year = date.getFullYear().toString().slice(-2);
@@ -28,8 +28,8 @@ export const formatDateTable = (d: string) => {
   return `${month}/${day}/${year}`;
 };
 
-export const formatTimeTable = (d: string) => {
-  const date = new Date(d);
+export const formatTimeTable = (date: Date) => {
+  // const date = new Date(d);
   let hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, "0");
 
@@ -40,7 +40,7 @@ export const formatTimeTable = (d: string) => {
   return `${hours}:${minutes}`;
 };
 
-export const formatTimeAmPm = (d: string) => {
+export const formatTimeAmPm = (d: Date) => {
   return new Date(d).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "numeric",

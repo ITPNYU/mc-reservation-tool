@@ -7,17 +7,17 @@ import {
   TableCell,
   TableRow,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import { BookingRow } from '../../../../types';
-import { Event } from '@mui/icons-material';
-import Grid from '@mui/material/Unstable_Grid2/Grid2';
-import React from 'react';
-import { RoomDetails } from '../../booking/components/BookingSelection';
-import StackedTableCell from './StackedTableCell';
-import StatusChip from './StatusChip';
-import { formatTimeAmPm } from '../../../utils/date';
-import { styled } from '@mui/system';
+import { BookingRow } from "../../../../types";
+import { Event } from "@mui/icons-material";
+import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import React from "react";
+import { RoomDetails } from "../../booking/components/BookingSelection";
+import StackedTableCell from "./StackedTableCell";
+import StatusChip from "./StatusChip";
+import { formatTimeAmPm } from "../../../utils/date";
+import { styled } from "@mui/system";
 
 interface Props {
   booking: BookingRow;
@@ -25,12 +25,12 @@ interface Props {
 }
 
 const modalStyle = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '75vw',
-  bgcolor: 'background.paper',
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "75vw",
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
   padding: 4,
@@ -39,18 +39,18 @@ const modalStyle = {
 const LabelCell = styled(TableCell)(({ theme }) => ({
   borderRight: `1px solid ${theme.palette.custom.border}`,
   width: 175,
-  verticalAlign: 'top',
+  verticalAlign: "top",
 }));
 
 const AlertHeader = styled(Alert)(({ theme }) => ({
   background: theme.palette.secondary.light,
 
-  '.MuiAlert-icon': {
+  ".MuiAlert-icon": {
     color: theme.palette.primary.main,
   },
 }));
 
-const BLANK = 'None';
+const BLANK = "None";
 
 export default function MoreInfoModal({ booking, closeModal }: Props) {
   return (
@@ -63,12 +63,12 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
           </RoomDetails>
           <RoomDetails container>
             <label>Date:</label>
-            <p>{new Date(booking.startDate).toLocaleDateString()}</p>
+            <p>{booking.startDate.toDate().toLocaleDateString()}</p>
           </RoomDetails>
           <RoomDetails container>
             <label>Time:</label>
-            <p>{`${formatTimeAmPm(booking.startDate)} - ${formatTimeAmPm(
-              booking.endDate
+            <p>{`${formatTimeAmPm(booking.startDate.toDate())} - ${formatTimeAmPm(
+              booking.endDate.toDate()
             )}`}</p>
           </RoomDetails>
           <RoomDetails container>
@@ -153,7 +153,7 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
                 {booking.mediaServices.length === 0
                   ? BLANK
                   : booking.mediaServices
-                      .split(', ')
+                      .split(", ")
                       .map((service) => (
                         <p style={{ fontWeight: 500 }}>{service.trim()}</p>
                       ))}
@@ -170,7 +170,7 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
             <TableRow>
               <LabelCell>Security</LabelCell>
               <StackedTableCell
-                topText={booking.hireSecurity === 'yes' ? 'Yes' : BLANK}
+                topText={booking.hireSecurity === "yes" ? "Yes" : BLANK}
                 bottomText={booking.chartFieldForSecurity}
               />
             </TableRow>
@@ -179,8 +179,8 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
 
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
+            display: "flex",
+            justifyContent: "flex-end",
             mt: 2,
           }}
         >

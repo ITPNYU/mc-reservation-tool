@@ -42,9 +42,9 @@ export default function BookingTableRow({
         <StatusChip status={optimisticStatus ?? status} />
       </TableCell>
       <StackedTableCell
-        topText={formatDateTable(booking.startDate)}
-        bottomText={`${formatTimeTable(booking.startDate)} - ${formatTimeTable(
-          booking.endDate
+        topText={formatDateTable(booking.startDate.toDate())}
+        bottomText={`${formatTimeTable(booking.startDate.toDate())} - ${formatTimeTable(
+          booking.endDate.toDate()
         )}`}
       />
       <TableCell sx={{ maxWidth: "150px" }}>{booking.roomId}</TableCell>

@@ -20,8 +20,6 @@ export default function Admin() {
     [adminUsers]
   );
   const userHasPermission = pagePermission === PagePermission.ADMIN;
-  console.log("adminEmails", adminEmails);
-  console.log("userEmail", userEmail);
 
   if (adminEmails.length === 0 || userEmail == null) {
     return <CenterLoading />;

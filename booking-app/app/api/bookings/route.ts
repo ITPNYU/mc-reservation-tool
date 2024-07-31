@@ -1,25 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  Booking,
-  BookingFormDetails,
-  BookingStatusLabel,
-} from "@/components/src/types";
-import { saveDataToFirestore } from "@/lib/firebase/firebase";
+import { BookingFormDetails, BookingStatusLabel } from "@/components/src/types";
 import { INSTANT_APPROVAL_ROOMS, TableNames } from "@/components/src/policy";
-import { Timestamp } from "@firebase/firestore";
-import { firstApproverEmails } from "@/components/src/server/db";
-import { sendHTMLEmail } from "@/app/lib/sendHTMLEmail";
-import { DateSelectArg } from "fullcalendar";
+import { NextRequest, NextResponse } from "next/server";
 import {
   approvalUrl,
   getBookingToolDeployUrl,
   rejectUrl,
 } from "@/components/src/server/ui";
-import { approveInstantBooking } from "@/components/src/server/admin";
 import {
   getRoomCalendarId,
   insertEvent,
 } from "@/components/src/server/calendars";
+
+import { Timestamp } from "@firebase/firestore";
+import { approveInstantBooking } from "@/components/src/server/admin";
+import { firstApproverEmails } from "@/components/src/server/db";
+import { saveDataToFirestore } from "@/lib/firebase/firebase";
+import { sendHTMLEmail } from "@/app/lib/sendHTMLEmail";
 import { toFirebaseTimestampFromString } from "@/components/src/client/utils/date";
 
 export async function POST(request: NextRequest) {
@@ -80,6 +76,8 @@ export async function POST(request: NextRequest) {
         contents: {
           ...contents,
           roomId: contents.roomId.toString(),
+          startDate: contents.startDate.toDate().toLocaleString(),
+          endDate: contents.endDate.toDate().toLocaleString(),
         },
         targetEmail: recipient,
         status: BookingStatusLabel.REQUESTED,

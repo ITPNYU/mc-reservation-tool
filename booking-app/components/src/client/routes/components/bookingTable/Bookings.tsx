@@ -38,6 +38,9 @@ export const Bookings: React.FC<BookingsProps> = ({
     reloadBookingStatuses,
   } = useContext(DatabaseContext);
 
+  console.log("BOOKINGS", bookings);
+  console.log("BOOKINGSTATUS", bookingStatuses);
+
   const [modalData, setModalData] = useState<BookingRow>(null);
   const [statusFilters, setStatusFilters] = useState([]);
   const [orderBy, setOrderBy] = useState<keyof BookingRow>("startDate");
