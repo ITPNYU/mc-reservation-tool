@@ -46,8 +46,7 @@ const Container = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "flex-start",
   borderRadius: "4px",
-  //TODO: Fix later
-  //border: `1px solid ${theme.palette.custom.border}` || "#e3e3e3",
+  border: `1px solid ${theme.palette.custom.border}` || "#e3e3e3",
 }));
 
 export default function FormInput() {
