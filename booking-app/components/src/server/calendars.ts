@@ -39,7 +39,7 @@ const patchCalendarEvent = async (
   eventId: string,
   body: any
 ) => {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
   const requestBody = {
     start: event.start,
     end: event.end,
@@ -58,7 +58,7 @@ export const inviteUserToCalendarEvent = async (
   roomId: number
 ) => {
   const roomCalendarIds = await getRoomCalendarIds(roomId);
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
 
   for (const roomCalendarId of roomCalendarIds) {
     try {
@@ -132,7 +132,7 @@ export const insertEvent = async ({
   endTime,
   roomEmails,
 }: InsertEventType) => {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
   console.log("getCalendar Client()", calendar);
   const event = await calendar.events.insert({
     calendarId,
