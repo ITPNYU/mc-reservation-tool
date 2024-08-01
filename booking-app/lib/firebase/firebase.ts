@@ -53,7 +53,6 @@ export const fetchAllDataFromCollection = async <T>(
   const colRef = collection(db, collectionName);
   const q = query(colRef, ...queryConstraints);
   const snapshot = await getDocs(q);
-  console.log("snapshot", snapshot.docs);
   const data = snapshot.docs.map((document) => ({
     id: document.id,
     ...(document.data() as unknown as T),
