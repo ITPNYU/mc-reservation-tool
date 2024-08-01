@@ -1,7 +1,14 @@
 // firebaseClient.ts
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { initializeFirestore } from "firebase/firestore";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  getAuth,
+  getRedirectResult,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  UserCredential,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -35,6 +42,34 @@ export const signInWithGoogle = async () => {
       throw new Error("Only nyu.edu email addresses are allowed.");
     }
     return user;
+  } catch (error) {
+    console.error("Google sign-in error", error);
+    throw error;
+  }
+};
+export const initiateGoogleSignIn = async () => {
+  try {
+    await signInWithRedirect(auth, googleProvider);
+  } catch (error) {
+    console.error("Error initiating Google sign-in", error);
+    throw error;
+  }
+};
+
+export const handleGoogleSignInResult = async (): Promise<
+  UserCredential["user"] | null
+> => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      const user = result.user;
+      if (!user.email?.endsWith("@nyu.edu")) {
+        await auth.signOut();
+        throw new Error("Only nyu.edu email addresses are allowed.");
+      }
+      return user;
+    }
+    return null; // No redirect result, user hasn't completed sign-in yet
   } catch (error) {
     console.error("Google sign-in error", error);
     throw error;
