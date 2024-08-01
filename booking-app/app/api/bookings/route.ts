@@ -16,7 +16,10 @@ import { approveInstantBooking } from "@/components/src/server/admin";
 import { firstApproverEmails } from "@/components/src/server/db";
 import { saveDataToFirestore } from "@/lib/firebase/firebase";
 import { sendHTMLEmail } from "@/app/lib/sendHTMLEmail";
-import { toFirebaseTimestampFromString } from "@/components/src/client/utils/date";
+import {
+  formatDate,
+  toFirebaseTimestampFromString,
+} from "@/components/src/client/utils/date";
 
 export async function POST(request: NextRequest) {
   const { email, selectedRooms, bookingCalendarInfo, data } =
@@ -76,8 +79,8 @@ export async function POST(request: NextRequest) {
         contents: {
           ...contents,
           roomId: contents.roomId.toString(),
-          startDate: contents.startDate.toDate().toLocaleString(),
-          endDate: contents.endDate.toDate().toLocaleString(),
+          startDate: formatDate(contents.startDate),
+          endDate: formatDate(contents.endDate),
         },
         targetEmail: recipient,
         status: BookingStatusLabel.REQUESTED,
@@ -95,12 +98,22 @@ export async function POST(request: NextRequest) {
 
     const endDate = toFirebaseTimestampFromString(bookingCalendarInfo?.endStr);
     const duration = endDate.toMillis() - startDate.toMillis();
+    console.log(
+      "condition",
+      duration <= 3.6e6 * 4 && // <= 4 hours
+        selectedRoomIds.every(r => INSTANT_APPROVAL_ROOMS.includes(r)) &&
+        data.catering === "no" &&
+        data.hireSecurity === "no" &&
+        data.mediaServices === undefined &&
+        data.roomSetup === "no",
+    );
+    debugger;
     return (
       duration <= 3.6e6 * 4 && // <= 4 hours
       selectedRoomIds.every(r => INSTANT_APPROVAL_ROOMS.includes(r)) &&
       data.catering === "no" &&
       data.hireSecurity === "no" &&
-      data.mediaServices.length === 0 &&
+      data.mediaServices === undefined &&
       data.roomSetup === "no"
     );
   };

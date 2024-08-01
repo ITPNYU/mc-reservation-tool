@@ -83,7 +83,6 @@ export async function GET(req: NextRequest) {
 
   try {
     const events = await getCalendarEvents(calendarId);
-    console.log("aaaaa events", events);
     return NextResponse.json(events);
   } catch (error) {
     console.error("Error fetching calendar events:", error);
