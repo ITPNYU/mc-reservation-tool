@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCalendarClient } from "@/lib/googleClient";
 import { inviteUserToCalendarEvent } from "@/components/src/server/calendars";
 
 export async function POST(request: NextRequest) {
