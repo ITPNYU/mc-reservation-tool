@@ -69,7 +69,7 @@ export function BookingProvider({ children }) {
   const [department, setDepartment] = useState<Department>();
   const [formData, setFormData] = useState<Inputs>(undefined);
   const [hasShownMocapModal, setHasShownMocapModal] = useState(false);
-  const [isSafetyTrained, setIsSafetyTrained] = useState(true);
+  // const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -82,6 +82,14 @@ export function BookingProvider({ children }) {
       .includes(userEmail);
   }, [userEmail, bannedUsers]);
 
+  const isSafetyTrained = useMemo(() => {
+    if (!userEmail) return;
+    const isTrained = safetyTrainedUsers
+      .map((user) => user.email)
+      .includes(userEmail);
+    return isTrained;
+  }, [userEmail, safetyTrainedUsers]);
+
   // block progressing in the form is safety training requirement isn't met
   const needsSafetyTraining = useMemo(() => {
     const isStudent = role === Role.STUDENT;
@@ -90,17 +98,6 @@ export function BookingProvider({ children }) {
     );
     return isStudent && roomRequiresSafetyTraining && !isSafetyTrained;
   }, [selectedRooms, role, isSafetyTrained]);
-
-  useEffect(() => {
-    const fetchIsSafetyTrained = async () => {
-      if (!userEmail) return;
-      let isTrained = safetyTrainedUsers
-        .map((user) => user.email)
-        .includes(userEmail);
-      setIsSafetyTrained(isTrained);
-    };
-    fetchIsSafetyTrained();
-  }, [userEmail, safetyTrainedUsers]);
 
   return (
     <BookingContext.Provider
