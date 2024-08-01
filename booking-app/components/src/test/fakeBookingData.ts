@@ -85,7 +85,7 @@ export function addFakeBookingData(
   fakeBookingStatusData: any
 ) {
   let calendarEventId;
-  const email = 'media-commons-devs@itp.nyu.edu';
+  const email = 'booking-app-devs@itp.nyu.edu';
   const bookingRows = [];
   const bookingStatusRows = [];
 
