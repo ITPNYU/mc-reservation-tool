@@ -1,12 +1,5 @@
 import { IconButton, MenuItem, Select } from "@mui/material";
 import React, { useContext, useMemo, useState } from "react";
-
-import AlertToast from "../../components/AlertToast";
-import { BookingStatusLabel } from "../../../../types";
-import Check from "@mui/icons-material/Check";
-import ConfirmDialog from "../../components/ConfirmDialog";
-import { DatabaseContext } from "../../components/Provider";
-import Loading from "../../components/Loading";
 import {
   approveBooking,
   cancel,
@@ -14,6 +7,13 @@ import {
   noShow,
   reject,
 } from "@/components/src/server/admin";
+
+import AlertToast from "../../components/AlertToast";
+import { BookingStatusLabel } from "../../../../types";
+import Check from "@mui/icons-material/Check";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import { DatabaseContext } from "../../components/Provider";
+import Loading from "../../components/Loading";
 
 interface Props {
   calendarEventId: string;
@@ -81,7 +81,11 @@ export default function BookingActions({
           onError();
           setOptimisticStatus(undefined);
         })
-        .finally(() => reload().then(() => setOptimisticStatus(undefined)));
+        .finally(() =>
+          reload().then(() => {
+            // setOptimisticStatus(undefined);
+          })
+        );
     } catch (ex) {
       console.error(ex);
       onError();

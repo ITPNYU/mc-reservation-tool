@@ -103,13 +103,11 @@ export default function BookingTableRow({
         </TableCell>
       )}
       <TableCell width={100}>
-        {/*
-          <BookingActions
-            status={optimisticStatus ?? status}
-            calendarEventId={booking.calendarEventId}
-            {...{ setOptimisticStatus, isAdminView, isUserView }}
-          />
-    */}
+        <BookingActions
+          status={optimisticStatus ?? status}
+          calendarEventId={booking.calendarEventId}
+          {...{ setOptimisticStatus, isAdminView, isUserView }}
+        />
       </TableCell>
     </TableRow>
   );

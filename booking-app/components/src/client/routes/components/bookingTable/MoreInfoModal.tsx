@@ -150,7 +150,7 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
             <TableRow>
               <LabelCell>Media Service</LabelCell>
               <TableCell>
-                {booking.mediaServices.length === 0
+                {booking.mediaServices == undefined
                   ? BLANK
                   : booking.mediaServices
                       .split(", ")
