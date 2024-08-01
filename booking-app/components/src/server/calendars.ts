@@ -133,6 +133,7 @@ export const insertEvent = async ({
   roomEmails,
 }: InsertEventType) => {
   const calendar = getCalendarClient();
+  console.log("getCalendar Client()", calendar);
   const event = await calendar.events.insert({
     calendarId,
     requestBody: {
@@ -148,6 +149,7 @@ export const insertEvent = async ({
       colorId: "8", // Gray
     },
   });
+  console.log("inseerted event", event);
   return event.data;
 };
 
