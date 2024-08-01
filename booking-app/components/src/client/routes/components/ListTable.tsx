@@ -1,9 +1,9 @@
 import { Box, TableCell } from "@mui/material";
 import React, { useMemo } from "react";
 
-import { TableNames } from "../../../policy";
-import Table from "./Table";
 import ListTableRow from "./ListTableRow";
+import Table from "./Table";
+import { TableNames } from "../../../policy";
 import { deleteDataFromFirestore } from "@/lib/firebase/firebase";
 
 interface Props {
@@ -27,9 +27,9 @@ export default function ListTable(props: Props) {
     return Object.keys(props.rows[0]) as string[];
   }, [props.rows]);
 
-  // if (props.rows.length === 0) {
-  //   return <p>No results</p>;
-  // }
+  if (props.rows.length === 0) {
+    return <p>No results</p>;
+  }
 
   const columns = useMemo(
     () => [

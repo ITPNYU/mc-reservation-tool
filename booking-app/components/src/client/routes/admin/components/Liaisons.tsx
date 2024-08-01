@@ -1,16 +1,16 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from "react";
 
-import AddRow from '../../components/AddRow';
-import { Box } from '@mui/material';
-import { DatabaseContext } from '../../components/Provider';
-import { Department } from '../../../../types';
-import Dropdown from '../../booking/components/Dropdown';
-import ListTable from '../../components/ListTable';
-import { formatDate } from '../../../utils/date';
-import { getLiaisonTableName } from '../../../../policy';
+import AddRow from "../../components/AddRow";
+import { Box } from "@mui/material";
+import { DatabaseContext } from "../../components/Provider";
+import { Department } from "../../../../types";
+import Dropdown from "../../booking/components/Dropdown";
+import ListTable from "../../components/ListTable";
+import { formatDate } from "../../../utils/date";
+import { getLiaisonTableName } from "../../../../policy";
 
 const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
-  const [department, setDepartment] = useState('');
+  const [department, setDepartment] = useState("");
 
   const departmentDropdown = useMemo(
     () => (
@@ -38,7 +38,7 @@ const AddLiaisonForm = ({ liaisonEmails, reloadLiaisonEmails }) => {
       title="Department Liaisons"
       extra={{
         components: [departmentDropdown],
-        values: [department],
+        values: { department },
         updates: [setDepartment],
       }}
     />

@@ -19,7 +19,7 @@ interface Props {
   title: string;
   extra?: {
     components: React.ReactNode[];
-    values: string[];
+    values: { [key: string]: string };
     updates: ((x: string) => void)[];
   };
 }
@@ -48,7 +48,7 @@ export default function AddRow(props: Props) {
     try {
       await saveDataToFirestore(tableName, {
         [props.columnNameUniqueValue]: valueToAdd,
-        ...(extra?.values ?? []),
+        ...(extra?.values ?? {}),
         createdAt: Timestamp.now(),
       });
       await rowsRefresh();

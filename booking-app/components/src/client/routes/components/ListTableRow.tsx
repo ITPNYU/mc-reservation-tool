@@ -31,7 +31,7 @@ export default function ListTableRow(props: Props) {
    */
   const onRemove = async () => {
     setUiLoading(true);
-    setIsRemoved(true); // optimistically hide component
+    // setIsRemoved(true); // optimistically hide component
     try {
       removeRow()
         .catch(() => {
@@ -55,9 +55,6 @@ export default function ListTableRow(props: Props) {
     return null;
   }
 
-  console.log("columnNames", columnNames);
-  console.log("columnFormatters", columnFormatters);
-  console.log("row", row);
   return (
     <TableRow key={index}>
       {columnNames.map((columnName, idx) => (
