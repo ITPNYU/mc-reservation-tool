@@ -2,14 +2,14 @@ import {
   CAMPUS_MEDIA_SERVICES_ROOMS,
   CHECKOUT_EQUIPMENT_ROOMS,
   LIGHTING_DMX_ROOMS,
-} from '../../../../policy';
-import { Checkbox, FormControlLabel, Switch } from '@mui/material';
-import { Control, Controller, UseFormTrigger } from 'react-hook-form';
-import { Inputs, MediaServices } from '../../../../types';
-import React, { useContext, useMemo } from 'react';
+} from "../../../../policy";
+import { Checkbox, FormControlLabel, Switch } from "@mui/material";
+import { Control, Controller, UseFormTrigger } from "react-hook-form";
+import { Inputs, MediaServices } from "../../../../types";
+import React, { useContext, useMemo } from "react";
 
-import { BookingContext } from '../bookingProvider';
-import styled from '@emotion/styled';
+import { BookingContext } from "../bookingProvider";
+import styled from "@emotion/styled";
 
 const Label = styled.label`
   font-weight: 500;
@@ -34,15 +34,15 @@ export default function BookingFormMediaServices(props: Props) {
 
   const checkboxes = useMemo(() => {
     const options: MediaServices[] = [];
-    const checkRoomMediaServices = (list: string[]) =>
+    const checkRoomMediaServices = (list: number[]) =>
       roomIds.some((roomId) => list.includes(roomId));
     if (checkRoomMediaServices(CHECKOUT_EQUIPMENT_ROOMS))
       options.push(MediaServices.CHECKOUT_EQUIPMENT);
-    if (checkRoomMediaServices(['103'])) {
+    if (checkRoomMediaServices([103])) {
       options.push(MediaServices.AUDIO_TECH_103);
       options.push(MediaServices.LIGHTING_TECH_103);
     }
-    if (checkRoomMediaServices(['230']))
+    if (checkRoomMediaServices([230]))
       options.push(MediaServices.AUDIO_TECH_230);
     if (checkRoomMediaServices(CAMPUS_MEDIA_SERVICES_ROOMS))
       options.push(MediaServices.CAMPUS_MEDIA_SERVICES);
@@ -55,7 +55,7 @@ export default function BookingFormMediaServices(props: Props) {
   return (
     <div style={{ marginBottom: 8 }}>
       <Label htmlFor={id}>Media Services</Label>
-      <p style={{ fontSize: '0.75rem' }}>
+      <p style={{ fontSize: "0.75rem" }}>
         Check out equipment, use DMX lighting grid, request a technician, etc.
       </p>
       <Controller
@@ -63,7 +63,7 @@ export default function BookingFormMediaServices(props: Props) {
         control={control}
         render={({ field }) => (
           <FormControlLabel
-            label={showMediaServices ? 'Yes' : 'No'}
+            label={showMediaServices ? "Yes" : "No"}
             control={
               <Switch
                 checked={showMediaServices}
@@ -71,7 +71,7 @@ export default function BookingFormMediaServices(props: Props) {
                   setShowMediaServices(e.target.checked);
                   if (!e.target.checked) {
                     // de-select boxes if switch says "no media services"
-                    field.onChange('');
+                    field.onChange("");
                   }
                   trigger(id);
                 }}
@@ -92,13 +92,13 @@ export default function BookingFormMediaServices(props: Props) {
                 <FormControlLabel
                   key={checkbox}
                   label={checkbox}
-                  sx={{ display: 'block' }}
+                  sx={{ display: "block" }}
                   control={
                     <Checkbox
                       checked={field.value?.includes(checkbox) || false}
                       onChange={(e) => {
                         const values = field.value
-                          ? field.value.split(', ')
+                          ? field.value.split(", ")
                           : [];
                         let newValue: string[];
                         if (e.target.checked) {
@@ -108,7 +108,7 @@ export default function BookingFormMediaServices(props: Props) {
                             (value) => value !== checkbox
                           );
                         }
-                        field.onChange(newValue.join(', '));
+                        field.onChange(newValue.join(", "));
                         trigger(id);
                       }}
                       onBlur={() => trigger(id)}

@@ -2,8 +2,8 @@ import { Booking, CalendarEvent, RoomSetting } from "../../../../types";
 import { CALENDAR_HIDE_STATUS, STORAGE_KEY_BOOKING } from "../../../../policy";
 import { useEffect, useState } from "react";
 
-import getBookingStatus from "../../hooks/getBookingStatus";
 import axios from "axios";
+import getBookingStatus from "../../hooks/getBookingStatus";
 
 export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -39,7 +39,7 @@ export default function fetchCalendarEvents(allRooms: RoomSetting[]) {
     const rowsWithResourceIds = filteredEvents.map((row) => ({
       ...row,
       id: room.roomId + row.start,
-      resourceId: room.roomId,
+      resourceId: room.roomId + "",
     }));
     return rowsWithResourceIds;
   };

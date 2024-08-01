@@ -1,15 +1,15 @@
-import { Box, Stack, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import { Box, Stack, Typography } from "@mui/material";
+import React, { useContext, useState } from "react";
 
-import { BookingContext } from '../bookingProvider';
-import { CalendarDatePicker } from '../components/CalendarDatePicker';
-import CalendarVerticalResource from '../components/CalendarVerticalResource';
-import { DatabaseContext } from '../../components/Provider';
-import Grid from '@mui/material/Unstable_Grid2';
-import { SelectRooms } from '../components/SelectRooms';
+import { BookingContext } from "../bookingProvider";
+import { CalendarDatePicker } from "../components/CalendarDatePicker";
+import CalendarVerticalResource from "../components/CalendarVerticalResource";
+import { DatabaseContext } from "../../components/Provider";
+import Grid from "@mui/material/Unstable_Grid2";
+import { SelectRooms } from "../components/SelectRooms";
 
 export default function SelectRoomPage() {
-  const { roomSettings, userEmail } = useContext(DatabaseContext);
+  const { roomSettings } = useContext(DatabaseContext);
   const { selectedRooms, setSelectedRooms } = useContext(BookingContext);
   const [date, setDate] = useState<Date>(new Date());
 

@@ -1,6 +1,6 @@
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext } from "react";
 
-import { BookingContext } from '../bookingProvider';
+import { BookingContext } from "../bookingProvider";
 
 export default function useCalculateOverlap() {
   const { bookingCalendarInfo, existingCalendarEvents, selectedRooms } =
@@ -11,7 +11,7 @@ export default function useCalculateOverlap() {
     const selectedRoomIds = selectedRooms.map((x) => x.roomId);
     return existingCalendarEvents
       .map((event) => {
-        if (!selectedRoomIds.includes(event.resourceId)) return false;
+        if (!selectedRoomIds.includes(Number(event.resourceId))) return false;
         const eventStart = new Date(event.start);
         const eventEnd = new Date(event.end);
         return (

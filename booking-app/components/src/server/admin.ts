@@ -9,12 +9,12 @@ import {
   BookingStatusLabel,
 } from "../types";
 import { approvalUrl, getBookingToolDeployUrl, rejectUrl } from "./ui";
-
-import { Timestamp } from "@firebase/firestore";
 import {
   getDataByCalendarEventId,
   updateDataInFirestore,
 } from "@/lib/firebase/firebase";
+
+import { Timestamp } from "@firebase/firestore";
 
 export const bookingContents = (id: string) => {
   return getDataByCalendarEventId(TableNames.BOOKING, id)
@@ -126,7 +126,6 @@ export const approveBooking = async (id: string) => {
         body: JSON.stringify(formData),
       }
     );
-    console.log(res.json());
   }
 };
 
@@ -165,7 +164,6 @@ export const sendBookingDetailEmail = async (
     },
     body: JSON.stringify(formData),
   });
-  console.log(res.json());
 };
 
 export const approveEvent = async (id: string) => {

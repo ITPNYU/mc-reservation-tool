@@ -283,6 +283,7 @@ export const DatabaseProvider = ({
           capacity: item.capacity,
           calendarId: item.calendarId,
         }));
+        filtered.sort((a, b) => a.roomId - b.roomId);
         setRoomSettings(filtered);
       })
       .catch((error) => console.error("Error fetching data:", error));

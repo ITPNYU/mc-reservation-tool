@@ -81,7 +81,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
   const resources = useMemo(
     () =>
       rooms.map((room) => ({
-        id: room.roomId,
+        id: room.roomId + "",
         title: `${room.roomId} ${room.name}`,
         index: Number(room.roomId),
       })),
@@ -106,7 +106,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
       start: bookingCalendarInfo.startStr,
       end: bookingCalendarInfo.endStr,
       id: room.roomId + bookingCalendarInfo.startStr,
-      resourceId: room.roomId,
+      resourceId: room.roomId + "",
       title: NEW_TITLE_TAG,
       overlap: true,
       url: `${index}:${rooms.length - 1}`, // some hackiness to let us render multiple events visually as one big block
@@ -129,7 +129,7 @@ export default function CalendarVerticalResource({ rooms, dateView }: Props) {
         start: start.toISOString(),
         end: today.toISOString(),
         id: room.roomId + "bg",
-        resourceId: room.roomId,
+        resourceId: room.roomId + "",
         overlap: false,
         display: "background",
         classNames: ["disabled"],

@@ -153,7 +153,7 @@ export enum Role {
 }
 
 export type RoomSetting = {
-  roomId: string;
+  roomId: number;
   name: string;
   capacity: string;
   calendarId: string;
