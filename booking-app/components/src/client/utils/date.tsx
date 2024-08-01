@@ -1,16 +1,32 @@
 import { Timestamp } from "@firebase/firestore";
 import { format } from "date-fns";
 
-export const formatDate = (oldDate: any) => {
+export const formatDate = (
+  oldDate:
+    | Date
+    | Timestamp
+    | { seconds: number; nanoseconds: number }
+    | number
+    | string
+) => {
   if (!oldDate) return "";
-  let date;
+
+  let date: Date;
+
   if (oldDate instanceof Date) {
     date = oldDate;
   } else if (oldDate instanceof Timestamp) {
     date = oldDate.toDate();
+  } else if (
+    typeof oldDate === "object" &&
+    "seconds" in oldDate &&
+    "nanoseconds" in oldDate
+  ) {
+    date = new Timestamp(oldDate.seconds, oldDate.nanoseconds).toDate();
   } else {
     date = new Date(oldDate);
   }
+
   return format(date, "yyyy-MM-dd hh:mm a");
 };
 

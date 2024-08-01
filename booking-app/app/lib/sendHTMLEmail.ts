@@ -5,6 +5,7 @@ import { getGmailClient } from "@/lib/googleClient";
 import { BookingStatusLabel } from "@/components/src/types";
 import { app } from "firebase-admin";
 import { approvalUrl, rejectUrl } from "@/components/src/server/ui";
+import { formatDate } from "@/components/src/client/utils/date";
 
 interface BookingFormDetails {
   [key: string]: string;
@@ -38,6 +39,8 @@ export const sendHTMLEmail = async (params: SendHTMLEmailParams) => {
     status,
     body,
     contents,
+    startDate: formatDate(contents.startDate),
+    endDate: formatDate(contents.endDate),
     approvalUrl: approvalUrl(contents.calendarEventId),
     rejectUrl: rejectUrl(contents.calendarEventId),
   });
