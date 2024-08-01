@@ -165,7 +165,7 @@ export const updateEventPrefix = async (
   );
   console.log(`Room Calendar Ids: ${roomCalendarIds}`);
   console.log("bookingContents", bookingContents);
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
 
   for (const roomCalendarId of roomCalendarIds) {
     try {

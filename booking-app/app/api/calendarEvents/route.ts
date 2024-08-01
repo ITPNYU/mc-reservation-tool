@@ -8,7 +8,7 @@ import { bookingContents } from "@/components/src/server/admin";
 import { BookingFormDetails } from "@/components/src/types";
 
 const getCalendarEvents = async (calendarId: string) => {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
   const now = new Date().toISOString();
   const threeMonthsFromNow = new Date();
   threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
@@ -34,7 +34,6 @@ const getCalendarEvents = async (calendarId: string) => {
 };
 
 export async function POST(request: NextRequest) {
-  const calendar = getCalendarClient();
   const { calendarId, title, description, startTime, endTime, roomEmails } =
     await request.json();
   console.log(calendarId, title, description, startTime, endTime, roomEmails);
