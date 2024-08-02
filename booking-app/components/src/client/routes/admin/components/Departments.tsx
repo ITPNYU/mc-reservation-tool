@@ -47,6 +47,7 @@ const AddDepartmentForm = ({ departments, reloadDepartments }) => {
       addDuplicateErrorMessage="This department is already registered"
       addFailedErrorMessage="Failed to add Department"
       columnNameUniqueValue="department"
+      valueToAdd = {departmentName}
       tableName={TableNames.DEPARTMENTS}
       rows={departments}
       rowsRefresh={reloadDepartments}

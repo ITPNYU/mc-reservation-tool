@@ -12,6 +12,8 @@ interface Props {
   addDuplicateErrorMessage?: string;
   addFailedErrorMessage?: string;
   columnNameUniqueValue: string;
+  inputPlaceholder?: string;
+  valueToAdd: string;
   tableName: TableNames;
   rows: { [key: string]: string }[];
   rowsRefresh: () => Promise<void>;
@@ -25,28 +27,27 @@ interface Props {
 
 export default function AddDepartmentRow(props: Props) {
   const { tableName, rows, rowsRefresh, title, extra } = props;
-  const [valueToAdd, setValueToAdd] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // const uniqueValues = useMemo<string[]>(
-  //   () => rows.map((row) => row[props.columnNameUniqueValue]),
-  //   [rows]
-  // );
+  const uniqueValues = useMemo<string[]>(
+    () => rows.map((row) => row[props.columnNameUniqueValue]),
+    [rows]
+  );
 
   const addValue = async () => {
-    if (!valueToAdd || valueToAdd.length === 0) return;
+    if (!props.valueToAdd || props.valueToAdd.length === 0) return;
 
-    // if (uniqueValues.includes(valueToAdd)) {
-    //   alert(
-    //     props.addDuplicateErrorMessage ?? "This value has already been added"
-    //   );
-    //   return;
-    // }
+    if (uniqueValues.includes(props.valueToAdd)) {
+      alert(
+        props.addDuplicateErrorMessage ?? "This value has already been added"
+      );
+      return;
+    }
 
     setLoading(true);
     try {
       await saveDataToFirestore(tableName, {
-        [props.columnNameUniqueValue]: valueToAdd,
+        [props.columnNameUniqueValue]: props.valueToAdd,
         ...(extra?.values ?? {}),
         createdAt: Timestamp.now(),
       });
@@ -56,7 +57,6 @@ export default function AddDepartmentRow(props: Props) {
       alert(props.addFailedErrorMessage ?? "Failed to add value");
     } finally {
       setLoading(false);
-      setValueToAdd("");
     }
   };
 
