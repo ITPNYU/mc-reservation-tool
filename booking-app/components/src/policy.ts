@@ -31,26 +31,6 @@ export enum TableNames {
   SETTINGS = "settings",
 }
 
-export enum ActiveSheetBookingStatusColumns {
-  CALENDAR_ID = 0,
-  EMAIL = 1,
-  REQUESTED_DATE = 2,
-  FIRST_APPROVED_DATE = 3,
-  SECOND_APPROVED_DATE = 4,
-  REJECTED_DATE = 5,
-  CANCELLED_DATE = 6,
-  CHECKED_IN_DATE = 7,
-  NO_SHOWED_DATE = 8,
-}
-
-export enum ActiveSheetRoomsColumns {
-  ROOM_ID = 0,
-  NAME = 1,
-  CAPACITY = 2,
-  CALENDAR_ID = 3,
-  CALENDAR_ID_PROD = 4,
-}
-
 /** Old safety training Google Sheet */
 export const OLD_SAFETY_TRAINING_SHEET_ID =
   "1Debe5qF-2qXJhqP0AMy5etEvwAPd3mNFiTswytsbKxQ";

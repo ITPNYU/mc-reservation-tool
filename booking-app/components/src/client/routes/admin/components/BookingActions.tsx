@@ -75,29 +75,20 @@ export default function BookingActions({
   }: ActionDefinition) => {
     setUiLoading(true);
     setOptimisticStatus(optimisticNextStatus);
+
     try {
-      action()
-        .catch(() => {
-          onError();
-          setOptimisticStatus(undefined);
-        })
-        .finally(() =>
-          reload().then(() => {
-            // setOptimisticStatus(undefined);
-          })
-        );
+      await action();
     } catch (ex) {
       console.error(ex);
+      setOptimisticStatus(undefined);
       onError();
     } finally {
+      await reload();
+      setOptimisticStatus(undefined);
       setSelectedAction(Actions.PLACEHOLDER);
       setUiLoading(false);
     }
   };
-
-  if (uiLoading) {
-    return <Loading />;
-  }
 
   const actions: { [key in Actions]: ActionDefinition } = {
     [Actions.CANCEL]: {
@@ -227,7 +218,9 @@ export default function BookingActions({
           </MenuItem>
         ))}
       </Select>
-      {actions[selectedAction].confirmation === true ? (
+      {uiLoading ? (
+        <Loading style={{ height: "24px", width: "24px", margin: 8 }} />
+      ) : actions[selectedAction].confirmation === true ? (
         <ConfirmDialog
           message="Are you sure? This action can't be undone."
           callback={handleDialogChoice}

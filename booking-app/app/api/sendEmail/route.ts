@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { sendHTMLEmail } from "@/app/lib/sendHTMLEmail";
 
 export async function POST(req: NextRequest) {
@@ -10,9 +11,6 @@ export async function POST(req: NextRequest) {
     eventTitle,
     bodyMessage,
   } = await req.json();
-  console.log("templateName", templateName);
-  console.log("contents", contents);
-  console.log("bodyMessage", bodyMessage);
 
   // if (!templateName || !contents || !targetEmail || !status || !eventTitle) {
   //  return NextResponse.json(
