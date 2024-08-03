@@ -6,7 +6,7 @@ import {
   Tooltip,
   tooltipClasses,
 } from "@mui/material";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useMemo, useRef, useState } from "react";
 import { formatDateTable, formatTimeTable } from "../../../utils/date";
 
 import BookingActions from "../../admin/components/BookingActions";
@@ -30,11 +30,15 @@ export default function BookingTableRow({
   setModalData,
 }: Props) {
   const { bookingStatuses } = useContext(DatabaseContext);
-  const status = getBookingStatus(booking, bookingStatuses);
   const titleRef = useRef();
 
   const [optimisticStatus, setOptimisticStatus] =
     useState<BookingStatusLabel>();
+
+  const status = useMemo(
+    () => getBookingStatus(booking, bookingStatuses),
+    [booking, bookingStatuses, optimisticStatus]
+  );
 
   return (
     <TableRow>

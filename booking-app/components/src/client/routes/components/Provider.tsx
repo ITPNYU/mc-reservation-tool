@@ -137,7 +137,6 @@ export const DatabaseProvider = ({
   const fetchBookings = async () => {
     fetchAllFutureBooking(TableNames.BOOKING)
       .then((fetchedData) => {
-        console.log("fetchedData Booking", fetchedData);
         const bookings = fetchedData.map((item: any) => ({
           id: item.id,
           calendarEventId: item.calendarEventId,
@@ -196,7 +195,7 @@ export const DatabaseProvider = ({
           rejectedAt: item.rejectedAt,
           canceledAt: item.canceledAt,
           checkedInAt: item.checkedInAt,
-          noShowedAt: item.checkedInAt,
+          noShowedAt: item.noShowedAt,
         }));
         setBookingStatuses(filtered);
       })
@@ -206,7 +205,6 @@ export const DatabaseProvider = ({
   const fetchAdminUsers = async () => {
     fetchAllDataFromCollection(TableNames.ADMINS)
       .then((fetchedData) => {
-        console.log("fetchedData", fetchedData);
         const adminUsers = fetchedData.map((item: any) => ({
           id: item.id,
           email: item.email,

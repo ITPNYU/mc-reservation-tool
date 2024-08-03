@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCalendarClient } from "@/lib/googleClient";
 import {
   insertEvent,
   updateEventPrefix,
 } from "@/components/src/server/calendars";
-import { bookingContents } from "@/components/src/server/admin";
+
 import { BookingFormDetails } from "@/components/src/types";
+import { bookingContents } from "@/components/src/server/admin";
+import { getCalendarClient } from "@/lib/googleClient";
 
 const getCalendarEvents = async (calendarId: string) => {
   const calendar = await getCalendarClient();
@@ -102,7 +103,6 @@ export async function PUT(req: NextRequest) {
     );
   }
   const contents = await bookingContents(calendarEventId);
-  console.log("contents", contents);
   try {
     await updateEventPrefix(calendarEventId, newPrefix, contents);
     return NextResponse.json(

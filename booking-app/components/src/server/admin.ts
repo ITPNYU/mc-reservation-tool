@@ -1,13 +1,9 @@
 import {
-  ActiveSheetBookingStatusColumns,
-  TableNames,
-  getSecondApproverEmail,
-} from "../policy";
-import {
   BookingFormDetails,
   BookingStatus,
   BookingStatusLabel,
 } from "../types";
+import { TableNames, getSecondApproverEmail } from "../policy";
 import { approvalUrl, getBookingToolDeployUrl, rejectUrl } from "./ui";
 import {
   getDataByCalendarEventId,
@@ -145,10 +141,7 @@ export const sendBookingDetailEmail = async (
   status: BookingStatusLabel
 ) => {
   const contents = await bookingContents(calendarEventId);
-  console.log("sendBookingDetailEmail");
-  console.log("contents", contents);
   contents.headerMessage = headerMessage;
-  console.log("contents", contents);
   const formData = {
     templateName: "booking_detail",
     contents: contents,
@@ -223,7 +216,7 @@ export const approveEvent = async (id: string) => {
 
 export const reject = async (id: string) => {
   updateDataByCalendarEventId(TableNames.BOOKING_STATUS, id, {
-    [ActiveSheetBookingStatusColumns.REJECTED_DATE]: Timestamp.now(),
+    rejectedAt: Timestamp.now(),
   });
 
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
@@ -254,7 +247,7 @@ export const reject = async (id: string) => {
 
 export const cancel = async (id: string) => {
   updateDataByCalendarEventId(TableNames.BOOKING_STATUS, id, {
-    [ActiveSheetBookingStatusColumns.CANCELLED_DATE]: Timestamp.now(),
+    canceledAt: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
   //@ts-ignore
@@ -289,7 +282,7 @@ export const cancel = async (id: string) => {
 
 export const checkin = async (id: string) => {
   updateDataByCalendarEventId(TableNames.BOOKING_STATUS, id, {
-    [ActiveSheetBookingStatusColumns.CHECKED_IN_DATE]: Timestamp.now(),
+    checkedInAt: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
   //@ts-ignore
@@ -320,7 +313,7 @@ export const checkin = async (id: string) => {
 
 export const noShow = async (id: string) => {
   updateDataByCalendarEventId(TableNames.BOOKING_STATUS, id, {
-    [ActiveSheetBookingStatusColumns.NO_SHOWED_DATE]: Timestamp.now(),
+    noShowedAt: Timestamp.now(),
   });
   const doc = await getDataByCalendarEventId(TableNames.BOOKING_STATUS, id);
   //@ts-ignore

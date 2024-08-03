@@ -1,5 +1,8 @@
 // saveData.ts
 import {
+  QueryConstraint,
+  QuerySnapshot,
+  Timestamp,
   addDoc,
   collection,
   deleteDoc,
@@ -7,12 +10,10 @@ import {
   getDoc,
   getDocs,
   query,
-  QueryConstraint,
-  QuerySnapshot,
-  Timestamp,
   updateDoc,
   where,
 } from "@firebase/firestore";
+
 import { TableNames } from "@/components/src/policy";
 import { db } from "./firebaseClient";
 
@@ -72,7 +73,6 @@ export const getDataByCalendarEventId = async <T>(
     if (!querySnapshot.empty) {
       const docSnap = querySnapshot.docs[0];
       const data = docSnap.data() as T;
-      console.log("Document data:", data);
       return { id: docSnap.id, ...data };
     }
     console.log("No such document!");
