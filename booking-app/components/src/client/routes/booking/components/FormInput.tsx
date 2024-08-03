@@ -5,12 +5,13 @@ import {
   BookingFormSwitch,
   BookingFormTextField,
 } from "./BookingFormInputs";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -19,9 +20,10 @@ import { BookingContext } from "../bookingProvider";
 import BookingFormMediaServices from "./BookingFormMediaServices";
 import BookingSelection from "./BookingSelection";
 import { DatabaseContext } from "../../components/Provider";
+import isEqual from "react-fast-compare";
 import { styled } from "@mui/system";
 import { useRouter } from "next/navigation";
-import useSubmitBooking from "../formPages/UserSectionPage";
+import useSubmitBooking from "../hooks/useSubmitBooking";
 
 const Section = ({ title, children }) => (
   <div style={{ marginBottom: "20px" }}>
@@ -51,7 +53,6 @@ const Container = styled(Box)(({ theme }) => ({
 
 export default function FormInput() {
   const { userEmail, settings } = useContext(DatabaseContext);
-  const theme = useTheme();
   const {
     role,
     department,
@@ -102,6 +103,20 @@ export default function FormInput() {
   const [resetRoom, setResetRoom] = useState(false);
   const [bookingPolicy, setBookingPolicy] = useState(false);
 
+  const watchedFields = watch();
+  const prevWatchedFieldsRef = useRef<Inputs>();
+
+  // update provider if form state changes so we can repopulate form if user switches form pages
+  useEffect(() => {
+    if (
+      !prevWatchedFieldsRef.current ||
+      !isEqual(prevWatchedFieldsRef.current, watchedFields)
+    ) {
+      setFormData(watchedFields);
+      prevWatchedFieldsRef.current = watchedFields;
+    }
+  }, [watchedFields, setFormData]);
+
   const maxCapacity = useMemo(
     () =>
       selectedRooms.reduce((sum, room) => {
@@ -142,8 +157,10 @@ export default function FormInput() {
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     if (!bookingCalendarInfo) return;
+
     setFormData(data);
     registerEvent(data);
+    router.push("/book/confirmation");
   };
 
   return (
