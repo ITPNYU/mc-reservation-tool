@@ -7,7 +7,7 @@ export const fetchAllFutureBooking = async <T>(
   collectionName: TableNames
 ): Promise<T[]> => {
   const now = Timestamp.now();
-  const futureQueryConstraints = [where("startDate", ">", now)];
+  const futureQueryConstraints = [where("endDate", ">", now)];
   return fetchAllDataFromCollection<T>(collectionName, futureQueryConstraints);
 };
 

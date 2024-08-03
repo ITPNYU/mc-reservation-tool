@@ -99,10 +99,6 @@ export const DatabaseProvider = ({
   const pagePermission = useMemo<PagePermission>(() => {
     if (!userEmail) return PagePermission.BOOKING;
 
-    console.log(
-      "admin",
-      adminUsers.map((admin) => admin)
-    );
     if (adminUsers.map((admin) => admin.email).includes(userEmail))
       return PagePermission.ADMIN;
     else if (paUsers.map((pa) => pa.email).includes(userEmail))
@@ -125,6 +121,7 @@ export const DatabaseProvider = ({
     }, 10000);
     return () => clearInterval(intervalId);
   }, [bookingsLoading]);
+
   useEffect(() => {
     fetchActiveUserEmail();
     fetchAdminUsers();
