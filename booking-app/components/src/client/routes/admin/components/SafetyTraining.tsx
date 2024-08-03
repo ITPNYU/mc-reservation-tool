@@ -12,7 +12,7 @@ export default function SafetyTrainedUsers() {
 
   return (
     <EmailListTable
-      columnFormatters={{ createdAt: formatDate }}
+      columnFormatters={{ completedAt: formatDate }}
       tableName={TableNames.SAFETY_TRAINING}
       title="Safety Trained Users"
       userList={safetyTrainedUsers}

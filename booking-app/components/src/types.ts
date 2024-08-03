@@ -162,7 +162,7 @@ export type RoomSetting = {
 
 export type SafetyTraining = {
   email: string;
-  createdAt: string;
+  completedAt: string;
 };
 
 export type Settings = {

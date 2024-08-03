@@ -236,7 +236,7 @@ export const DatabaseProvider = ({
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
           email: item.email,
-          createdAt: item.createdAt,
+          completedAt: item.createdAt,
         }));
         setSafetyTrainedUsers(filtered);
       })
@@ -249,7 +249,7 @@ export const DatabaseProvider = ({
         const filtered = fetchedData.map((item: any) => ({
           id: item.id,
           email: item.email,
-          bannedAt: item.bannedAt,
+          bannedAt: item.createdAt,
         }));
         setBannedUsers(filtered);
       })

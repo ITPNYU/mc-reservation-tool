@@ -27,13 +27,9 @@ export default function ListTable(props: Props) {
     return Object.keys(props.rows[0]) as string[];
   }, [props.rows]);
 
-  if (props.rows.length === 0) {
-    return <p>No results</p>;
-  }
-
   const columns = useMemo(
     () => [
-      ...columnNames.map((columnName) => (
+      ...columnNames?.map((columnName) => (
         <TableCell key={columnName}>{formatColumnName(columnName)}</TableCell>
       )),
       <TableCell align="right" key="action">
@@ -45,7 +41,7 @@ export default function ListTable(props: Props) {
 
   return (
     <Table {...{ columns, topRow }}>
-      {props.rows.map((row, index: number) => (
+      {props?.rows.map((row, index: number) => (
         <ListTableRow
           key={index}
           removeRow={() => deleteDataFromFirestore(props.tableName, row.id)}
