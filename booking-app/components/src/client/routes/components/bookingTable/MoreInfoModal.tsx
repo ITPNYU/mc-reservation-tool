@@ -4,6 +4,7 @@ import {
   Button,
   Modal,
   Table,
+  TableBody,
   TableCell,
   TableRow,
   Typography,
@@ -80,100 +81,106 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
           <Grid xs={6}>
             <Typography variant="h6">Requestor</Typography>
             <Table size="small" sx={{ marginBottom: 3 }}>
-              <TableRow>
-                <LabelCell>NetID / Name</LabelCell>
-                <StackedTableCell
-                  topText={booking.netId}
-                  bottomText={`${booking.firstName} ${booking.lastName}`}
-                />
-              </TableRow>
-              <TableRow>
-                <LabelCell>Contact Info</LabelCell>
-                <StackedTableCell
-                  topText={booking.email}
-                  bottomText={booking.phoneNumber}
-                />
-              </TableRow>
-              <TableRow>
-                <LabelCell>N-Number </LabelCell>
-                <TableCell>{booking.nNumber}</TableCell>
-              </TableRow>
-              <TableRow>
-                <LabelCell>Secondary Contact</LabelCell>
-                <TableCell>{booking.secondaryName || BLANK}</TableCell>
-              </TableRow>
-              <TableRow>
-                <LabelCell>Sponsor</LabelCell>
-                <StackedTableCell
-                  topText={booking.sponsorEmail || BLANK}
-                  bottomText={`${booking.sponsorFirstName} ${booking.sponsorLastName}`}
-                />
-              </TableRow>
+              <TableBody>
+                <TableRow>
+                  <LabelCell>NetID / Name</LabelCell>
+                  <StackedTableCell
+                    topText={booking.netId}
+                    bottomText={`${booking.firstName} ${booking.lastName}`}
+                  />
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Contact Info</LabelCell>
+                  <StackedTableCell
+                    topText={booking.email}
+                    bottomText={booking.phoneNumber}
+                  />
+                </TableRow>
+                <TableRow>
+                  <LabelCell>N-Number </LabelCell>
+                  <TableCell>{booking.nNumber}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Secondary Contact</LabelCell>
+                  <TableCell>{booking.secondaryName || BLANK}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Sponsor</LabelCell>
+                  <StackedTableCell
+                    topText={booking.sponsorEmail || BLANK}
+                    bottomText={`${booking.sponsorFirstName} ${booking.sponsorLastName}`}
+                  />
+                </TableRow>
+              </TableBody>
             </Table>
           </Grid>
 
           <Grid xs={6}>
             <Typography variant="h6">Details</Typography>
             <Table size="small" sx={{ marginBottom: 3 }}>
-              <TableRow>
-                <LabelCell>Title</LabelCell>
-                <TableCell>{booking.title}</TableCell>
-              </TableRow>
-              <TableRow>
-                <LabelCell>Description</LabelCell>
-                <TableCell>{booking.description}</TableCell>
-              </TableRow>
-              <TableRow>
-                <LabelCell>Reservation Type</LabelCell>
-                <TableCell>{booking.reservationType}</TableCell>
-              </TableRow>
-              <TableRow>
-                <LabelCell>Expected Attendance</LabelCell>
-                <TableCell>{booking.expectedAttendance}</TableCell>
-              </TableRow>
-              <TableRow>
-                <LabelCell>Attendee Affiliation</LabelCell>
-                <TableCell>{booking.attendeeAffiliation}</TableCell>
-              </TableRow>
+              <TableBody>
+                <TableRow>
+                  <LabelCell>Title</LabelCell>
+                  <TableCell>{booking.title}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Description</LabelCell>
+                  <TableCell>{booking.description}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Reservation Type</LabelCell>
+                  <TableCell>{booking.reservationType}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Expected Attendance</LabelCell>
+                  <TableCell>{booking.expectedAttendance}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <LabelCell>Attendee Affiliation</LabelCell>
+                  <TableCell>{booking.attendeeAffiliation}</TableCell>
+                </TableRow>
+              </TableBody>
             </Table>
           </Grid>
 
           <Typography variant="h6">Services</Typography>
           <Table size="small">
-            <TableRow>
-              <LabelCell>Room Setup</LabelCell>
-              <StackedTableCell
-                topText={booking.setupDetails || BLANK}
-                bottomText={booking.chartFieldForRoomSetup}
-              />
-            </TableRow>
-            <TableRow>
-              <LabelCell>Media Service</LabelCell>
-              <TableCell>
-                {booking.mediaServices == undefined
-                  ? BLANK
-                  : booking.mediaServices
-                      .split(", ")
-                      .map((service) => (
-                        <p style={{ fontWeight: 500 }}>{service.trim()}</p>
-                      ))}
-                <p>{booking.mediaServicesDetails}</p>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <LabelCell>Catering</LabelCell>
-              <StackedTableCell
-                topText={booking.cateringService || BLANK}
-                bottomText={booking.chartFieldForCatering}
-              />
-            </TableRow>
-            <TableRow>
-              <LabelCell>Security</LabelCell>
-              <StackedTableCell
-                topText={booking.hireSecurity === "yes" ? "Yes" : BLANK}
-                bottomText={booking.chartFieldForSecurity}
-              />
-            </TableRow>
+            <TableBody>
+              <TableRow>
+                <LabelCell>Room Setup</LabelCell>
+                <StackedTableCell
+                  topText={booking.setupDetails || BLANK}
+                  bottomText={booking.chartFieldForRoomSetup}
+                />
+              </TableRow>
+              <TableRow>
+                <LabelCell>Media Service</LabelCell>
+                <TableCell>
+                  {booking.mediaServices == undefined
+                    ? BLANK
+                    : booking.mediaServices
+                        .split(", ")
+                        .map((service) => (
+                          <p style={{ fontWeight: 500 }}>{service.trim()}</p>
+                        ))}
+                  <p>{booking.mediaServicesDetails}</p>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <LabelCell>Catering</LabelCell>
+                <StackedTableCell
+                  topText={booking.cateringService || BLANK}
+                  bottomText={booking.chartFieldForCatering}
+                />
+              </TableRow>
+              <TableRow>
+                <LabelCell>Security</LabelCell>
+                <StackedTableCell
+                  topText={booking.hireSecurity === "yes" ? "Yes" : BLANK}
+                  bottomText={booking.chartFieldForSecurity}
+                />
+              </TableRow>
+            </TableBody>
           </Table>
         </Grid>
 
