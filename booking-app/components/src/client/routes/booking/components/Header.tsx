@@ -1,10 +1,10 @@
 import { Box, useScrollTrigger } from "@mui/material";
+import { usePathname, useRouter } from "next/navigation";
 
 import BookingFormStepper from "./Stepper";
 import BookingStatusBar from "./BookingStatusBar";
 import React from "react";
 import { styled } from "@mui/system";
-import { usePathname, useRouter } from "next/navigation";
 
 const StickyScroll = styled(Box)`
   position: -webkit-sticky;
@@ -25,7 +25,7 @@ export const Header = () => {
     threshold: 100,
   });
 
-  if (pathname === "/book") {
+  if (pathname === "/book" || pathname === "/walk-in") {
     return null;
   }
 
@@ -35,6 +35,10 @@ export const Header = () => {
         return () => router.push("/book/role");
       case "/book/form":
         return () => router.push("/book/selectRoom");
+      case "/walk-in/selectRoom":
+        return () => router.push("/walk-in/role");
+      case "/walk-in/form":
+        return () => router.push("/walk-in/selectRoom");
       default:
         return () => {};
     }
@@ -44,15 +48,21 @@ export const Header = () => {
     switch (pathname) {
       case "/book/selectRoom":
         return () => router.push("/book/form");
+      case "/walk-in/selectRoom":
+        return () => router.push("/walk-in/form");
       default:
         return () => {};
     }
   })();
 
-  const hideNextButton = pathname === "/book/form";
+  const hideNextButton =
+    pathname === "/book/form" || pathname === "/walk-in/form";
 
   const showStatusBar =
-    pathname === "/book/selectRoom" || pathname === "/book/form";
+    pathname === "/book/selectRoom" ||
+    pathname === "/book/form" ||
+    pathname === "/walk-in/selectRoom" ||
+    pathname === "/walk-in/form";
 
   return (
     <StickyScroll
