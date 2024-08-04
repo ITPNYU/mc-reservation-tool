@@ -13,7 +13,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { DatabaseContext } from "./Provider";
 import { PagePermission } from "../../../types";
 import { styled } from "@mui/system";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Title = styled(Typography)`
   width: fit-content;
@@ -36,9 +36,8 @@ const Divider = styled(Box)(({ theme }) => ({
 export default function NavBar() {
   const router = useRouter();
   const { pagePermission, userEmail } = useContext(DatabaseContext);
-  const [selectedView, setSelectedView] = useState<PagePermission>(
-    PagePermission.BOOKING
-  );
+  const [selectedView, setSelectedView] = useState<PagePermission>();
+  const pathname = usePathname();
 
   const netId = userEmail?.split("@")[0];
 
@@ -63,7 +62,9 @@ export default function NavBar() {
   useEffect(() => {
     switch (selectedView) {
       case PagePermission.BOOKING:
-        router.push("/");
+        if (pathname !== "/") {
+          router.push("/");
+        }
         break;
       case PagePermission.PA:
         router.push("/pa");
