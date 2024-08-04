@@ -24,11 +24,18 @@ interface Props {
   trigger: UseFormTrigger<Inputs>;
   showMediaServices: boolean;
   setShowMediaServices: any;
+  isWalkIn: boolean;
 }
 
 export default function BookingFormMediaServices(props: Props) {
-  const { id, control, trigger, showMediaServices, setShowMediaServices } =
-    props;
+  const {
+    id,
+    control,
+    trigger,
+    showMediaServices,
+    setShowMediaServices,
+    isWalkIn,
+  } = props;
   const { selectedRooms } = useContext(BookingContext);
   const roomIds = selectedRooms.map((room) => room.roomId);
 
@@ -52,36 +59,52 @@ export default function BookingFormMediaServices(props: Props) {
     return options;
   }, [roomIds]);
 
+  const toggle = (
+    <Controller
+      name={id}
+      control={control}
+      render={({ field }) => (
+        <FormControlLabel
+          label={showMediaServices ? "Yes" : "No"}
+          control={
+            <Switch
+              checked={showMediaServices}
+              onChange={(e) => {
+                setShowMediaServices(e.target.checked);
+                if (!e.target.checked) {
+                  // de-select boxes if switch says "no media services"
+                  field.onChange("");
+                } else if (isWalkIn) {
+                  field.onChange(MediaServices.CHECKOUT_EQUIPMENT);
+                }
+
+                trigger(id);
+              }}
+              onBlur={() => trigger(id)}
+            />
+          }
+        />
+      )}
+    ></Controller>
+  );
+
+  if (isWalkIn) {
+    return (
+      <div style={{ marginBottom: 8 }}>
+        <Label htmlFor={id}>Media Services</Label>
+        <p style={{ fontSize: "0.75rem" }}>Check out equipment</p>
+        {toggle}
+      </div>
+    );
+  }
+
   return (
     <div style={{ marginBottom: 8 }}>
       <Label htmlFor={id}>Media Services</Label>
       <p style={{ fontSize: "0.75rem" }}>
         Check out equipment, use DMX lighting grid, request a technician, etc.
       </p>
-      <Controller
-        name={id}
-        control={control}
-        render={({ field }) => (
-          <FormControlLabel
-            label={showMediaServices ? "Yes" : "No"}
-            control={
-              <Switch
-                checked={showMediaServices}
-                onChange={(e) => {
-                  setShowMediaServices(e.target.checked);
-                  if (!e.target.checked) {
-                    // de-select boxes if switch says "no media services"
-                    field.onChange("");
-                  }
-                  trigger(id);
-                }}
-                onBlur={() => trigger(id)}
-              />
-            }
-          />
-        )}
-      ></Controller>
-
+      {toggle}
       {showMediaServices && (
         <Controller
           name={id}

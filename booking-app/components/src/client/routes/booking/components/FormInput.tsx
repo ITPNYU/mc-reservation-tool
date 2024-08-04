@@ -366,6 +366,7 @@ export default function FormInput({ isWalkIn }: Props) {
                   trigger,
                   showMediaServices,
                   setShowMediaServices,
+                  isWalkIn,
                 }}
               />
               {watch("mediaServices") !== undefined &&
