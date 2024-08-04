@@ -31,7 +31,7 @@ export default function SelectRoomPage({ isWalkIn = false }: Props) {
       <Grid container>
         <Grid width={330}>
           <Stack spacing={2}>
-            <CalendarDatePicker handleChange={setDate} />
+            {!isWalkIn && <CalendarDatePicker handleChange={setDate} />}
             <Box paddingLeft="24px">
               <Typography fontWeight={500}>Spaces</Typography>
               <SelectRooms
