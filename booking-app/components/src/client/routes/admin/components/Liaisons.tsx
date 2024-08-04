@@ -53,11 +53,18 @@ export const Liaisons = () => {
     [liaisonUsers]
   );
 
+  const rows = useMemo(() => {
+    const sorted = liaisonUsers.sort((a, b) =>
+      a.department.localeCompare(b.department)
+    );
+    return sorted as unknown as { [key: string]: string }[];
+  }, [liaisonUsers]);
+
   return (
     <ListTable
       tableName={getLiaisonTableName()}
       columnNameToRemoveBy="email"
-      rows={liaisonUsers as unknown as { [key: string]: string }[]}
+      rows={rows}
       rowsRefresh={reloadLiaisonUsers}
       topRow={
         <AddLiaisonForm

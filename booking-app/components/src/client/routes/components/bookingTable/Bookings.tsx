@@ -182,7 +182,7 @@ export const Bookings: React.FC<BookingsProps> = ({
       ),
       !isUserView && <TableCell key="contacts">Contact Info</TableCell>,
       <TableCell key="title">Title</TableCell>,
-      !isUserView && <TableCell key="other">Details</TableCell>,
+      <TableCell key="other">Details</TableCell>,
       <TableCell key="action">Action</TableCell>,
     ],
     [isUserView, order, orderBy]

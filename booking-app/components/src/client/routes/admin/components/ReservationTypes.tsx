@@ -25,11 +25,18 @@ export default function ReservationTypes() {
     [settings.reservationTypes, reloadReservationTypes]
   );
 
+  const rows = useMemo(() => {
+    const sorted = settings.reservationTypes.sort((a, b) =>
+      a.reservationType.localeCompare(b.reservationType)
+    );
+    return sorted as unknown as { [key: string]: string }[];
+  }, [settings.reservationTypes]);
+
   return (
     <ListTable
       columnNameToRemoveBy="reservationType"
       tableName={TableNames.RESERVATION_TYPES}
-      rows={settings.reservationTypes as unknown as { [key: string]: string }[]}
+      rows={rows}
       rowsRefresh={reloadReservationTypes}
       columnFormatters={{ createdAt: formatDate }}
       topRow={addResType}

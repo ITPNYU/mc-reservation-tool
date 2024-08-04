@@ -277,7 +277,9 @@ export default function FormInput() {
             <BookingFormDropdown
               id="reservationType"
               label="Reservation Type"
-              options={settings.reservationTypes.map((x) => x.reservationType)}
+              options={settings.reservationTypes
+                .map((x) => x.reservationType)
+                .sort((a, b) => a.localeCompare(b))}
               {...{ control, errors, trigger }}
             />
             <BookingFormTextField

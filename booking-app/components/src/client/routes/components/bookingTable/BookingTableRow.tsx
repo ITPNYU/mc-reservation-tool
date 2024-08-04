@@ -99,13 +99,11 @@ export default function BookingTableRow({
           <p ref={titleRef}>{booking.title}</p>
         </TableCell>
       </Tooltip>
-      {!isUserView && (
-        <TableCell>
-          <IconButton onClick={() => setModalData(booking)}>
-            <MoreHoriz />
-          </IconButton>
-        </TableCell>
-      )}
+      <TableCell>
+        <IconButton onClick={() => setModalData(booking)}>
+          <MoreHoriz />
+        </IconButton>
+      </TableCell>
       <TableCell width={100}>
         <BookingActions
           status={optimisticStatus ?? status}

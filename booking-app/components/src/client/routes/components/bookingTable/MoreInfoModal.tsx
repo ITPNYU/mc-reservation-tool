@@ -41,6 +41,7 @@ const LabelCell = styled(TableCell)(({ theme }) => ({
   borderRight: `1px solid ${theme.palette.custom.border}`,
   width: 175,
   verticalAlign: "top",
+  fontWeight: 500,
 }));
 
 const AlertHeader = styled(Alert)(({ theme }) => ({
