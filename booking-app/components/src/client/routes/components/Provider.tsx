@@ -11,21 +11,15 @@ import {
   SafetyTraining,
   Settings,
 } from "../../../types";
-import {
-  AuthProvider,
-  useAuth,
-} from "@/components/src/client/routes/components/AuthProvider";
-import React, { createContext, use, useEffect, useMemo, useState } from "react";
-import { Tab, Table } from "react-bootstrap";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 import {
   fetchAllFutureBooking,
   fetchAllFutureBookingStatus,
 } from "@/components/src/server/db";
 
 import { TableNames } from "@/components/src/policy";
-import axios from "axios";
-import { co } from "@fullcalendar/core/internal-common";
 import { fetchAllDataFromCollection } from "@/lib/firebase/firebase";
+import { useAuth } from "@/components/src/client/routes/components/AuthProvider";
 
 export interface DatabaseContextType {
   adminUsers: AdminUser[];
@@ -93,7 +87,7 @@ export const DatabaseProvider = ({
   >([]);
   const [settings, setSettings] = useState<Settings>({ reservationTypes: [] });
   const [userEmail, setUserEmail] = useState<string | undefined>();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
 
   // page permission updates with respect to user email, admin list, PA list
   const pagePermission = useMemo<PagePermission>(() => {

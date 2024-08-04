@@ -62,6 +62,8 @@ export default function FormInput({ isWalkIn }: Props) {
     department,
     selectedRooms,
     bookingCalendarInfo,
+    isBanned,
+    needsSafetyTraining,
     formData,
     setFormData,
   } = useContext(BookingContext);
@@ -164,7 +166,10 @@ export default function FormInput({ isWalkIn }: Props) {
     [userEmail]
   );
 
-  const disabledButton = !(checklist && resetRoom && bookingPolicy && isValid);
+  const disabledButton =
+    !(checklist && resetRoom && bookingPolicy && isValid) ||
+    isBanned ||
+    needsSafetyTraining;
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     if (!bookingCalendarInfo) return;

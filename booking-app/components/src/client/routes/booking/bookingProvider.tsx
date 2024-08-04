@@ -5,18 +5,13 @@ import {
   Role,
   RoomSetting,
 } from "../../../types";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 import { DatabaseContext } from "../components/Provider";
 import { DateSelectArg } from "@fullcalendar/core";
 import { SAFETY_TRAINING_REQUIRED_ROOM } from "../../../policy";
 import fetchCalendarEvents from "./hooks/fetchCalendarEvents";
+import { usePathname } from "next/navigation";
 
 export interface BookingContextType {
   bookingCalendarInfo: DateSelectArg | undefined;
@@ -63,32 +58,39 @@ export const BookingContext = createContext<BookingContextType>({
 export function BookingProvider({ children }) {
   const { bannedUsers, roomSettings, safetyTrainedUsers, userEmail } =
     useContext(DatabaseContext);
+  const pathname = usePathname();
 
   const [bookingCalendarInfo, setBookingCalendarInfo] =
     useState<DateSelectArg>();
   const [department, setDepartment] = useState<Department>();
   const [formData, setFormData] = useState<Inputs>(undefined);
   const [hasShownMocapModal, setHasShownMocapModal] = useState(false);
-  // const [isSafetyTrained, setIsSafetyTrained] = useState(true);
   const [role, setRole] = useState<Role>();
   const [selectedRooms, setSelectedRooms] = useState<RoomSetting[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const existingCalendarEvents = fetchCalendarEvents(roomSettings);
 
   const isBanned = useMemo<boolean>(() => {
+    const bannedEmails = bannedUsers.map((bannedUser) => bannedUser.email);
+
+    if (pathname.includes("/walk-in/form") && formData.netId?.length > 0) {
+      return bannedEmails.includes(formData.netId + "@nyu.edu");
+    }
+
     if (!userEmail) return false;
-    return bannedUsers
-      .map((bannedUser) => bannedUser.email)
-      .includes(userEmail);
-  }, [userEmail, bannedUsers]);
+    return bannedEmails.includes(userEmail);
+  }, [userEmail, bannedUsers, formData?.netId, pathname]);
 
   const isSafetyTrained = useMemo(() => {
+    const safetyTrainedEmails = safetyTrainedUsers.map((user) => user.email);
+
+    if (pathname.includes("/walk-in/form") && formData.netId?.length > 0) {
+      return safetyTrainedEmails.includes(formData.netId + "@nyu.edu");
+    }
+
     if (!userEmail) return;
-    const isTrained = safetyTrainedUsers
-      .map((user) => user.email)
-      .includes(userEmail);
-    return isTrained;
-  }, [userEmail, safetyTrainedUsers]);
+    return safetyTrainedEmails.includes(userEmail);
+  }, [userEmail, safetyTrainedUsers, formData?.netId, pathname]);
 
   // block progressing in the form is safety training requirement isn't met
   const needsSafetyTraining = useMemo(() => {
