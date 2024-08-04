@@ -125,6 +125,13 @@ export default function FormInput() {
     [selectedRooms]
   );
 
+  const validateTitleLength = (value: string) => {
+    if (value.trim().length > 40) {
+      return "Must be less than 40 characters";
+    }
+    return true;
+  };
+
   const validateExpectedAttendance = useCallback(
     (value: string) => {
       const attendance = parseInt(value);
@@ -259,6 +266,7 @@ export default function FormInput() {
             <BookingFormTextField
               id="title"
               label="Reservation Title"
+              validate={validateTitleLength}
               {...{ control, errors, trigger }}
             />
             <BookingFormTextField

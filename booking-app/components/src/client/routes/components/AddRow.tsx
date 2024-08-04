@@ -47,7 +47,7 @@ export default function AddRow(props: Props) {
     setLoading(true);
     try {
       await saveDataToFirestore(tableName, {
-        [props.columnNameUniqueValue]: valueToAdd,
+        [props.columnNameUniqueValue]: valueToAdd.trim(),
         ...(extra?.values ?? {}),
         createdAt: Timestamp.now(),
       });
