@@ -14,6 +14,9 @@ export default function useSubmitBooking() {
     department,
     role,
     selectedRooms,
+    setBookingCalendarInfo,
+    setSelectedRooms,
+    setFormData,
     setSubmitting,
   } = useContext(BookingContext);
 
@@ -49,6 +52,11 @@ export default function useSubmitBooking() {
             data,
           }),
         });
+
+        // clear stored booking data after submit confirmation
+        setBookingCalendarInfo(undefined);
+        setSelectedRooms([]);
+        setFormData(undefined);
 
         reloadBookings();
         reloadBookingStatuses();
