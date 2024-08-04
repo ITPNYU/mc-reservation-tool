@@ -11,6 +11,11 @@ oauth2Client.setCredentials({
 });
 
 const refreshAccessTokenIfNeeded = async () => {
+  console.log(
+    "oauth2Client.credentials.expiry_date < Date.now()",
+    oauth2Client.credentials.expiry_date < Date.now()
+  );
+  console.log("oauth2Client", oauth2Client);
   if (
     !oauth2Client.credentials.access_token ||
     oauth2Client.credentials.expiry_date < Date.now()
