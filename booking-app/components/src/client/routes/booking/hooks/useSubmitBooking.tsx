@@ -1,11 +1,11 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext } from "react";
 
 import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
 import { Inputs } from "../../../../types";
 import { useRouter } from "next/navigation";
 
-export default function useSubmitBooking() {
+export default function useSubmitBooking(isWalkIn: boolean) {
   const router = useRouter();
   const { liaisonUsers, userEmail, reloadBookings, reloadBookingStatuses } =
     useContext(DatabaseContext);
@@ -28,8 +28,14 @@ export default function useSubmitBooking() {
         return;
       }
 
+      let email: string;
       setSubmitting(true);
-      const email = userEmail || data.missingEmail;
+      if (isWalkIn) {
+        email = data.netId + "@nyu.edu";
+      } else {
+        email = userEmail || data.missingEmail;
+      }
+
       if (
         !bookingCalendarInfo ||
         !bookingCalendarInfo.startStr ||
@@ -40,7 +46,8 @@ export default function useSubmitBooking() {
       }
 
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/bookings`, {
+        const endpoint = isWalkIn ? "/api/walkIn" : "/api/bookings";
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
