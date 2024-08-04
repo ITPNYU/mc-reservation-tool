@@ -51,7 +51,11 @@ const Container = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.custom.border}` || "#e3e3e3",
 }));
 
-export default function FormInput() {
+interface Props {
+  isWalkIn: boolean;
+}
+
+export default function FormInput({ isWalkIn }: Props) {
   const { userEmail, settings } = useContext(DatabaseContext);
   const {
     role,
@@ -98,10 +102,10 @@ export default function FormInput() {
   // different from other switches b/c mediaServices doesn't have yes/no column in DB
   const [showMediaServices, setShowMediaServices] = useState(false);
 
-  // agreements
-  const [checklist, setChecklist] = useState(false);
-  const [resetRoom, setResetRoom] = useState(false);
-  const [bookingPolicy, setBookingPolicy] = useState(false);
+  // agreements, skip for walk-ins
+  const [checklist, setChecklist] = useState(isWalkIn);
+  const [resetRoom, setResetRoom] = useState(isWalkIn);
+  const [bookingPolicy, setBookingPolicy] = useState(isWalkIn);
 
   const watchedFields = watch();
   const prevWatchedFieldsRef = useRef<Inputs>();
@@ -311,47 +315,49 @@ export default function FormInput() {
           </Section>
 
           <Section title="Services">
-            <div style={{ marginBottom: 32 }}>
-              <BookingFormSwitch
-                id="roomSetup"
-                label="Room Setup Needed?"
-                required={false}
-                description={
-                  <p>
-                    If your reservation is in 233 or 1201 and requires a
-                    specific room setup that is different from the standard
-                    configuration, it is the reservation holder’s responsibility
-                    to submit a
-                    <a
-                      className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
-                      href="https://nyu.service-now.com/csmp?id=sc_home"
-                      target="_blank"
-                    >
-                      work order with CBS
-                    </a>
-                    . <br />
-                    It is also the reservation holder's responsibility to ensure
-                    the room is reset after use.
-                  </p>
-                }
-                {...{ control, errors, trigger }}
-              />
-              {watch("roomSetup") === "yes" && (
-                <>
-                  <BookingFormTextField
-                    id="setupDetails"
-                    label="Room Setup Details"
-                    description="If you requested Room Setup and are not using rooms 233 or 1201, please explain your needs including # of chairs, # tables, and formation."
-                    {...{ control, errors, trigger }}
-                  />
-                  <BookingFormTextField
-                    id="chartFieldForRoomSetup"
-                    label="ChartField for Room Setup"
-                    {...{ control, errors, trigger }}
-                  />
-                </>
-              )}
-            </div>
+            {!isWalkIn && (
+              <div style={{ marginBottom: 32 }}>
+                <BookingFormSwitch
+                  id="roomSetup"
+                  label="Room Setup Needed?"
+                  required={false}
+                  description={
+                    <p>
+                      If your reservation is in 233 or 1201 and requires a
+                      specific room setup that is different from the standard
+                      configuration, it is the reservation holder’s
+                      responsibility to submit a
+                      <a
+                        className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+                        href="https://nyu.service-now.com/csmp?id=sc_home"
+                        target="_blank"
+                      >
+                        work order with CBS
+                      </a>
+                      . <br />
+                      It is also the reservation holder's responsibility to
+                      ensure the room is reset after use.
+                    </p>
+                  }
+                  {...{ control, errors, trigger }}
+                />
+                {watch("roomSetup") === "yes" && (
+                  <>
+                    <BookingFormTextField
+                      id="setupDetails"
+                      label="Room Setup Details"
+                      description="If you requested Room Setup and are not using rooms 233 or 1201, please explain your needs including # of chairs, # tables, and formation."
+                      {...{ control, errors, trigger }}
+                    />
+                    <BookingFormTextField
+                      id="chartFieldForRoomSetup"
+                      label="ChartField for Room Setup"
+                      {...{ control, errors, trigger }}
+                    />
+                  </>
+                )}
+              </div>
+            )}
             <div style={{ marginBottom: 32 }}>
               <BookingFormMediaServices
                 id="mediaServices"
@@ -398,125 +404,131 @@ export default function FormInput() {
                   />
                 )}
             </div>
-            <div style={{ marginBottom: 32 }}>
-              <BookingFormSwitch
-                id="catering"
-                label="Catering?"
-                description="It is required for the reservation holder to pay and arrange for
+            {!isWalkIn && (
+              <div style={{ marginBottom: 32 }}>
+                <BookingFormSwitch
+                  id="catering"
+                  label="Catering?"
+                  description="It is required for the reservation holder to pay and arrange for
               CBS cleaning services if the event includes catering"
-                required={false}
-                {...{ control, errors, trigger }}
-              />
-              {watch("catering") === "yes" && (
-                <>
-                  <BookingFormDropdown
-                    id="cateringService"
-                    label="Catering Information"
-                    options={["Outside Catering", "NYU Plated"]}
-                    {...{ control, errors, trigger }}
-                  />
+                  required={false}
+                  {...{ control, errors, trigger }}
+                />
+                {watch("catering") === "yes" && (
+                  <>
+                    <BookingFormDropdown
+                      id="cateringService"
+                      label="Catering Information"
+                      options={["Outside Catering", "NYU Plated"]}
+                      {...{ control, errors, trigger }}
+                    />
+                    <BookingFormTextField
+                      id="chartFieldForCatering"
+                      label="ChartField for Catering"
+                      {...{ control, errors, trigger }}
+                    />
+                  </>
+                )}
+              </div>
+            )}
+            {!isWalkIn && (
+              <div style={{ marginBottom: 32 }}>
+                <BookingFormSwitch
+                  id="hireSecurity"
+                  label="Hire Security?"
+                  required={false}
+                  description={
+                    <p>
+                      Only for large events with 75+ attendees, and bookings in
+                      The Garage where the Willoughby entrance will be in use.
+                      Once your booking is confirmed, it is your responsibility
+                      to hire Campus Safety for your event. If appropriate,
+                      please coordinate with your departmental Scheduling
+                      Liaison to hire Campus Safety, as there is a fee.
+                      <a
+                        href="https://www.nyu.edu/life/safety-health-wellness/campus-safety.html"
+                        target="_blank"
+                        className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
+                      >
+                        Click for Campus Safety Form
+                      </a>
+                    </p>
+                  }
+                  {...{ control, errors, trigger }}
+                />
+                {watch("hireSecurity") === "yes" && (
                   <BookingFormTextField
-                    id="chartFieldForCatering"
-                    label="ChartField for Catering"
+                    id="chartFieldForSecurity"
+                    label="ChartField for Security"
                     {...{ control, errors, trigger }}
                   />
-                </>
-              )}
-            </div>
-            <div style={{ marginBottom: 32 }}>
-              <BookingFormSwitch
-                id="hireSecurity"
-                label="Hire Security?"
-                required={false}
-                description={
-                  <p>
-                    Only for large events with 75+ attendees, and bookings in
-                    The Garage where the Willoughby entrance will be in use.
-                    Once your booking is confirmed, it is your responsibility to
-                    hire Campus Safety for your event. If appropriate, please
-                    coordinate with your departmental Scheduling Liaison to hire
-                    Campus Safety, as there is a fee.
-                    <a
-                      href="https://www.nyu.edu/life/safety-health-wellness/campus-safety.html"
-                      target="_blank"
-                      className="text-blue-600 hover:underline dark:text-blue-500 mx-1"
-                    >
-                      Click for Campus Safety Form
-                    </a>
-                  </p>
-                }
-                {...{ control, errors, trigger }}
-              />
-            </div>
-            {watch("hireSecurity") === "yes" && (
-              <BookingFormTextField
-                id="chartFieldForSecurity"
-                label="ChartField for Security"
-                {...{ control, errors, trigger }}
-              />
+                )}
+              </div>
             )}
           </Section>
 
-          <Section title="Agreement">
-            <BookingFormAgreementCheckbox
-              id="checklist"
-              checked={checklist}
-              onChange={setChecklist}
-              description={
-                <p>
-                  {" "}
-                  I confirm receipt of the
-                  <a
-                    href="https://docs.google.com/document/d/1TIOl8f8-7o2BdjHxHYIYELSb4oc8QZMj1aSfaENWjR8/edit?usp=sharing"
-                    target="_blank"
-                    className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
-                  >
-                    370J Pre-Event Checklist
-                  </a>
-                  and acknowledge that it is my responsibility to setup various
-                  event services as detailed within the checklist. While the
-                  370J Operations staff do setup cleaning services through CBS,
-                  they do not facilitate hiring security, catering, and
-                  arranging room setup services.
-                </p>
-              }
-            />
-            <BookingFormAgreementCheckbox
-              id="resetRoom"
-              checked={resetRoom}
-              onChange={setResetRoom}
-              description={
-                <p>
-                  I agree to reset any and all requested rooms and common spaces
-                  to their original state at the end of the event, including
-                  cleaning and furniture return, and will notify building staff
-                  of any problems, damage, or other concerns affecting the
-                  condition and maintenance of the reserved space. I understand
-                  that if I do not reset the room, I will lose reservation
-                  privileges.
-                </p>
-              }
-            />
-            <BookingFormAgreementCheckbox
-              id="bookingPolicy"
-              checked={bookingPolicy}
-              onChange={setBookingPolicy}
-              description={
-                <p>
-                  I have read the
-                  <a
-                    href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit?usp=sharing"
-                    target="_blank"
-                    className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
-                  >
-                    Booking Policy for 370 Jay Street Shared Spaces
-                  </a>
-                  and agree to follow all policies outlined. I understand that I
-                  may lose access to spaces if I break this agreement.
-                </p>
-              }
-            />
-          </Section>
+          {!isWalkIn && (
+            <Section title="Agreement">
+              <BookingFormAgreementCheckbox
+                id="checklist"
+                checked={checklist}
+                onChange={setChecklist}
+                description={
+                  <p>
+                    {" "}
+                    I confirm receipt of the
+                    <a
+                      href="https://docs.google.com/document/d/1TIOl8f8-7o2BdjHxHYIYELSb4oc8QZMj1aSfaENWjR8/edit?usp=sharing"
+                      target="_blank"
+                      className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
+                    >
+                      370J Pre-Event Checklist
+                    </a>
+                    and acknowledge that it is my responsibility to setup
+                    various event services as detailed within the checklist.
+                    While the 370J Operations staff do setup cleaning services
+                    through CBS, they do not facilitate hiring security,
+                    catering, and arranging room setup services.
+                  </p>
+                }
+              />
+              <BookingFormAgreementCheckbox
+                id="resetRoom"
+                checked={resetRoom}
+                onChange={setResetRoom}
+                description={
+                  <p>
+                    I agree to reset any and all requested rooms and common
+                    spaces to their original state at the end of the event,
+                    including cleaning and furniture return, and will notify
+                    building staff of any problems, damage, or other concerns
+                    affecting the condition and maintenance of the reserved
+                    space. I understand that if I do not reset the room, I will
+                    lose reservation privileges.
+                  </p>
+                }
+              />
+              <BookingFormAgreementCheckbox
+                id="bookingPolicy"
+                checked={bookingPolicy}
+                onChange={setBookingPolicy}
+                description={
+                  <p>
+                    I have read the
+                    <a
+                      href="https://docs.google.com/document/d/1vAajz6XRV0EUXaMrLivP_yDq_LyY43BvxOqlH-oNacc/edit?usp=sharing"
+                      target="_blank"
+                      className="text-blue-600 hover:underline dark:text-blue-500 mx-1 mx-1"
+                    >
+                      Booking Policy for 370 Jay Street Shared Spaces
+                    </a>
+                    and agree to follow all policies outlined. I understand that
+                    I may lose access to spaces if I break this agreement.
+                  </p>
+                }
+              />
+            </Section>
+          )}
           <Button type="submit" disabled={disabledButton} variant="contained">
             Submit
           </Button>
