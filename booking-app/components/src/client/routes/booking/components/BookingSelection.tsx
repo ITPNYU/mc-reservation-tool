@@ -57,25 +57,6 @@ export default function BookingSelection() {
           )} - ${formatTimeAmPm(new Date(bookingCalendarInfo.endStr))}`}</p>
         </RoomDetails>
       </AlertHeader>
-      {/* <Typography variant={'h5'}>Your Request</Typography>
-      <RoomDetails container>
-        <label>Rooms:</label>
-        <p>
-          {selectedRooms
-            .map((room) => `${room.roomId} ${room.name}`)
-            .join(', ')}
-        </p>
-      </RoomDetails>
-      <RoomDetails container>
-        <label>Date:</label>
-        <p>{bookingCalendarInfo?.start.toDateString()}</p>
-      </RoomDetails>
-      <RoomDetails container>
-        <label>Time:</label>
-        <p>{`${formatTimeAmPm(
-          bookingCalendarInfo?.startStr
-        )} - ${formatTimeAmPm(bookingCalendarInfo?.endStr)}`}</p>
-      </RoomDetails> */}
     </Box>
   );
 }
