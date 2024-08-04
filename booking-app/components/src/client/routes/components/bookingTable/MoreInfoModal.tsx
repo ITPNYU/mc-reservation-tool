@@ -161,9 +161,7 @@ export default function MoreInfoModal({ booking, closeModal }: Props) {
                     ? BLANK
                     : booking.mediaServices
                         .split(", ")
-                        .map((service) => (
-                          <p style={{ fontWeight: 500 }}>{service.trim()}</p>
-                        ))}
+                        .map((service) => <p>{service.trim()}</p>)}
                   <p>{booking.mediaServicesDetails}</p>
                 </TableCell>
               </TableRow>

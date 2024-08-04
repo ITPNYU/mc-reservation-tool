@@ -62,6 +62,7 @@ export const Bookings: React.FC<BookingsProps> = ({
       BookingStatusLabel.APPROVED,
       BookingStatusLabel.CHECKED_IN,
       BookingStatusLabel.NO_SHOW,
+      BookingStatusLabel.WALK_IN,
     ];
     if (isPaView) {
       return paViewStatuses;

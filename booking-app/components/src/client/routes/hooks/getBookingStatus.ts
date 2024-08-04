@@ -50,6 +50,8 @@ export default function getBookingStatus(
       return BookingStatusLabel.PRE_APPROVED;
     } else if (bookingStatusMatch.requestedAt != undefined) {
       return BookingStatusLabel.REQUESTED;
+    } else if (bookingStatusMatch.walkedInAt != undefined) {
+      return BookingStatusLabel.WALK_IN;
     } else {
       return BookingStatusLabel.UNKNOWN;
     }

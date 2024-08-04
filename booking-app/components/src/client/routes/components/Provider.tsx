@@ -196,6 +196,7 @@ export const DatabaseProvider = ({
           canceledAt: item.canceledAt,
           checkedInAt: item.checkedInAt,
           noShowedAt: item.noShowedAt,
+          walkedInAt: item.walkedInAt,
         }));
         setBookingStatuses(filtered);
       })

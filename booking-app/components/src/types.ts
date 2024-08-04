@@ -46,6 +46,7 @@ export type BookingStatus = {
   canceledAt: Timestamp;
   checkedInAt: Timestamp;
   noShowedAt: Timestamp;
+  walkedInAt: Timestamp;
 };
 
 // the order here is the order these are displayed as table filters
@@ -58,6 +59,7 @@ export enum BookingStatusLabel {
   REJECTED = "DECLINED",
   REQUESTED = "REQUESTED",
   UNKNOWN = "UNKNOWN",
+  WALK_IN = "WALK-IN",
 }
 
 export type CalendarEvent = {

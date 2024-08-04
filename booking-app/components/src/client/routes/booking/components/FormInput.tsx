@@ -66,7 +66,7 @@ export default function FormInput({ isWalkIn }: Props) {
     setFormData,
   } = useContext(BookingContext);
   const router = useRouter();
-  const registerEvent = useSubmitBooking();
+  const registerEvent = useSubmitBooking(isWalkIn);
 
   const {
     control,
