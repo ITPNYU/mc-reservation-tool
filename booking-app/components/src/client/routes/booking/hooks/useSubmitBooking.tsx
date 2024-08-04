@@ -17,6 +17,7 @@ export default function useSubmitBooking() {
     setBookingCalendarInfo,
     setSelectedRooms,
     setFormData,
+    setHasShownMocapModal,
     setSubmitting,
   } = useContext(BookingContext);
 
@@ -57,6 +58,7 @@ export default function useSubmitBooking() {
         setBookingCalendarInfo(undefined);
         setSelectedRooms([]);
         setFormData(undefined);
+        setHasShownMocapModal(false);
 
         reloadBookings();
         reloadBookingStatuses();

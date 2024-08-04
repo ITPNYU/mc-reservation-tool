@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from "react";
 
-import { BookingContext } from '../bookingProvider';
-import { INSTANT_APPROVAL_ROOMS } from '../../../../policy';
+import { BookingContext } from "../bookingProvider";
+import { INSTANT_APPROVAL_ROOMS } from "../../../../policy";
 
-export default function useCheckAutoApproval() {
+export default function useCheckAutoApproval(isWalkIn = false) {
   const { bookingCalendarInfo, selectedRooms, formData } =
     useContext(BookingContext);
 
@@ -22,48 +22,53 @@ export default function useCheckAutoApproval() {
       const endDate = bookingCalendarInfo.end;
       const duration = endDate.getTime() - startDate.getTime();
       if (duration > 3.6e6 * 4) {
-        throwError('Event duration exceeds 4 hours');
+        throwError("Event duration exceeds 4 hours");
+        return;
+      }
+      if (isWalkIn && duration < 3.6e6) {
+        throwError("Walk-in event duration must be at least 1 hour");
         return;
       }
     }
 
     // ROOMS REQUIRE APPROVAL
     if (
+      !isWalkIn &&
       !selectedRooms.every((room) =>
         INSTANT_APPROVAL_ROOMS.includes(room.roomId)
       )
     ) {
       throwError(
-        'At least one of the requested rooms is not eligible for auto approval'
+        "At least one of the requested rooms is not eligible for auto approval"
       );
       return;
     }
 
     // ROOM SETUP
-    if (formData?.roomSetup === 'yes') {
+    if (formData?.roomSetup === "yes") {
       throwError(
-        'Requesting additional room setup for an event will require approval'
+        "Requesting additional room setup for an event will require approval"
       );
       return;
     }
 
     // HAS MEDIA SERVICES
-    if (formData?.mediaServices?.length > 0) {
+    if (!isWalkIn && formData?.mediaServices?.length > 0) {
       throwError(
-        'Requesting media services for an event will require approval'
+        "Requesting media services for an event will require approval"
       );
       return;
     }
 
     // HAS CATERING
-    if (formData?.catering === 'yes') {
-      throwError('Providing catering for an event will require approval');
+    if (formData?.catering === "yes") {
+      throwError("Providing catering for an event will require approval");
       return;
     }
 
     // HAS SECURITY
-    if (formData?.hireSecurity === 'yes') {
-      throwError('Hiring security for an event will require approval');
+    if (formData?.hireSecurity === "yes") {
+      throwError("Hiring security for an event will require approval");
       return;
     }
 

@@ -36,6 +36,7 @@ export default function SelectRoomPage({ isWalkIn = false }: Props) {
               <Typography fontWeight={500}>Spaces</Typography>
               <SelectRooms
                 allRooms={roomsToShow}
+                isWalkIn={isWalkIn}
                 selected={selectedRooms}
                 setSelected={setSelectedRooms}
               />
