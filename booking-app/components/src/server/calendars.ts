@@ -133,7 +133,6 @@ export const insertEvent = async ({
   roomEmails,
 }: InsertEventType) => {
   const calendar = await getCalendarClient();
-  console.log("getCalendar Client()", calendar);
   const event = await calendar.events.insert({
     calendarId,
     requestBody: {
