@@ -58,6 +58,10 @@ const getGmailClient = async () => {
   const authClient = await getAuthenticatedClient();
   return google.gmail({ version: "v1", auth: authClient });
 };
+const getGoogleSheet = async (spreadsheetId: string) => {
+  const authClient = await getAuthenticatedClient();
+  return google.sheets({ version: "v4", auth: authClient });
+};
 
 const oauth2Client = createOAuth2Client();
-export { getCalendarClient, getGmailClient, oauth2Client };
+export { getCalendarClient, getGmailClient, getGoogleSheet, oauth2Client };

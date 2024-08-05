@@ -236,6 +236,19 @@ export const DatabaseProvider = ({
       .catch((error) => console.error("Error fetching data:", error));
   };
 
+  const fetchSafetyTrainedUsersFromSheets = async () => {
+    try {
+      const response = await fetch("/api/safety_training_users");
+      if (!response.ok) {
+        throw new Error("Failed to fetch authorized emails");
+      }
+      const data = await response.json();
+      setAuthorizedEmails(data.emails);
+    } catch (error) {
+      console.error("Failed to fetch emails:", error);
+    }
+  };
+
   const fetchBannedUsers = async () => {
     fetchAllDataFromCollection(TableNames.BANNED)
       .then((fetchedData) => {
