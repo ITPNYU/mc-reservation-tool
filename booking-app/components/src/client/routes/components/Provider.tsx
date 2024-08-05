@@ -120,7 +120,6 @@ export const DatabaseProvider = ({
     fetchActiveUserEmail();
     fetchAdminUsers();
     fetchPaUsers();
-    setBookingsLoading(false);
   }, [user]);
 
   const fetchActiveUserEmail = () => {
@@ -172,6 +171,7 @@ export const DatabaseProvider = ({
           chartFieldForRoomSetup: item.chartFieldForRoomSetup,
         }));
         setBookings(bookings);
+        setBookingsLoading(false);
       })
       .catch((error) => console.error("Error fetching data:", error));
   };
