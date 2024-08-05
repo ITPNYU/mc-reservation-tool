@@ -2,26 +2,30 @@ import { getGoogleSheet } from "@/lib/googleClient";
 import { NextRequest, NextResponse } from "next/server";
 
 const SPREADSHEET_ID = process.env.GOOGLE_SPREADSHEET_ID;
-const SHEET_ID = process.env.GOOGLE_SHEET_ID;
+const SHEET_GID = process.env.GOOGLE_SHEET_ID;
 const COLUMN = "B";
+const MAX_ROWS = 1000;
 
 export async function GET(request: NextRequest) {
   try {
-    const sheets = await getGoogleSheet(SPREADSHEET_ID);
+    const sheetsService = await getGoogleSheet(SPREADSHEET_ID);
 
-    const sheetInfo = await sheets.spreadsheets.get({
+    const spreadsheet = await sheetsService.spreadsheets.get({
       spreadsheetId: SPREADSHEET_ID,
-      ranges: [`${SHEET_ID}`],
-      fields: "sheets.properties",
     });
 
-    const rowCount =
-      sheetInfo.data.sheets[0].properties.gridProperties?.rowCount || 0;
+    const sheet = spreadsheet.data.sheets.find(
+      s => s.properties.sheetId.toString() === SHEET_GID,
+    );
+    if (!sheet) {
+      throw new Error("Sheet not found");
+    }
 
-    // First row is header
-    const range = `${SHEET_ID}!${COLUMN}2:${COLUMN}${rowCount}`;
+    const sheetName = sheet.properties.title;
 
-    const response = await sheets.spreadsheets.values.get({
+    const range = `${sheetName}!${COLUMN}2:${COLUMN}${MAX_ROWS}`;
+
+    const response = await sheetsService.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: range,
     });
@@ -34,9 +38,18 @@ export async function GET(request: NextRequest) {
     const emails = rows
       .flat()
       .filter(email => email && typeof email === "string");
+
     return NextResponse.json({ emails });
   } catch (error) {
     console.error("Failed to fetch emails:", error);
+    if (
+      error.message.includes("insufficient permission") ||
+      error.message.includes("access not configured")
+    ) {
+      console.error(
+        "Google Sheets API access is not properly configured. Please check the OAuth scopes.",
+      );
+    }
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },

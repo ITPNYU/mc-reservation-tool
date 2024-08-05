@@ -163,6 +163,7 @@ export type RoomSetting = {
 };
 
 export type SafetyTraining = {
+  id: string;
   email: string;
   completedAt: string;
 };

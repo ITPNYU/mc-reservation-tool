@@ -223,29 +223,57 @@ export const DatabaseProvider = ({
       .catch((error) => console.error("Error fetching data:", error));
   };
 
-  const fetchSafetyTrainedUsers = async () => {
-    fetchAllDataFromCollection(TableNames.SAFETY_TRAINING)
-      .then((fetchedData) => {
-        const filtered = fetchedData.map((item: any) => ({
+  const fetchSafetyTrainedUsers = async (): Promise<SafetyTraining[]> => {
+    try {
+      // Fetch data from Firestore
+      const firestoreData = await fetchAllDataFromCollection(
+        TableNames.SAFETY_TRAINING
+      );
+      const firestoreUsers: SafetyTraining[] = firestoreData.map(
+        (item: any) => ({
           id: item.id,
           email: item.email,
-          completedAt: item.createdAt,
-        }));
-        setSafetyTrainedUsers(filtered);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  };
+          completedAt: item.completedAt || new Date().toISOString(), // Use current time if completedAt is missing
+        })
+      );
 
-  const fetchSafetyTrainedUsersFromSheets = async () => {
-    try {
+      // Fetch data from spreadsheet
       const response = await fetch("/api/safety_training_users");
       if (!response.ok) {
-        throw new Error("Failed to fetch authorized emails");
+        throw new Error("Failed to fetch authorized emails from spreadsheet");
       }
-      const data = await response.json();
-      setAuthorizedEmails(data.emails);
+      const spreadsheetData = await response.json();
+      const currentDate = new Date().toISOString();
+
+      // Map to merge users
+      const userMap = new Map<string, SafetyTraining>();
+
+      // Add Firestore users to the map
+      firestoreUsers.forEach((user) => {
+        userMap.set(user.email, user);
+      });
+      console.log("firestoreData", firestoreData);
+      console.log("firestoreUsers", firestoreUsers);
+      console.log("Firestore safety trained users:", userMap);
+
+      // Add or update spreadsheet users
+      spreadsheetData.emails.forEach((email: string) => {
+        if (!userMap.has(email)) {
+          userMap.set(email, { email, completedAt: currentDate });
+        }
+      });
+
+      // Convert Map to SafetyTraining array
+      const uniqueUsers = Array.from(userMap.values());
+      console.log("Unique safety trained users:", uniqueUsers);
+
+      // Update state
+      setSafetyTrainedUsers(uniqueUsers);
+
+      return uniqueUsers;
     } catch (error) {
-      console.error("Failed to fetch emails:", error);
+      console.error("Error fetching safety trained users:", error);
+      throw error;
     }
   };
 
