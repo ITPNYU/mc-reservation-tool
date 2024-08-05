@@ -22,7 +22,7 @@ import {
 } from "@/components/src/client/utils/date";
 
 export async function POST(request: NextRequest) {
-  const { email, selectedRooms, bookingCalendarInfo, data } =
+  const { email, selectedRooms, bookingCalendarInfo, data, isAutoApproval } =
     await request.json();
   console.log("data", data);
   const { department } = data;
@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
   );
 
   const calendarId = await getRoomCalendarId(room.roomId);
+  const shouldAutoApprove = isAutoApproval === true;
   if (calendarId == null) {
     return NextResponse.json(
       { result: "error", message: "ROOM CALENDAR ID NOT FOUND" },
@@ -68,7 +69,6 @@ export async function POST(request: NextRequest) {
   });
 
   const firstApprovers = await firstApproverEmails(department);
-  console.log("firstApprovers", firstApprovers);
   const sendApprovalEmail = async (
     recipients: string[],
     contents: BookingFormDetails,
@@ -91,37 +91,7 @@ export async function POST(request: NextRequest) {
     await Promise.all(emailPromises);
   };
 
-  const isAutoApproval = (selectedRoomIds, data, bookingCalendarInfo) => {
-    const startDate = toFirebaseTimestampFromString(
-      bookingCalendarInfo?.startStr,
-    );
-
-    const endDate = toFirebaseTimestampFromString(bookingCalendarInfo?.endStr);
-    const duration = endDate.toMillis() - startDate.toMillis();
-    console.log(
-      "condition",
-      duration <= 3.6e6 * 4 && // <= 4 hours
-        selectedRoomIds.every(r => INSTANT_APPROVAL_ROOMS.includes(r)) &&
-        data.catering === "no" &&
-        data.hireSecurity === "no" &&
-        data.mediaServices === undefined &&
-        data.roomSetup === "no",
-    );
-    debugger;
-    return (
-      duration <= 3.6e6 * 4 && // <= 4 hours
-      selectedRoomIds.every(r => INSTANT_APPROVAL_ROOMS.includes(r)) &&
-      data.catering === "no" &&
-      data.hireSecurity === "no" &&
-      data.mediaServices === undefined &&
-      data.roomSetup === "no"
-    );
-  };
-
-  if (
-    calendarEventId &&
-    isAutoApproval(selectedRoomIds, data, bookingCalendarInfo)
-  ) {
+  if (calendarEventId && shouldAutoApprove) {
     approveInstantBooking(calendarEventId);
   } else {
     const userEventInputs: BookingFormDetails = {
