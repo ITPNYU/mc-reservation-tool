@@ -8,6 +8,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import ConfirmDialog, { ConfirmDialogControlled } from "./ConfirmDialog";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -145,14 +146,21 @@ export default function NavBar() {
         {button}
         {dropdown}
         <Divider />
-        <Typography
-          component="p"
-          color="rgba(0,0,0,0.6)"
-          minWidth="50px"
-          textAlign="right"
+        <ConfirmDialog
+          callback={(result) => console.log("logout:", result)} // TODO @Riho implement logout based on dialog result
+          message="Are you sure you want to log out?"
+          title="Log Out"
         >
-          {netId}
-        </Typography>
+          <Typography
+            component="p"
+            color="rgba(0,0,0,0.6)"
+            minWidth="50px"
+            textAlign="right"
+            sx={{ cursor: "pointer" }}
+          >
+            {netId}
+          </Typography>
+        </ConfirmDialog>
       </Box>
     </Nav>
   );
