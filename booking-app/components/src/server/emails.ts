@@ -14,7 +14,7 @@ const getCcEmail = (status: BookingStatusLabel): string => {
   return getApprovalCcEmail(process.env.BRANCH_NAME);
 };
 
-const getEmailBranchTag = () => {
+export const getEmailBranchTag = () => {
   switch (process.env.BRANCH_NAME as DevBranch) {
     case "development":
       return "[DEV] ";
