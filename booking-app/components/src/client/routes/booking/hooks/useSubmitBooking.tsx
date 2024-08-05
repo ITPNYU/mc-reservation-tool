@@ -4,11 +4,13 @@ import { BookingContext } from "../bookingProvider";
 import { DatabaseContext } from "../../components/Provider";
 import { Inputs } from "../../../../types";
 import { useRouter } from "next/navigation";
+import useCheckAutoApproval from "./useCheckAutoApproval";
 
 export default function useSubmitBooking(isWalkIn: boolean) {
   const router = useRouter();
   const { liaisonUsers, userEmail, reloadBookings, reloadBookingStatuses } =
     useContext(DatabaseContext);
+  const { isAutoApproval } = useCheckAutoApproval();
   const {
     bookingCalendarInfo,
     department,
@@ -58,6 +60,7 @@ export default function useSubmitBooking(isWalkIn: boolean) {
             bookingCalendarInfo,
             liaisonUsers,
             data,
+            isAutoApproval,
           }),
         });
 
