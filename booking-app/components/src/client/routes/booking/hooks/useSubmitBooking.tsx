@@ -30,7 +30,7 @@ export default function useSubmitBooking(isWalkIn: boolean) {
 
       let email: string;
       setSubmitting(true);
-      if (isWalkIn) {
+      if (isWalkIn && data.netId) {
         email = data.netId + "@nyu.edu";
       } else {
         email = userEmail || data.missingEmail;

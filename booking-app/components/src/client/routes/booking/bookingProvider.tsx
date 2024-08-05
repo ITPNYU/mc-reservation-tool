@@ -73,8 +73,8 @@ export function BookingProvider({ children }) {
   const isBanned = useMemo<boolean>(() => {
     const bannedEmails = bannedUsers.map((bannedUser) => bannedUser.email);
 
-    if (pathname.includes("/walk-in/form") && formData.netId?.length > 0) {
-      return bannedEmails.includes(formData.netId + "@nyu.edu");
+    if (pathname.includes("/walk-in/form") && formData?.netId?.length > 0) {
+      return bannedEmails.includes(formData?.netId + "@nyu.edu");
     }
 
     if (!userEmail) return false;
@@ -84,8 +84,8 @@ export function BookingProvider({ children }) {
   const isSafetyTrained = useMemo(() => {
     const safetyTrainedEmails = safetyTrainedUsers.map((user) => user.email);
 
-    if (pathname.includes("/walk-in/form") && formData.netId?.length > 0) {
-      return safetyTrainedEmails.includes(formData.netId + "@nyu.edu");
+    if (pathname.includes("/walk-in/form") && formData?.netId?.length > 0) {
+      return safetyTrainedEmails.includes(formData?.netId + "@nyu.edu");
     }
 
     if (!userEmail) return;
