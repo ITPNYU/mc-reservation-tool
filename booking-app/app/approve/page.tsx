@@ -1,8 +1,10 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+
+import { Button } from "@mui/material";
 import { approveBooking } from "@/components/src/server/admin";
+import { useSearchParams } from "next/navigation";
 
 const ApprovePageContent: React.FC = () => {
   const searchParams = useSearchParams();
@@ -27,24 +29,22 @@ const ApprovePageContent: React.FC = () => {
   };
 
   return (
-    <div>
+    <div style={{ padding: 24 }}>
       <h1>Booking Approval</h1>
       {paramCalendarEventId ? (
         <div>
           <p>Event ID: {paramCalendarEventId}</p>
-          <button
+          <Button
             onClick={() => handleApprove()}
-            className={
-              "px-4 py-2 text-white rounded-md focus:outline-none bg-blue-600 hover:bg-blue-700"
-            }
             disabled={loading || approved}
+            variant="contained"
           >
             {loading
               ? "Approving..."
               : approved
                 ? "Approved"
                 : "Approve Booking"}
-          </button>
+          </Button>
           {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
       ) : (

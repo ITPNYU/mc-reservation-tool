@@ -1,6 +1,6 @@
 export default function ForbiddenPage() {
   return (
-    <div>
+    <div style={{ padding: 24 }}>
       <h1>403 - Forbidden</h1>
       <p>Only nyu.edu email addresses are allowed.</p>
       <p>

@@ -1,8 +1,10 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+
+import { Button } from "@mui/material";
 import { reject } from "@/components/src/server/admin";
+import { useSearchParams } from "next/navigation";
 
 const RejectPageContent: React.FC = () => {
   const searchParams = useSearchParams();
@@ -27,24 +29,22 @@ const RejectPageContent: React.FC = () => {
   };
 
   return (
-    <div>
+    <div style={{ padding: 24 }}>
       <h1>Booking Rejection</h1>
       {paramCalendarEventId ? (
         <div>
           <p>Event ID: {paramCalendarEventId}</p>
-          <button
-            className={
-              "px-4 py-2 text-white rounded-md focus:outline-none bg-blue-600 hover:bg-blue-700"
-            }
+          <Button
             onClick={() => handleReject()}
             disabled={loading || rejected}
+            variant="contained"
           >
             {loading
               ? "Rejecting..."
               : rejected
                 ? "Rejected"
                 : "Reject Booking"}
-          </button>
+          </Button>
           {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
       ) : (

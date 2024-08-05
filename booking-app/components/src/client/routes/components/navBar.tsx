@@ -9,11 +9,12 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
+import { BookingContext } from "../booking/bookingProvider";
 import { DatabaseContext } from "./Provider";
 import { PagePermission } from "../../../types";
 import { styled } from "@mui/system";
-import { usePathname, useRouter } from "next/navigation";
 
 const Title = styled(Typography)`
   width: fit-content;
@@ -33,10 +34,15 @@ const Divider = styled(Box)(({ theme }) => ({
   margin: "0px 20px",
 }));
 
+const PATHNAME_HIDE_NAVBAR = ["/approve", "/reject", "/forbidden"];
+
 export default function NavBar() {
   const router = useRouter();
   const { pagePermission, userEmail } = useContext(DatabaseContext);
-  const [selectedView, setSelectedView] = useState<PagePermission>();
+  const { setHasShownMocapModal } = useContext(BookingContext);
+  const [selectedView, setSelectedView] = useState<PagePermission>(
+    PagePermission.BOOKING
+  );
   const pathname = usePathname();
 
   const netId = userEmail?.split("@")[0];
@@ -60,11 +66,12 @@ export default function NavBar() {
   })();
 
   useEffect(() => {
+    if (PATHNAME_HIDE_NAVBAR.some((hidePath) => pathname.includes(hidePath))) {
+      return;
+    }
     switch (selectedView) {
       case PagePermission.BOOKING:
-        if (pathname !== "/") {
-          router.push("/");
-        }
+        router.push("/");
         break;
       case PagePermission.PA:
         router.push("/pa");
@@ -114,7 +121,10 @@ export default function NavBar() {
     if (pagePermission !== PagePermission.BOOKING) {
       return (
         <Button
-          onClick={() => router.push("/walk-in")}
+          onClick={() => {
+            router.push("/walk-in");
+            setHasShownMocapModal(false);
+          }}
           variant="outlined"
           sx={{ height: "40px", marginRight: 2 }}
         >
