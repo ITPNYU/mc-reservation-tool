@@ -59,4 +59,5 @@ const getGmailClient = async () => {
   return google.gmail({ version: "v1", auth: authClient });
 };
 
-export { getCalendarClient, getGmailClient };
+const oauth2Client = createOAuth2Client();
+export { getCalendarClient, getGmailClient, oauth2Client };
