@@ -6,6 +6,7 @@ import { BookingStatusLabel } from "@/components/src/types";
 import { app } from "firebase-admin";
 import { approvalUrl, rejectUrl } from "@/components/src/server/ui";
 import { formatDate } from "@/components/src/client/utils/date";
+import { getEmailBranchTag } from "@/components/src/server/emails";
 
 interface BookingFormDetails {
   [key: string]: string;
@@ -24,7 +25,7 @@ export const sendHTMLEmail = async (params: SendHTMLEmailParams) => {
   const { templateName, contents, targetEmail, status, eventTitle, body } =
     params;
 
-  const subj = `${status}: Media Commons request for "${eventTitle}"`;
+  const subj = `${getEmailBranchTag}${status}: Media Commons request for "${eventTitle}"`;
 
   const templatePath = path.join(
     process.cwd(),
