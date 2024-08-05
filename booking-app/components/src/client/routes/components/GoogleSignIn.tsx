@@ -47,6 +47,7 @@ const GoogleSignIn = () => {
         >
           Sign in with NYU Google Account
         </Button>
+        <p>You must enable pop-ups for this site in order to login.</p>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </Center>
     </div>
