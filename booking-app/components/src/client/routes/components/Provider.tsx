@@ -223,7 +223,7 @@ export const DatabaseProvider = ({
       .catch((error) => console.error("Error fetching data:", error));
   };
 
-  const fetchSafetyTrainedUsers = async (): Promise<SafetyTraining[]> => {
+  const fetchSafetyTrainedUsers = async () => {
     try {
       // Fetch data from Firestore
       const firestoreData = await fetchAllDataFromCollection(
@@ -252,25 +252,19 @@ export const DatabaseProvider = ({
       firestoreUsers.forEach((user) => {
         userMap.set(user.email, user);
       });
-      console.log("firestoreData", firestoreData);
-      console.log("firestoreUsers", firestoreUsers);
-      console.log("Firestore safety trained users:", userMap);
 
       // Add or update spreadsheet users
       spreadsheetData.emails.forEach((email: string) => {
         if (!userMap.has(email)) {
-          userMap.set(email, { email, completedAt: currentDate });
+          userMap.set(email, { email, id: null, completedAt: currentDate });
         }
       });
 
       // Convert Map to SafetyTraining array
       const uniqueUsers = Array.from(userMap.values());
-      console.log("Unique safety trained users:", uniqueUsers);
 
       // Update state
       setSafetyTrainedUsers(uniqueUsers);
-
-      return uniqueUsers;
     } catch (error) {
       console.error("Error fetching safety trained users:", error);
       throw error;
