@@ -26,7 +26,6 @@ export const sendHTMLEmail = async (params: SendHTMLEmailParams) => {
     params;
 
   const subj = `${getEmailBranchTag()}${status}: Media Commons request for "${eventTitle}"`;
-
   const templatePath = path.join(
     process.cwd(),
     "app/templates",
