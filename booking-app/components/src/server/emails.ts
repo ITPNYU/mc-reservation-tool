@@ -15,7 +15,7 @@ const getCcEmail = (status: BookingStatusLabel): string => {
 };
 
 export const getEmailBranchTag = () => {
-  switch (process.env.BRANCH_NAME as DevBranch) {
+  switch (process.env.NEXT_PUBLIC_BRANCH_NAME as DevBranch) {
     case "development":
       return "[DEV] ";
     case "staging":

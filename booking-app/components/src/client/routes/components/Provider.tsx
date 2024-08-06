@@ -224,16 +224,51 @@ export const DatabaseProvider = ({
   };
 
   const fetchSafetyTrainedUsers = async () => {
-    fetchAllDataFromCollection(TableNames.SAFETY_TRAINING)
-      .then((fetchedData) => {
-        const filtered = fetchedData.map((item: any) => ({
+    try {
+      // Fetch data from Firestore
+      const firestoreData = await fetchAllDataFromCollection(
+        TableNames.SAFETY_TRAINING
+      );
+      const firestoreUsers: SafetyTraining[] = firestoreData.map(
+        (item: any) => ({
           id: item.id,
           email: item.email,
-          completedAt: item.createdAt,
-        }));
-        setSafetyTrainedUsers(filtered);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+          completedAt: item.completedAt || new Date().toISOString(), // Use current time if completedAt is missing
+        })
+      );
+
+      // Fetch data from spreadsheet
+      const response = await fetch("/api/safety_training_users");
+      if (!response.ok) {
+        throw new Error("Failed to fetch authorized emails from spreadsheet");
+      }
+      const spreadsheetData = await response.json();
+      const currentDate = new Date().toISOString();
+
+      // Map to merge users
+      const userMap = new Map<string, SafetyTraining>();
+
+      // Add Firestore users to the map
+      firestoreUsers.forEach((user) => {
+        userMap.set(user.email, user);
+      });
+
+      // Add or update spreadsheet users
+      spreadsheetData.emails.forEach((email: string) => {
+        if (!userMap.has(email)) {
+          userMap.set(email, { email, id: null, completedAt: currentDate });
+        }
+      });
+
+      // Convert Map to SafetyTraining array
+      const uniqueUsers = Array.from(userMap.values());
+
+      // Update state
+      setSafetyTrainedUsers(uniqueUsers);
+    } catch (error) {
+      console.error("Error fetching safety trained users:", error);
+      throw error;
+    }
   };
 
   const fetchBannedUsers = async () => {
