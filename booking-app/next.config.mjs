@@ -18,6 +18,8 @@ const nextConfig = {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
     GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
+    GOOGLE_SHEET_ID: process.env.GOOGLE_SHEET_ID,
+    GOOGLE_SPREADSHEET_ID: process.env.GOOGLE_SPREADSHEET_ID,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
   },
   compiler: {
