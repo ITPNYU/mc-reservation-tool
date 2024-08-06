@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     const response = await sheetsService.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: range,
+      fields: "values",
     });
 
     const rows = response.data.values;
