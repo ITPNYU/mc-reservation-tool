@@ -24,12 +24,14 @@ export async function GET(request: NextRequest) {
     const sheetName = sheet.properties.title;
 
     const range = `${sheetName}!${COLUMN}2:${COLUMN}${MAX_ROWS}`;
+    const timestamp = new Date().getTime();
 
     const response = await sheetsService.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: range,
       fields: "values",
     });
+    console.log("emails", response.data.values);
 
     const rows = response.data.values;
     if (!rows || rows.length === 0) {

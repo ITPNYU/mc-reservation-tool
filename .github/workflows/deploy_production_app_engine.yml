@@ -2,8 +2,7 @@ name: Deploy PRODUCTION to App Engine
 on:
   push:
     branches:
-      - production
-      - riho/deploy_prod
+      - prod
 jobs:
   deploy:
     runs-on: ubuntu-latest
