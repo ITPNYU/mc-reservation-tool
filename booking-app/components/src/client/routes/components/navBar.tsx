@@ -39,7 +39,8 @@ const PATHNAME_HIDE_NAVBAR = ["/approve", "/reject", "/forbidden"];
 
 export default function NavBar() {
   const router = useRouter();
-  const { pagePermission, userEmail } = useContext(DatabaseContext);
+  const { pagePermission, userEmail, reloadSafetyTrainedUsers } =
+    useContext(DatabaseContext);
   const { setHasShownMocapModal } = useContext(BookingContext);
   const [selectedView, setSelectedView] = useState<PagePermission>(
     PagePermission.BOOKING
@@ -110,7 +111,10 @@ export default function NavBar() {
     if (selectedView === PagePermission.BOOKING) {
       return (
         <Button
-          onClick={() => router.push("/book")}
+          onClick={() => {
+            reloadSafetyTrainedUsers();
+            router.push("/book");
+          }}
           variant="outlined"
           sx={{ height: "40px", marginRight: 2 }}
         >
@@ -123,8 +127,9 @@ export default function NavBar() {
       return (
         <Button
           onClick={() => {
-            router.push("/walk-in");
+            reloadSafetyTrainedUsers();
             setHasShownMocapModal(false);
+            router.push("/walk-in");
           }}
           variant="outlined"
           sx={{ height: "40px", marginRight: 2 }}
