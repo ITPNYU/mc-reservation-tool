@@ -27,9 +27,9 @@ export default function ListTable(props: Props) {
     return Object.keys(props.rows[0]) as string[];
   }, [props.rows]);
 
-  // if (props.rows.length === 0) {
-  //   return <p>No results</p>;
-  // }
+  if (props.rows.length === 0) {
+    return <p>No results</p>;
+  }
 
   const columns = useMemo(
     () => [

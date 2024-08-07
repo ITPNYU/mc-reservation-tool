@@ -52,11 +52,8 @@ const AddDepartmentForm = ({ departments, reloadDepartments }) => {
       rows={departments}
       rowsRefresh={reloadDepartments}
       title="Departments"
-      extra={{
-        components: [departmentDropdown, departmentTierDropdown],
-        values: {departmentName, departmentTier},
-        updates: [setDepartmentName, setDepartmentTier],
-      }}
+      components = {[departmentDropdown, departmentTierDropdown]}
+      values = {{departmentName, departmentTier}}
     />
   );
 };

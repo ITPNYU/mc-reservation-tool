@@ -12,21 +12,17 @@ interface Props {
   addDuplicateErrorMessage?: string;
   addFailedErrorMessage?: string;
   columnNameUniqueValue: string;
-  inputPlaceholder?: string;
   valueToAdd: string;
   tableName: TableNames;
   rows: { [key: string]: string }[];
   rowsRefresh: () => Promise<void>;
   title: string;
-  extra?: {
-    components: React.ReactNode[];
-    values: { [key: string]: string };
-    updates: ((x: string) => void)[];
-  };
+  components?: React.ReactNode[];
+  values?: { [key: string]: string };
 }
 
 export default function AddDepartmentRow(props: Props) {
-  const { tableName, rows, rowsRefresh, title, extra } = props;
+  const { tableName, rows, rowsRefresh, title, components, values } = props;
   const [loading, setLoading] = useState(false);
 
   const uniqueValues = useMemo<string[]>(
@@ -48,7 +44,7 @@ export default function AddDepartmentRow(props: Props) {
     try {
       await saveDataToFirestore(tableName, {
         [props.columnNameUniqueValue]: props.valueToAdd,
-        ...(extra?.values ?? {}),
+        ...(values ?? {}),
         createdAt: Timestamp.now(),
       });
       await rowsRefresh();
@@ -73,7 +69,7 @@ export default function AddDepartmentRow(props: Props) {
       </Grid>
       <Grid paddingLeft={0} paddingRight={4} display="flex" alignItems="center">
         <Grid container paddingRight={1}>
-          {...extra?.components ?? []}
+          {...(components ?? [])}
         </Grid>
         {loading ? (
           <Loading style={{ height: "25px", width: "25px" }} />
