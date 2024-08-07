@@ -118,7 +118,6 @@ export type LiaisonType = {
   email: string;
   department: string;
   createdAt: string;
-  //departmentTier: string;
 };
 
 export type DepartmentType = {
