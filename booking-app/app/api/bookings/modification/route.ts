@@ -257,6 +257,10 @@ export async function PUT(request: NextRequest) {
         updatedData.setupServiceApproved =
           existingBookingData.setupServiceApproved;
       }
+      if (existingBookingData.furnishingsServiceApproved !== undefined) {
+        updatedData.furnishingsServiceApproved =
+          existingBookingData.furnishingsServiceApproved;
+      }
     }
 
     console.log(
@@ -285,7 +289,7 @@ export async function PUT(request: NextRequest) {
       : (await import("@/lib/stateMachines/itpBookingMachine"))
           .itpBookingMachine;
     const servicesRequested = isMediaCommons
-      ? getMediaCommonsServices(data)
+      ? getMediaCommonsServices(data, await serverGetTenantResources(tenant))
       : undefined;
     const servicesApproved = isMediaCommons
       ? {
@@ -295,6 +299,8 @@ export async function PUT(request: NextRequest) {
           cleaning: existingBookingData.cleaningServiceApproved || false,
           security: existingBookingData.securityServiceApproved || false,
           setup: existingBookingData.setupServiceApproved || false,
+          furnishings:
+            existingBookingData.furnishingsServiceApproved || false,
         }
       : undefined;
 
