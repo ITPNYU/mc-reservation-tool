@@ -1,3 +1,4 @@
+import { TENANTS } from "@/components/src/constants/tenants";
 import { EquipmentServices, StaffingServices } from "@/components/src/types";
 import { isServiceRequested } from "@/components/src/utils/tenantUtils";
 import type {
@@ -37,7 +38,7 @@ export type BookingServicesDisplay = {
   bookingLevel: BookingServiceDisplayRow[];
 };
 
-/** Booking fields the details modal needs to group services by room. */
+/** Booking fields used to group services by room for the modal, email, and calendar. */
 export type BookingServicesSource = {
   roomId?: string;
   roomSetup?: string;
@@ -88,6 +89,51 @@ export function hasBookingServicesDisplay(
 }
 
 /**
+ * ITP confirmation emails hide catering / equipment / setup, but annex is a
+ * schema-driven room feature and must still render. Other tenants keep the
+ * full display.
+ */
+export function bookingServicesDisplayForEmail(
+  display: BookingServicesDisplay,
+  tenant?: string,
+): BookingServicesDisplay {
+  if (tenant !== TENANTS.ITP) return display;
+  return {
+    bookingLevel: [],
+    rooms: display.rooms
+      .map((room) => ({
+        ...room,
+        rows: room.rows.filter((row) => row.key === "annex"),
+      }))
+      .filter((room) => room.rows.length > 0),
+  };
+}
+
+function descriptionListItem(row: BookingServiceDisplayRow): string {
+  const chart = row.chartField ? `<br>${row.chartField}` : "";
+  return `<li><strong>${row.label}:</strong> ${row.value}${chart}</li>`;
+}
+
+/**
+ * HTML for Google Calendar event descriptions: Services heading, optional
+ * booking-level list, then a heading + list per room.
+ */
+export function formatServicesDescriptionHtml(
+  display: BookingServicesDisplay,
+): string {
+  if (!hasBookingServicesDisplay(display)) return "";
+
+  let html = "<h3>Services</h3>";
+  if (display.bookingLevel.length > 0) {
+    html += `<ul>${display.bookingLevel.map(descriptionListItem).join("")}</ul>`;
+  }
+  for (const room of display.rooms) {
+    html += `<h4>${room.title}</h4><ul>${room.rows.map(descriptionListItem).join("")}</ul>`;
+  }
+  return html;
+}
+
+/**
  * Group a booking's requested services by booked room, matching the room-first
  * layout of BookingFormResourceServices.
  *
@@ -108,10 +154,12 @@ export function getBookingServicesByRoom(
     ...extraRoomIdsFromMaps(booking, bookedIds),
   ]);
 
+  // First resource for an id wins so live tenant-schema rooms are not
+  // overwritten by later hardcoded MC fallbacks for the same parent id.
   const resourceById = new Map<string, ServiceResourceLike>();
   for (const resource of resources) {
     const id = getServiceResourceId(resource);
-    if (id) resourceById.set(id, resource);
+    if (id && !resourceById.has(id)) resourceById.set(id, resource);
   }
 
   const rooms: ServiceResourceLike[] = roomIds.map(

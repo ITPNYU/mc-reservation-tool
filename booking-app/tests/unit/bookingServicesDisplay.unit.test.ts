@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  bookingServicesDisplayForEmail,
+  formatServicesDescriptionHtml,
   getBookingServicesByRoom,
   hasBookingServicesDisplay,
 } from "@/components/src/utils/bookingServicesDisplay";
@@ -301,6 +303,47 @@ describe("getBookingServicesByRoom", () => {
     ]);
   });
 
+  it("keeps tenant-schema rooms when a later fallback repeats the same id", () => {
+    const staleFallback: ServiceResourceLike = {
+      resourceId: "103",
+      services: {
+        setup: {
+          label: "Room Setup",
+          mode: "radio",
+          options: [
+            { value: "103_LAYOUT_1", label: "STALE HARDCODED LAYOUT" },
+          ],
+        },
+        security: { label: "Campus Safety" },
+      },
+    };
+    const display = getBookingServicesByRoom(
+      {
+        roomId: "103",
+        roomSetupByRoom: { "103": "103_LAYOUT_1" },
+        hireSecurityByRoom: { "103": "willoughby" },
+        annexByRoom: { "103": ["202GR"] },
+      },
+      [
+        garage,
+        {
+          resourceId: "202GR",
+          name: "Garage Green Room",
+          parentResourceId: "103",
+        },
+        staleFallback,
+      ],
+    );
+
+    expect(display.rooms[0].title).toBe("103 The Garage");
+    expect(display.rooms[0].rows.find((row) => row.key === "setup")?.value).toBe(
+      "Audience Layout 1 - 44 Seated*",
+    );
+    expect(
+      display.rooms[0].rows.find((row) => row.key === "security")?.value,
+    ).toBe("Willoughby Street Entrance");
+  });
+
   it("shows staffing on the first staffing-capable room and media on every booked room", () => {
     const staffingRoom: ServiceResourceLike = {
       resourceId: "202",
@@ -518,5 +561,131 @@ describe("getBookingServicesByRoom", () => {
         value: "chairs",
       },
     ]);
+  });
+});
+
+describe("bookingServicesDisplayForEmail", () => {
+  const mixed: ReturnType<typeof getBookingServicesByRoom> = {
+    bookingLevel: [{ key: "setup", label: "Room Setup", value: "Standard" }],
+    rooms: [
+      {
+        roomId: "202",
+        title: "202 Screening Room",
+        rows: [{ key: "equipment", label: "Equipment", value: "Camera" }],
+      },
+      {
+        roomId: "103",
+        title: "103 The Garage",
+        rows: [
+          {
+            key: "annex",
+            label: "Auxiliary Spaces",
+            value: "202GR Garage Green Room",
+          },
+          { key: "catering", label: "Catering", value: "Yes" },
+        ],
+      },
+    ],
+  };
+
+  it("keeps the full display for non-ITP tenants", () => {
+    expect(bookingServicesDisplayForEmail(mixed, "mc")).toEqual(mixed);
+  });
+
+  it("keeps only annex rows for ITP so auxiliary spaces are not dropped", () => {
+    const filtered = bookingServicesDisplayForEmail(mixed, "itp");
+    expect(filtered.bookingLevel).toEqual([]);
+    expect(filtered.rooms).toEqual([
+      {
+        roomId: "103",
+        title: "103 The Garage",
+        rows: [
+          {
+            key: "annex",
+            label: "Auxiliary Spaces",
+            value: "202GR Garage Green Room",
+          },
+        ],
+      },
+    ]);
+    expect(hasBookingServicesDisplay(filtered)).toBe(true);
+  });
+
+  it("hides the Services block for ITP when nothing but non-annex services were requested", () => {
+    const equipmentOnly = bookingServicesDisplayForEmail(
+      {
+        bookingLevel: [],
+        rooms: [
+          {
+            roomId: "371",
+            title: "371",
+            rows: [{ key: "equipment", label: "Equipment", value: "Camera" }],
+          },
+        ],
+      },
+      "itp",
+    );
+    expect(hasBookingServicesDisplay(equipmentOnly)).toBe(false);
+  });
+});
+
+describe("formatServicesDescriptionHtml", () => {
+  it("renders booking-level rows then a heading and list per room", () => {
+    const html = formatServicesDescriptionHtml({
+      bookingLevel: [
+        { key: "setup", label: "Room Setup", value: "Standard" },
+      ],
+      rooms: [
+        {
+          roomId: "202",
+          title: "202 Screening Room",
+          rows: [
+            {
+              key: "catering",
+              label: "Catering",
+              value: "Yes",
+              chartField: "123-456",
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(html).toContain("<h3>Services</h3>");
+    expect(html).toContain("<strong>Room Setup:</strong> Standard");
+    expect(html).toContain("<h4>202 Screening Room</h4>");
+    expect(html).toContain("<strong>Catering:</strong> Yes<br>123-456");
+  });
+
+  it("returns an empty string when nothing was requested", () => {
+    expect(
+      formatServicesDescriptionHtml({ bookingLevel: [], rooms: [] }),
+    ).toBe("");
+  });
+
+  it("renders staffing once under the first staffing-capable room", () => {
+    const display = getBookingServicesByRoom(
+      {
+        roomId: "103, 230",
+        staffingServices: "AUDIO_TECH_A1",
+      },
+      [
+        {
+          resourceId: "103",
+          name: "The Garage",
+          services: { staffing: { label: "Staffing" } },
+        },
+        {
+          resourceId: "230",
+          name: "SAI Studio",
+          services: { staffing: { label: "Staffing" } },
+        },
+      ],
+    );
+    const html = formatServicesDescriptionHtml(display);
+
+    expect(html.match(/<strong>Staffing:<\/strong>/g)).toHaveLength(1);
+    expect(html).toContain("<h4>103 The Garage</h4>");
+    expect(html).not.toContain("<h4>230 SAI Studio</h4>");
   });
 });
