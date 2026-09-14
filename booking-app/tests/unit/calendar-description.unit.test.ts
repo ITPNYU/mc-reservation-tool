@@ -259,12 +259,50 @@ describe("Calendar Description Functions", () => {
       expect(result).toContain(
         "<strong>Staffing:</strong> Audio technician — Audio support for event",
       );
+      expect(result.match(/<strong>Staffing:<\/strong>/g)).toHaveLength(1);
       expect(result).toContain(
         "<strong>Media Service:</strong> Audio/Visual equipment — Projector and speakers",
       );
       expect(result).not.toContain("Cleaning");
       expect(result).not.toContain("Security");
     });
+
+    it("shows staffing once under the first booked room that offers it", async () => {
+      vi.mocked(serverGetTenantResources).mockResolvedValueOnce([
+        {
+          resourceId: "103",
+          name: "The Garage",
+          services: { staffing: { label: "Staffing" } },
+        },
+        {
+          resourceId: "230",
+          name: "SAI Studio",
+          services: { staffing: { label: "Staffing" } },
+        },
+      ]);
+
+      const result = await bookingContentsToDescription({
+        ...mockBookingContents,
+        roomId: "103, 230",
+        roomSetup: "",
+        setupDetails: "",
+        equipmentServices: "",
+        equipmentServicesDetails: "",
+        mediaServices: "",
+        mediaServicesDetails: "",
+        staffingServices: "AUDIO_TECH_A1",
+        staffingServicesDetails: "",
+      });
+
+      expect(result.match(/<strong>Staffing:<\/strong>/g)).toHaveLength(1);
+      expect(result).toContain("<h4>103 The Garage</h4>");
+      expect(result).not.toContain("<h4>230 SAI Studio</h4>");
+      const garageBlock = result.slice(
+        result.indexOf("<h4>103 The Garage</h4>"),
+      );
+      expect(garageBlock).toContain("<strong>Staffing:</strong> AUDIO_TECH_A1");
+    });
+
 
     it('should display "none" for "no" or "No" values', async () => {
       const bookingWithNoValues = {

@@ -2,6 +2,7 @@ import fs from "fs";
 import Handlebars from "handlebars";
 import path from "path";
 import { describe, expect, it } from "vitest";
+import { getBookingServicesByRoom } from "@/components/src/utils/bookingServicesDisplay";
 
 const templateSource = fs.readFileSync(
   path.join(process.cwd(), "app/templates/booking_detail.html"),
@@ -64,6 +65,43 @@ describe("booking_detail email services", () => {
     expect(html).toContain("103 The Garage");
     expect(html).toContain("Campus Safety");
     expect(html).not.toContain("Equipment Service");
+  });
+
+  it("renders staffing once under the first room, not under later rooms", () => {
+    const display = getBookingServicesByRoom(
+      {
+        roomId: "103, 230",
+        staffingServices: "AUDIO_TECH_A1",
+      },
+      [
+        {
+          resourceId: "103",
+          name: "The Garage",
+          services: { staffing: { label: "Staffing" } },
+        },
+        {
+          resourceId: "230",
+          name: "SAI Studio",
+          services: { staffing: { label: "Staffing" } },
+        },
+      ],
+    );
+    const html = template({
+      contents: {
+        ...baseContents,
+        services: {
+          show: true,
+          bookingLevel: display.bookingLevel,
+          rooms: display.rooms,
+        },
+      },
+      bookingLogs: [],
+    });
+
+    expect(html.match(/>Staffing</g)).toHaveLength(1);
+    expect(html).toContain("103 The Garage");
+    expect(html).toContain("AUDIO_TECH_A1");
+    expect(html).not.toContain("230 SAI Studio");
   });
 
   it("omits the Services section when nothing was requested", () => {
