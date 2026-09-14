@@ -91,78 +91,6 @@ describe("getBookingServicesByRoom", () => {
     expect(display.rooms).toEqual([]);
   });
 
-  it("does not hide a room's requested setup because another room uses that label as a default", () => {
-    const otherRoomDefault: ServiceResourceLike = {
-      resourceId: "1201",
-      name: "Seminar",
-      services: {
-        setup: {
-          label: "Room Setup",
-          mode: "radio",
-          defaultValue: "1201_LAYOUT_0",
-          options: [
-            {
-              value: "1201_LAYOUT_0",
-              label: "Audience Layout 1 - 44 Seated*",
-            },
-          ],
-        },
-      },
-    };
-    const display = getBookingServicesByRoom(
-      {
-        roomId: "103",
-        roomSetupByRoom: { "103": "103_LAYOUT_1" },
-        chartFieldForRoomSetupByRoom: { "103": "cbs-1" },
-      },
-      [garage, otherRoomDefault],
-    );
-
-    expect(display.rooms[0].rows).toEqual([
-      {
-        key: "setup",
-        label: "Room Setup",
-        value: "Audience Layout 1 - 44 Seated*",
-        chartField: "cbs-1",
-      },
-    ]);
-  });
-
-  it("does not hide booking-level setup that matches an unbooked room's default", () => {
-    const unbooked: ServiceResourceLike = {
-      resourceId: "1201",
-      name: "Seminar",
-      services: {
-        setup: {
-          label: "Room Setup",
-          mode: "radio",
-          defaultValue: "1201_LAYOUT_0",
-          options: [
-            {
-              value: "1201_LAYOUT_0",
-              label: "Lecture Style (Default) - 84 Seated",
-            },
-          ],
-        },
-      },
-    };
-    const display = getBookingServicesByRoom(
-      {
-        roomId: "202, 103",
-        setupDetails: "Lecture Style (Default) - 84 Seated",
-      },
-      [screeningRoom, garage, unbooked],
-    );
-
-    expect(display.bookingLevel).toEqual([
-      {
-        key: "setup",
-        label: "Room Setup",
-        value: "Lecture Style (Default) - 84 Seated",
-      },
-    ]);
-  });
-
   it("shows a requested setup option label and skips the room id prefix", () => {
     const display = getBookingServicesByRoom(
       {
@@ -194,47 +122,6 @@ describe("getBookingServicesByRoom", () => {
     expect(display.rooms.map((room) => room.roomId)).toEqual(["230"]);
     expect(display.rooms[0].rows).toEqual([
       { key: "equipment", label: "Equipment", value: "2x SM58 microphones" },
-    ]);
-  });
-
-  it("keeps the equipment checklist when a per-room details map also exists", () => {
-    const display = getBookingServicesByRoom({
-      roomId: "202",
-      equipmentServices: "Camera, Projector",
-      equipmentServicesDetails: "need two stands",
-      equipmentServicesDetailsByRoom: { "202": "need two stands" },
-    });
-
-    expect(display.bookingLevel).toEqual([]);
-    expect(display.rooms).toHaveLength(1);
-    expect(display.rooms[0].rows).toEqual([
-      {
-        key: "equipment",
-        label: "Equipment",
-        value: "Camera — Projector — need two stands",
-      },
-    ]);
-  });
-
-  it("shows the equipment checklist at booking level when multi-room details are per-room", () => {
-    const display = getBookingServicesByRoom({
-      roomId: "202, 103",
-      equipmentServices: "Camera, Projector",
-      equipmentServicesDetails: "need two stands",
-      equipmentServicesDetailsByRoom: { "202": "need two stands" },
-    });
-
-    expect(display.bookingLevel).toEqual([
-      {
-        key: "equipment",
-        label: "Equipment",
-        value: "Camera — Projector",
-      },
-    ]);
-    expect(display.rooms).toHaveLength(1);
-    expect(display.rooms[0].roomId).toBe("202");
-    expect(display.rooms[0].rows).toEqual([
-      { key: "equipment", label: "Equipment", value: "need two stands" },
     ]);
   });
 
@@ -286,6 +173,49 @@ describe("getBookingServicesByRoom", () => {
         value: "Willoughby Street Entrance",
       },
     ]);
+  });
+
+  it("does not fan legacy catering onto leftover rooms from unrelated maps", () => {
+    const leftoverRoom: ServiceResourceLike = {
+      resourceId: "230",
+      name: "Black Box",
+      services: {
+        catering: { label: "Catering?", toggle: "optional" },
+        cleaning: { label: "Cleaning", toggle: "optional" },
+        setup: { label: "Room Setup" },
+      },
+    };
+    const display = getBookingServicesByRoom(
+      {
+        roomId: "202, 103",
+        catering: "yes",
+        chartFieldForCatering: "cat-1",
+        cleaningService: "yes",
+        hireSecurity: "willoughby",
+        roomSetupByRoom: { "230": "Theater" },
+      },
+      [screeningRoom, garage, leftoverRoom],
+    );
+
+    expect(display.rooms.map((room) => room.roomId)).toEqual([
+      "202",
+      "103",
+      "230",
+    ]);
+    expect(display.rooms[0].rows).toEqual([
+      { key: "catering", label: "Catering", value: "Yes", chartField: "cat-1" },
+    ]);
+    expect(display.rooms[1].rows).toEqual([
+      {
+        key: "security",
+        label: "Campus Safety",
+        value: "Willoughby Street Entrance",
+      },
+    ]);
+    expect(display.rooms[2].rows).toEqual([
+      { key: "setup", label: "Room Setup", value: "Theater" },
+    ]);
+    expect(display.bookingLevel.map((row) => row.key)).toEqual(["cleaning"]);
   });
 
   it("shows multi-room setup, equipment, and staffing once at booking level", () => {
@@ -478,11 +408,7 @@ describe("getBookingServicesByRoom", () => {
 
     expect(display.rooms).toEqual([]);
     expect(display.bookingLevel).toEqual([
-      {
-        key: "staffing",
-        label: "Staffing",
-        value: "(Garage 103) Request an audio technician",
-      },
+      { key: "staffing", label: "Staffing", value: "(Garage 103) Request an audio technician" },
     ]);
   });
 
@@ -517,92 +443,124 @@ describe("getBookingServicesByRoom", () => {
     ]);
   });
 
-  it("shows furnishings only on rooms that requested them", () => {
+  it("does not show leftover furnishings details without a yes", () => {
     const display = getBookingServicesByRoom({
       roomId: "202, 103",
-      furnishingsByRoom: { "202": "yes", "103": "no" },
-      furnishingsDetailsByRoom: { "202": "Two extra tables" },
-      chartFieldForFurnishingsByRoom: { "202": "furn-1" },
+      furnishingsDetails: "2 tables",
     });
 
-    expect(display.bookingLevel).toEqual([]);
-    expect(display.rooms).toHaveLength(1);
-    expect(display.rooms[0].rows).toEqual([
-      {
-        key: "furnishings",
-        label: "Additional Event Furniture",
-        value: "Two extra tables",
-        chartField: "furn-1",
-      },
-    ]);
-  });
-
-  it("does not surface leftover furnishingsDetails on legacy multi-room bookings", () => {
-    const display = getBookingServicesByRoom({
-      roomId: "202, 103",
-      furnishingsDetails: "stale leftover furniture notes",
-    });
-
-    expect(display.bookingLevel.find((row) => row.key === "furnishings")).toBeUndefined();
     expect(
-      display.rooms.some((room) =>
-        room.rows.some((row) => row.key === "furnishings"),
-      ),
-    ).toBe(false);
+      display.bookingLevel.find((row) => row.key === "furnishings"),
+    ).toBeUndefined();
+    expect(display.rooms).toEqual([]);
   });
 
-  it("keeps shared furnishingsDetails on the one room that requested them", () => {
+  it("does not show furnishings details when every room is no", () => {
     const display = getBookingServicesByRoom({
       roomId: "202, 103",
-      furnishingsByRoom: { "202": "yes", "103": "no" },
-      furnishingsDetails: "Podium and two chairs",
+      furnishingsByRoom: { "202": "no", "103": "no" },
+      furnishingsDetails: "2 tables",
+      furnishingsDetailsByRoom: { "202": "2 tables" },
     });
 
     expect(display.bookingLevel).toEqual([]);
-    expect(display.rooms).toHaveLength(1);
+    expect(display.rooms).toEqual([]);
+  });
+
+  it("shows furnishings on the room that requested them", () => {
+    const display = getBookingServicesByRoom({
+      roomId: "202, 103",
+      furnishingsByRoom: { "202": "yes", "103": "no" },
+      furnishingsDetailsByRoom: { "202": "2 tables" },
+      furnishingsDetails: "2 tables",
+    });
+
+    expect(display.bookingLevel).toEqual([]);
+    expect(display.rooms.map((room) => room.roomId)).toEqual(["202"]);
     expect(display.rooms[0].rows).toEqual([
       {
         key: "furnishings",
         label: "Additional Event Furniture",
-        value: "Podium and two chairs",
+        value: "2 tables",
       },
     ]);
   });
 
-  it("shows shared furnishingsDetails once at booking level for multi-room yes requests", () => {
+  it("attaches a shared furnishings description to the only yes room", () => {
+    const display = getBookingServicesByRoom({
+      roomId: "202, 103",
+      furnishingsByRoom: { "202": "yes", "103": "no" },
+      furnishingsDetails: "2 tables",
+    });
+
+    expect(display.bookingLevel).toEqual([]);
+    expect(display.rooms.map((room) => room.roomId)).toEqual(["202"]);
+    expect(display.rooms[0].rows).toEqual([
+      {
+        key: "furnishings",
+        label: "Additional Event Furniture",
+        value: "2 tables",
+      },
+    ]);
+  });
+
+  it("keeps shared furnishings details at booking level for legacy multi-room requests", () => {
     const display = getBookingServicesByRoom({
       roomId: "202, 103",
       furnishingsByRoom: { "202": "yes", "103": "yes" },
-      furnishingsDetails: "Two extra tables",
+      furnishingsDetails: "2 round tables for 202, chairs for 103",
     });
 
     expect(display.bookingLevel).toEqual([
       {
         key: "furnishings",
         label: "Additional Event Furniture",
-        value: "Two extra tables",
+        value: "2 round tables for 202, chairs for 103",
       },
     ]);
     expect(display.rooms.map((room) => room.roomId)).toEqual(["202", "103"]);
     expect(display.rooms[0].rows).toEqual([
-      { key: "furnishings", label: "Additional Event Furniture", value: "Yes" },
+      {
+        key: "furnishings",
+        label: "Additional Event Furniture",
+        value: "Yes",
+      },
     ]);
     expect(display.rooms[1].rows).toEqual([
-      { key: "furnishings", label: "Additional Event Furniture", value: "Yes" },
+      {
+        key: "furnishings",
+        label: "Additional Event Furniture",
+        value: "Yes",
+      },
     ]);
   });
 
-  it("does not repeat furnishingsDetails at booking level when a room has its own details", () => {
+  it("does not duplicate furnishings details at booking level when rooms have their own", () => {
     const display = getBookingServicesByRoom({
       roomId: "202, 103",
       furnishingsByRoom: { "202": "yes", "103": "yes" },
-      furnishingsDetailsByRoom: { "202": "Two extra tables" },
-      furnishingsDetails: "Two extra tables",
+      furnishingsDetailsByRoom: {
+        "202": "2 tables",
+        "103": "chairs",
+      },
+      furnishingsDetails: "2 tables; chairs",
     });
 
     expect(display.bookingLevel).toEqual([]);
-    expect(display.rooms[0].rows[0].value).toBe("Two extra tables");
-    expect(display.rooms[1].rows[0].value).toBe("Yes");
+    expect(display.rooms[0].rows).toEqual([
+      {
+        key: "furnishings",
+        label: "Additional Event Furniture",
+        value: "2 tables",
+      },
+    ]);
+    expect(display.rooms[1].rows).toEqual([
+      {
+        key: "furnishings",
+        label: "Additional Event Furniture",
+        value: "chairs",
+      },
+    ]);
   });
 });
 

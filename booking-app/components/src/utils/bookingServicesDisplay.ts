@@ -12,7 +12,7 @@ import {
   getStaffingServiceLabel,
   isPassiveSetupSelection,
   resourceHasService,
-  type ServiceResourceLike,
+  ServiceResourceLike,
 } from "@/components/src/utils/resourceServicesUtils";
 
 /** One requested service under a room or in the booking-level block. */
@@ -32,8 +32,8 @@ export type BookingRoomServicesDisplay = {
 export type BookingServicesDisplay = {
   rooms: BookingRoomServicesDisplay[];
   /**
-   * Setup / equipment shown once under the Services title when they are
-   * booking-level and cannot be attributed to a room.
+   * Setup / equipment / shared furnishings shown once under the Services
+   * title when they are booking-level and cannot be attributed to a room.
    */
   bookingLevel: BookingServiceDisplayRow[];
 };
@@ -140,8 +140,9 @@ export function formatServicesDescriptionHtml(
  * Legacy catering / cleaning / security (no *ByRoom map) are shown on each
  * booked room that offers that service. Staffing is shown on the first booked
  * room that offers staffing, matching BookingFormResourceServices. Media is
- * shown on every booked room. Setup and equipment that cannot be attributed
- * to one room are returned in `bookingLevel`.
+ * shown on every booked room. Setup, equipment, and a shared furnishings
+ * description that cannot be attributed to one room are returned in
+ * `bookingLevel`.
  */
 export function getBookingServicesByRoom(
   booking: BookingServicesSource,
@@ -209,22 +210,26 @@ export function getBookingServicesByRoom(
   );
 
   const isMultiRoom = bookedIds.length !== 1;
+  // Fan legacy scalars onto booked rooms only, not leftover map-only rooms.
+  const bookedRooms = rooms.filter((room) =>
+    bookedIds.includes(getServiceResourceId(room)),
+  );
   const cateringFanIds = fanTargetIds(
-    rooms,
+    bookedRooms,
     "catering",
     !hasCateringMap &&
       isMultiRoom &&
       isRequestedDisplayValue(firstLegacyCatering(booking)),
   );
   const cleaningFanIds = fanTargetIds(
-    rooms,
+    bookedRooms,
     "cleaning",
     !hasCleaningMap &&
       isMultiRoom &&
       isRequestedDisplayValue(booking.cleaningService),
   );
   const securityFanIds = fanTargetIds(
-    rooms,
+    bookedRooms,
     "security",
     !hasSecurityMap &&
       isMultiRoom &&
@@ -233,12 +238,8 @@ export function getBookingServicesByRoom(
   // Same rule as the form: only the first booked room that offers staffing
   // shows the shared staffingServices value.
   const firstStaffingRoomId =
-    rooms
-      .filter(
-        (room) =>
-          bookedIds.includes(getServiceResourceId(room)) &&
-          resourceHasService(room, "staffing"),
-      )
+    bookedRooms
+      .filter((room) => resourceHasService(room, "staffing"))
       .map((room) => getServiceResourceId(room))
       .find(Boolean) ?? "";
 
@@ -292,7 +293,7 @@ export function getBookingServicesByRoom(
         hasKeys(setupChartMap),
       ),
       setupCfg,
-      [room],
+      resources,
     );
     if (setup) {
       rows.push({
@@ -303,7 +304,9 @@ export function getBookingServicesByRoom(
     }
 
     const equipment = formatListAndDetails(
-      legacyForRoom(booking.equipmentServices, roomId, bookedIds),
+      !hasEquipmentMap
+        ? legacyForRoom(booking.equipmentServices, roomId, bookedIds)
+        : undefined,
       valueForRoom(
         equipmentDetailsMap,
         roomId,
@@ -453,24 +456,6 @@ export function getBookingServicesByRoom(
   });
 
   const bookingLevel: BookingServiceDisplayRow[] = [];
-  // Legacy multi-room furnishings stored one shared furnishingsDetails
-  // string. Do not fan it onto every yes-room, and do not show it unless
-  // furnishings was actually requested.
-  const sharedFurnishingsDetails = meaningfulText(booking.furnishingsDetails);
-  const hasPerRoomFurnishingsDetails = furnYesRoomIds.some((id) =>
-    Boolean(meaningfulText(furnishingsDetailsMap[id])),
-  );
-  if (
-    furnYesRoomIds.length > 1 &&
-    !hasPerRoomFurnishingsDetails &&
-    sharedFurnishingsDetails
-  ) {
-    bookingLevel.push({
-      key: "furnishings",
-      label: "Additional Event Furniture",
-      value: sharedFurnishingsDetails,
-    });
-  }
   if (isMultiRoom) {
     if (!hasSetupMap) {
       const setup = resolveSetupDisplay(
@@ -478,7 +463,7 @@ export function getBookingServicesByRoom(
         booking.setupDetails,
         booking.chartFieldForRoomSetup,
         undefined,
-        rooms,
+        resources,
       );
       if (setup) {
         bookingLevel.push({
@@ -488,18 +473,38 @@ export function getBookingServicesByRoom(
         });
       }
     }
-    const equipment = formatListAndDetails(
-      booking.equipmentServices,
-      hasEquipmentMap ? undefined : booking.equipmentServicesDetails,
-      ", ",
-    );
-    if (equipment) {
-      bookingLevel.push({
-        key: "equipment",
-        label: "Equipment",
-        value: equipment,
-      });
+    if (!hasEquipmentMap) {
+      const equipment = formatListAndDetails(
+        booking.equipmentServices,
+        booking.equipmentServicesDetails,
+        ", ",
+      );
+      if (equipment) {
+        bookingLevel.push({
+          key: "equipment",
+          label: "Equipment",
+          value: equipment,
+        });
+      }
     }
+  }
+  const sharedFurnishingsDetails = meaningfulText(booking.furnishingsDetails);
+  const hasPerRoomFurnishingsDetails = furnYesRoomIds.some((id) =>
+    Boolean(meaningfulText(furnishingsDetailsMap[id])),
+  );
+  // Legacy bookings store one furnishingsDetails string for the whole request.
+  // Attach it to the only "yes" room; otherwise show it once at booking level
+  // so multi-room requests do not drop the furniture description.
+  if (
+    furnYesRoomIds.length > 1 &&
+    sharedFurnishingsDetails &&
+    !hasPerRoomFurnishingsDetails
+  ) {
+    bookingLevel.push({
+      key: "furnishings",
+      label: "Additional Event Furniture",
+      value: sharedFurnishingsDetails,
+    });
   }
   if (staffingValue && !firstStaffingRoomId) {
     bookingLevel.push({
@@ -836,17 +841,16 @@ function resolveFurnishingsRow({
   chartField: string | undefined;
 }): { value: string; chartField?: string } | undefined {
   const isYes = isRequestedDisplayValue(requested);
+  if (!isYes) return undefined;
   const perRoomDetails = meaningfulText(details);
   const sharedDetails =
     !perRoomDetails &&
-    isYes &&
     furnYesRoomIds.length === 1 &&
     furnYesRoomIds[0] === roomId
       ? meaningfulText(joinedDetails)
       : undefined;
   const detailText = perRoomDetails ?? sharedDetails;
   const chart = meaningfulText(chartField);
-  if (!isYes) return undefined;
   const value = detailText ?? "Yes";
   return chart ? { value, chartField: chart } : { value };
 }
