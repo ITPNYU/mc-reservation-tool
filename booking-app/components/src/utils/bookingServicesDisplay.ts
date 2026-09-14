@@ -92,9 +92,11 @@ export function hasBookingServicesDisplay(
  * layout of BookingFormResourceServices.
  *
  * Legacy catering / cleaning / security (no *ByRoom map) are shown on each
- * booked room that offers that service. Staffing and media are shown on every
- * booked room. Setup, equipment, and a shared furnishings description that
- * cannot be attributed to one room are returned in `bookingLevel`.
+ * booked room that offers that service. Staffing is shown on the first booked
+ * room that offers staffing, matching BookingFormResourceServices. Media is
+ * shown on every booked room. Setup, equipment, and a shared furnishings
+ * description that cannot be attributed to one room are returned in
+ * `bookingLevel`.
  */
 export function getBookingServicesByRoom(
   booking: BookingServicesSource,
@@ -185,6 +187,13 @@ export function getBookingServicesByRoom(
       isMultiRoom &&
       isRequestedDisplayValue(booking.hireSecurity),
   );
+  // Same rule as the form: only the first booked room that offers staffing
+  // shows the shared staffingServices value.
+  const firstStaffingRoomId =
+    bookedRooms
+      .filter((room) => resourceHasService(room, "staffing"))
+      .map((room) => getServiceResourceId(room))
+      .find(Boolean) ?? "";
 
   const roomDisplays: BookingRoomServicesDisplay[] = rooms.map((room) => {
     const roomId = getServiceResourceId(room);
@@ -295,7 +304,7 @@ export function getBookingServicesByRoom(
       });
     }
 
-    if (staffingValue && bookedIds.includes(roomId)) {
+    if (staffingValue && roomId === firstStaffingRoomId) {
       rows.push({
         key: "staffing",
         label: sectionLabel(staffingCfg?.label, "Staffing"),
@@ -449,7 +458,7 @@ export function getBookingServicesByRoom(
       value: sharedFurnishingsDetails,
     });
   }
-  if (staffingValue && bookedIds.length === 0) {
+  if (staffingValue && !firstStaffingRoomId) {
     bookingLevel.push({
       key: "staffing",
       label: "Staffing",

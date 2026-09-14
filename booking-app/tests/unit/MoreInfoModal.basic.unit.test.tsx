@@ -173,7 +173,7 @@ describe("MoreInfoModal - Basic Rendering", () => {
       expect(screen.queryByText("202: yes")).toBeNull();
     });
 
-    it("shows staffing on each booked room", () => {
+    it("shows staffing once, not under every booked room", () => {
       const booking = createMockBooking({
         roomId: "202, 103",
         roomSetup: "",
@@ -185,9 +185,8 @@ describe("MoreInfoModal - Basic Rendering", () => {
 
       renderModal(booking, context);
 
-      expect(screen.getAllByText("Staffing")).toHaveLength(2);
+      expect(screen.getAllByText("Staffing")).toHaveLength(1);
       expect(screen.getByRole("heading", { name: "202" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "103" })).toBeInTheDocument();
     });
 
     it("renders modal with booking information", () => {

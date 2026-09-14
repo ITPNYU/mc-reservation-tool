@@ -247,12 +247,11 @@ describe("getBookingServicesByRoom", () => {
     expect(
       display.bookingLevel.find((row) => row.key === "equipment")?.value,
     ).toBe("2x SM58 microphones");
-    expect(display.rooms.map((room) => room.roomId)).toEqual(["202", "103"]);
+    expect(display.rooms.map((room) => room.roomId)).toEqual(["202"]);
     expect(display.rooms[0].rows.map((row) => row.key)).toEqual([
       "staffing",
       "catering",
     ]);
-    expect(display.rooms[1].rows.map((row) => row.key)).toEqual(["staffing"]);
     expect(display.rooms[0].rows.find((row) => row.key === "staffing")?.value).toContain(
       "Need an A1",
     );
@@ -302,7 +301,7 @@ describe("getBookingServicesByRoom", () => {
     ]);
   });
 
-  it("shows staffing and media on every booked room", () => {
+  it("shows staffing on the first staffing-capable room and media on every booked room", () => {
     const staffingRoom: ServiceResourceLike = {
       resourceId: "202",
       name: "Screening Room",
@@ -320,16 +319,54 @@ describe("getBookingServicesByRoom", () => {
 
     expect(display.bookingLevel).toEqual([]);
     expect(display.rooms.map((room) => room.roomId)).toEqual(["103", "202"]);
-    expect(display.rooms[0].rows.map((row) => row.key)).toEqual([
-      "staffing",
-      "media",
-    ]);
+    expect(display.rooms[0].rows.map((row) => row.key)).toEqual(["media"]);
     expect(display.rooms[1].rows.map((row) => row.key)).toEqual([
       "staffing",
       "media",
     ]);
-    expect(display.rooms[0].rows[0].value).toContain("Need an A1");
-    expect(display.rooms[0].rows[1].value).toBe("Checkout Equipment");
+    expect(display.rooms[1].rows[0].value).toContain("Need an A1");
+    expect(display.rooms[0].rows[0].value).toBe("Checkout Equipment");
+  });
+
+  it("does not copy staffing onto later rooms that also offer it", () => {
+    const garageStaffing: ServiceResourceLike = {
+      resourceId: "103",
+      name: "The Garage",
+      services: { staffing: { label: "Staffing" } },
+    };
+    const studioStaffing: ServiceResourceLike = {
+      resourceId: "230",
+      name: "SAI Studio",
+      services: { staffing: { label: "Staffing" } },
+    };
+    const display = getBookingServicesByRoom(
+      {
+        roomId: "103, 230",
+        staffingServices: "AUDIO_TECH_A1",
+      },
+      [garageStaffing, studioStaffing],
+    );
+
+    expect(display.bookingLevel).toEqual([]);
+    expect(display.rooms.map((room) => room.roomId)).toEqual(["103"]);
+    expect(display.rooms[0].rows).toEqual([
+      { key: "staffing", label: "Staffing", value: "AUDIO_TECH_A1" },
+    ]);
+  });
+
+  it("shows staffing at booking level when no booked room offers it", () => {
+    const display = getBookingServicesByRoom(
+      {
+        roomId: "202, 103",
+        staffingServices: "AUDIO_TECH_103",
+      },
+      [screeningRoom, garage],
+    );
+
+    expect(display.rooms).toEqual([]);
+    expect(display.bookingLevel).toEqual([
+      { key: "staffing", label: "Staffing", value: "(Garage 103) Request an audio technician" },
+    ]);
   });
 
   it("does not repeat Checkout Equipment as media when equipment already has it", () => {
