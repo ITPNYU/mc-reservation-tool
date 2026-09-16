@@ -19,6 +19,132 @@ export type StaffingSection = {
   indexes: number[];
 };
 
+export type ShowInOrigin = {
+  user?: boolean;
+  walkIn?: boolean;
+  VIP?: boolean;
+};
+
+export type ResourceChartFieldConfig = {
+  label?: string;
+  descriptionHtml?: string;
+  required?: boolean;
+  /** Reserved for schema authors; forms always apply CHARTFIELD_REGEX when required. */
+  validation?: string;
+};
+
+export type ResourceFormOption = {
+  value: string;
+  label: string;
+  required?: boolean;
+  descriptionHtml?: string;
+  chartField?: ResourceChartFieldConfig;
+  /** Optional Google Calendar ID for auxiliary spaces (filled when calendars exist). */
+  calendarId?: string;
+  /** Production calendar ID for auxiliary spaces. */
+  calendarIdProd?: string;
+};
+
+/** @deprecated Use ResourceFormOption */
+export type ResourceFormSelectOption = ResourceFormOption & {
+  requiresChartField?: boolean;
+  defaultValue?: boolean;
+};
+
+/**
+ * Yes/No switch lock state for a service section.
+ * - "on": switch is locked to Yes; the service is always requested and its
+ *   dependent fields (chartfield, details) are always shown
+ * - "off": switch is locked to No; only the description is shown
+ * - "optional" (default when omitted): the user controls the switch
+ * Schema locks take precedence over dynamic locks (catering → cleaning,
+ * large-event security).
+ */
+export type ServiceToggle = "on" | "off" | "optional";
+
+/**
+ * Service section config.
+ * - mode "radio" / "select": choice list via options (`select` normalizes to radio on migrate)
+ * - mode "checkbox": optional option checkboxes (not forced like radio)
+ * - mode "static": read-only HTML
+ * - mode "hidden": offered but not shown
+ * - omit mode + chartField (no options): yes/no switch
+ * - omit mode + description only (no options/chartField/toggle): treated as static on migrate
+ * - toggle: lock the yes/no switch (see ServiceToggle). For equipment, omitting
+ *   toggle keeps the legacy layout (details field always shown, no switch).
+ */
+export type ResourceFormSectionConfig = {
+  showInOrigin?: ShowInOrigin;
+  label?: string;
+  descriptionHtml?: string;
+  mode?: "radio" | "select" | "checkbox" | "static" | "hidden";
+  toggle?: ServiceToggle;
+  options?: ResourceFormOption[];
+  defaultValue?: string;
+  required?: boolean;
+  chartField?: ResourceChartFieldConfig;
+  forceCleaning?: boolean;
+  studentLoungeCheckbox?: boolean;
+  showDetailsField?: boolean;
+  detailsLabel?: string;
+  detailsDescriptionHtml?: string;
+  /** @deprecated Prefer showInOrigin */
+  hideForUser?: boolean;
+  /** @deprecated Prefer showInOrigin */
+  hideForVIP?: boolean;
+  /** @deprecated Prefer showInOrigin */
+  hideForWalkIn?: boolean;
+};
+
+export type ResourceStaffingServiceOption = {
+  value: string;
+  label: string;
+  defaultValue?: boolean;
+};
+
+export type ResourceStaffingSectionConfig = {
+  label: string;
+  descriptionHtml?: string;
+  mode: "radio";
+  defaultValue?: string;
+  options: ResourceFormOption[];
+  /** @deprecated Prefer label */
+  name?: string;
+  /** @deprecated Prefer options */
+  services?: ResourceStaffingServiceOption[];
+};
+
+export type ResourceStaffingConfig = {
+  showInOrigin?: ShowInOrigin;
+  label?: string;
+  descriptionHtml?: string;
+  /** Lock the staffing yes/no switch (see ServiceToggle). */
+  toggle?: ServiceToggle;
+  sections?: Record<string, ResourceStaffingSectionConfig>;
+  /** @deprecated Prefer sections with options */
+  staffingOptions?: ResourceStaffingServiceOption[];
+  /** @deprecated Prefer omitting mode (switch) or sections */
+  mode?: "radio" | "static" | "hidden";
+  hideForUser?: boolean;
+  hideForVIP?: boolean;
+  hideForWalkIn?: boolean;
+};
+
+export type ResourceServicesConfig = {
+  annex?: ResourceFormSectionConfig;
+  setup?: ResourceFormSectionConfig;
+  staffing?: ResourceStaffingConfig;
+  furnishings?: ResourceFormSectionConfig;
+  equipment?: ResourceFormSectionConfig;
+  catering?: ResourceFormSectionConfig;
+  cleaning?: ResourceFormSectionConfig;
+  security?: ResourceFormSectionConfig;
+  /** @deprecated Prefer annex */
+  auxiliarySpace?: ResourceFormSectionConfig & { enabled?: boolean };
+};
+
+export type ResourceServiceKey = keyof ResourceServicesConfig;
+
 export type ResourceTraining = {
   required?: boolean;
   formId?: string;
@@ -38,12 +164,20 @@ export type Resource = {
   capacity: number;
   name: string;
   resourceId: string;
+  /**
+   * When set, this resource is an auxiliary (annex) space belonging to the
+   * parent resource. Annex resources are hidden from the top-level room list,
+   * cannot be booked standalone, and are offered as annex checkboxes under
+   * their parent; selecting one invites its calendar to the parent's event.
+   */
+  parentResourceId?: string;
   isEquipment: boolean;
   calendarId: string;
   training?: ResourceTraining;
   isWalkIn: boolean;
   isWalkInCanBookTwo: boolean;
-  services: string[];
+  /** Consolidated service config; legacy string[] coerced on read */
+  services: ResourceServicesConfig | string[];
   /**
    * Limit how many requests a user can make per period for this resource.
    * Convention: `-1` (or missing) means “unlimited”.
@@ -70,6 +204,7 @@ export type Resource = {
       catering: boolean;
       cleaning: boolean;
       security: boolean;
+      furnishings?: boolean;
     };
   };
   maxHour?: {
@@ -256,7 +391,7 @@ export const defaultResource: Resource = {
   },
   isWalkIn: false,
   isWalkInCanBookTwo: false,
-  services: [],
+  services: {},
   requestLimits: {
     perDay: { admin: -1, faculty: -1, student: -1 },
     perWeek: { admin: -1, faculty: -1, student: -1 },
@@ -274,6 +409,7 @@ export const defaultResource: Resource = {
       catering: false,
       cleaning: false,
       security: false,
+      furnishings: false,
     },
   },
   maxHour: {

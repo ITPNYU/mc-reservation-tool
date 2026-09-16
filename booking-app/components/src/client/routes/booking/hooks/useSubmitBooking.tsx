@@ -7,9 +7,14 @@ import {
   Inputs,
   PagePermission,
 } from "../../../../types";
+import {
+  getServiceRooms,
+  pruneServiceMapsToRooms,
+} from "../../../../utils/resourceServicesUtils";
 import { isValidNetIdFormat } from "../../../../utils/validationHelpers";
 
 import { DatabaseContext } from "../../components/Provider";
+import { useTenantSchema } from "../../components/SchemaProvider";
 import { BookingContext } from "../bookingProvider";
 import useCalculateOverlap from "./useCalculateOverlap";
 
@@ -41,7 +46,10 @@ export default function useSubmitBooking(formContext: FormContextLevel) {
     isBanned,
     needsSafetyTraining,
     isInBlackoutPeriod,
+    annexByRoom,
+    setAnnexByRoom,
   } = useContext(BookingContext);
+  const { resources: schemaResources } = useTenantSchema();
 
   const isOverlap = useCalculateOverlap();
   if (isOverlap) {
@@ -231,11 +239,21 @@ export default function useSubmitBooking(formContext: FormContextLevel) {
 
       // Convert sponsorEmail from NetID format to email format if needed
       // The form accepts NetID (e.g., "abc123") but the field should store email format
+      const finalAnnexByRoom = data.annexByRoom ?? annexByRoom ?? {};
+      // Per-room service answers survive in the form after a room or annex is
+      // unchecked; keep only the rooms that are actually being booked.
+      const serviceRooms = getServiceRooms(
+        selectedRooms,
+        finalAnnexByRoom,
+        schemaResources ?? [],
+      );
       const transformedData = {
-        ...data,
-        sponsorEmail: data.sponsorEmail && isValidNetIdFormat(data.sponsorEmail)
-          ? `${data.sponsorEmail}@nyu.edu`
-          : data.sponsorEmail,
+        ...pruneServiceMapsToRooms(data, serviceRooms),
+        annexByRoom: finalAnnexByRoom,
+        sponsorEmail:
+          data.sponsorEmail && isValidNetIdFormat(data.sponsorEmail)
+            ? `${data.sponsorEmail}@nyu.edu`
+            : data.sponsorEmail,
       };
 
       const requestBody = {
@@ -323,6 +341,7 @@ export default function useSubmitBooking(formContext: FormContextLevel) {
           // clear stored booking data after submit confirmation
           setBookingCalendarInfo(undefined);
           setSelectedRooms([]);
+          setAnnexByRoom({});
           setFormData(undefined);
           setHasShownMocapModal(false);
 
@@ -340,6 +359,8 @@ export default function useSubmitBooking(formContext: FormContextLevel) {
     [
       bookingCalendarInfo,
       selectedRooms,
+      annexByRoom,
+      schemaResources,
       liaisonUsers,
       userEmail,
       router,

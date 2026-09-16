@@ -1,10 +1,34 @@
 import { bookingCalendarStrToDate } from "@/components/src/client/utils/date";
 import { getCalendarClient } from "@/lib/googleClient";
+import { serverGetTenantResources } from "@/lib/tenant/serverGetTenantResources";
 import { traceExternalCall } from "@/lib/newrelic-utils";
 import { BookingFormDetails, BookingStatusLabel } from "../types";
 import { formatOrigin, getSecondaryContactName } from "../utils/formatters";
+import {
+  formatServicesDescriptionHtml,
+  getBookingServicesByRoom,
+  type BookingServicesSource,
+} from "../utils/bookingServicesDisplay";
+import type { ServiceResourceLike } from "../utils/resourceServicesUtils";
 
 import { serverGetRoomCalendarIds } from "./admin";
+
+async function resourcesForServicesDisplay(
+  bookingContents: BookingFormDetails,
+  tenant?: string,
+): Promise<ServiceResourceLike[]> {
+  const tenantResources = await serverGetTenantResources(tenant);
+  const annexByRoom = bookingContents.annexByRoom;
+  // Annex parent ids that are not in the tenant schema still need a resource
+  // entry so services can be grouped under that room.
+  const fallbackRooms =
+    annexByRoom && typeof annexByRoom === "object"
+      ? Object.keys(annexByRoom).map((roomId) => ({
+          resourceId: roomId,
+        }))
+      : [];
+  return [...tenantResources, ...fallbackRooms];
+}
 
 export const patchCalendarEvent = async (
   event: any,
@@ -175,95 +199,20 @@ export const bookingContentsToDescription = async (
   );
   description += "</ul>";
 
-  // Services Section
-  description += "<h3>Services</h3><ul>";
-  description += listItem(
-    "Room Setup",
-    getProperty(bookingContents, "setupDetails") ||
-      getProperty(bookingContents, "roomSetup"),
+  const resources = await resourcesForServicesDisplay(bookingContents, tenant);
+  const servicesDisplay = getBookingServicesByRoom(
+    bookingContents as BookingServicesSource,
+    resources,
   );
-  if (getProperty(bookingContents, "chartFieldForRoomSetup")) {
-    description += listItem(
-      "Room Setup Chart Field",
-      getProperty(bookingContents, "chartFieldForRoomSetup"),
-    );
-  }
-  // Only show equipment service if it exists
-  const equipmentServices = getProperty(bookingContents, "equipmentServices");
-  if (equipmentServices) {
-    description += listItem("Equipment Service", equipmentServices);
-    const equipmentDetails = getProperty(
-      bookingContents,
-      "equipmentServicesDetails",
-    );
-    if (equipmentDetails) {
-      description += listItem("Equipment Service Details", equipmentDetails);
-    }
-  }
-
-  // Only show staffing service if it exists
-  const staffingServices = getProperty(bookingContents, "staffingServices");
-  if (staffingServices) {
-    description += listItem("Staffing Service", staffingServices);
-    const staffingDetails = getProperty(
-      bookingContents,
-      "staffingServicesDetails",
-    );
-    if (staffingDetails) {
-      description += listItem("Staffing Service Details", staffingDetails);
-    }
-  }
-
-  // Add WebCheckout Cart Number
   const cartNumber = getProperty(bookingContents, "webcheckoutCartNumber");
   if (cartNumber) {
-    description += listItem("Cart Number", cartNumber);
+    servicesDisplay.bookingLevel.push({
+      key: "cart",
+      label: "Cart Number",
+      value: cartNumber,
+    });
   }
-
-  // Only show catering service if it's not "no" or "No"
-  const cateringService =
-    getProperty(bookingContents, "cateringService") ||
-    getProperty(bookingContents, "catering");
-  if (cateringService && cateringService !== "no" && cateringService !== "No") {
-    description += listItem("Catering Service", cateringService);
-    const cateringChartField = getProperty(
-      bookingContents,
-      "chartFieldForCatering",
-    );
-    if (cateringChartField) {
-      description += listItem("Catering Chart Field", cateringChartField);
-    }
-  }
-
-  // Only show cleaning service if it's not "no" or "No"
-  const cleaningService = getProperty(bookingContents, "cleaningService");
-  if (cleaningService && cleaningService !== "no" && cleaningService !== "No") {
-    description += listItem("Cleaning Service", "Yes");
-    const cleaningChartField = getProperty(
-      bookingContents,
-      "chartFieldForCleaning",
-    );
-    if (cleaningChartField) {
-      description += listItem(
-        "Cleaning Service Chart Field",
-        cleaningChartField,
-      );
-    }
-  }
-
-  // Only show security service if it's not "no" or "No"
-  const securityService = getProperty(bookingContents, "hireSecurity");
-  if (securityService && securityService !== "no" && securityService !== "No") {
-    description += listItem("Security", securityService);
-    const securityChartField = getProperty(
-      bookingContents,
-      "chartFieldForSecurity",
-    );
-    if (securityChartField) {
-      description += listItem("Security Chart Field", securityChartField);
-    }
-  }
-  description += "</ul>";
+  description += formatServicesDescriptionHtml(servicesDisplay);
 
   description += "<h3>Cancellation Policy</h3>";
 
