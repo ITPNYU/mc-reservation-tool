@@ -13,12 +13,14 @@ import { getMediaCommonsServices, isMediaCommons } from "@/components/src/utils/
 import { resolveCallerRole } from "@/lib/api/authz";
 import { requireSession } from "@/lib/api/requireSession";
 import {
+  logServerBookingChange,
   serverGetDataByCalendarEventId,
   serverGetFinalApproverEmail,
   serverListResourceApproversByEmail,
 } from "@/lib/firebase/server/adminDb";
 import { executeXStateTransition } from "@/lib/stateMachines/xstateUtilsV5";
 import { NextRequest, NextResponse } from "next/server";
+import { serverGetTenantResources } from "@/lib/tenant/serverGetTenantResources";
 
 const SERVICE_APPROVED_FIELDS: Record<string, string> = {
   staff: "staffServiceApproved",
@@ -27,14 +29,21 @@ const SERVICE_APPROVED_FIELDS: Record<string, string> = {
   cleaning: "cleaningServiceApproved",
   security: "securityServiceApproved",
   setup: "setupServiceApproved",
+  furnishings: "furnishingsServiceApproved",
 };
 
 /**
  * Returns true if the booking has at least one requested service that has not yet been
  * approved or declined
  */
-function hasUnprocessedServices(bookingData: any): boolean {
-  const servicesRequested = getMediaCommonsServices(bookingData);
+async function hasUnprocessedServices(
+  bookingData: any,
+  tenant: string,
+): Promise<boolean> {
+  const servicesRequested = getMediaCommonsServices(
+    bookingData,
+    await serverGetTenantResources(tenant),
+  );
   for (const [service, requested] of Object.entries(servicesRequested)) {
     if (!requested) continue;
     const field = SERVICE_APPROVED_FIELDS[service];
@@ -168,7 +177,10 @@ export async function POST(req: NextRequest) {
           id,
           tenant
         );
-        if (bookingData && hasUnprocessedServices(bookingData)) {
+        if (
+          bookingData &&
+          (await hasUnprocessedServices(bookingData, tenant))
+        ) {
           console.log(
             `🛑 BLOCKING FALLBACK: REQUEST HAS UNPROCESSED SERVICES [${tenant?.toUpperCase()}]:`,
             { calendarEventId: id }
@@ -287,44 +299,24 @@ export async function POST(req: NextRequest) {
         }>(TableNames.BOOKING, id, tenant);
 
         if (doc) {
-          const logResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/booking-logs`,
+          await logServerBookingChange({
+            bookingId: doc.id,
+            calendarEventId: id,
+            status: BookingStatusLabel.PRE_APPROVED,
+            changedBy: email,
+            requestNumber: doc.requestNumber,
+            tenant,
+          });
+
+          console.log(
+            `📋 XSTATE SERVICES REQUEST HISTORY LOGGED [${tenant?.toUpperCase()}]:`,
             {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-tenant": tenant || DEFAULT_TENANT,
-              },
-              body: JSON.stringify({
-                bookingId: doc.id,
-                calendarEventId: id,
-                status: BookingStatusLabel.PRE_APPROVED, // Services Request is still PRE_APPROVED status
-                changedBy: email,
-                requestNumber: doc.requestNumber,
-                note: null,
-              }),
+              calendarEventId: id,
+              bookingId: doc.id,
+              requestNumber: doc.requestNumber,
+              status: BookingStatusLabel.PRE_APPROVED,
             },
           );
-
-          if (logResponse.ok) {
-            console.log(
-              `📋 XSTATE SERVICES REQUEST HISTORY LOGGED [${tenant?.toUpperCase()}]:`,
-              {
-                calendarEventId: id,
-                bookingId: doc.id,
-                requestNumber: doc.requestNumber,
-                status: BookingStatusLabel.PRE_APPROVED,
-              },
-            );
-          } else {
-            console.error(
-              `🚨 XSTATE SERVICES REQUEST HISTORY LOG FAILED [${tenant?.toUpperCase()}]:`,
-              {
-                calendarEventId: id,
-                status: logResponse.status,
-              },
-            );
-          }
 
           try {
             await notifyServiceApproversForRequestedServices(id, tenant);

@@ -39,7 +39,20 @@ import { BookingContext } from "../bookingProvider";
 import { mapAffiliationToRole } from "../formPages/UserRolePage";
 import useCheckAutoApproval from "../hooks/useCheckAutoApproval";
 import useSubmitBooking from "../hooks/useSubmitBooking";
+import {
+  anyRoomHasVisibleService,
+  getResourceServicesConfig,
+  getRoomsWithVisibleService,
+  getServiceRooms,
+  getServiceSectionConfig,
+  hasSchemaServicesConfig,
+  isChoiceMode,
+  isSchemaDrivenEquipmentSection,
+  needsGenericSetupSwitch,
+  ServiceVisibilityContext,
+} from "../../../../utils/resourceServicesUtils";
 import BookingFormEquipmentServices from "./BookingFormEquipmentServices";
+import BookingFormResourceServices from "./BookingFormResourceServices";
 import BookingFormStaffingServices from "./BookingFormStaffingServices";
 import BookingSelection from "./BookingSelection";
 
@@ -91,6 +104,7 @@ export default function FormInput({
     isInBlackoutPeriod,
     formData,
     setFormData,
+    annexByRoom,
   } = useContext(BookingContext);
   const router = useRouter();
   const { tenant } = useParams();
@@ -125,32 +139,114 @@ export default function FormInput({
     },
     attestations,
     mappings: { role: roleMapping },
+    resources: schemaResources,
   } = useTenantSchema();
+
+  // Checked annex spaces (e.g. 1200L-6 under 1201) live in annexByRoom, not
+  // selectedRooms, but their own services must still be offered on the form.
+  const serviceRooms = useMemo(
+    () => getServiceRooms(selectedRooms, annexByRoom, schemaResources),
+    [selectedRooms, annexByRoom, schemaResources],
+  );
+
+  const serviceVisibility = useMemo<ServiceVisibilityContext>(
+    () => ({
+      isVIP,
+      isWalkIn,
+      isStandardUser: !isVIP && !isWalkIn,
+    }),
+    [isVIP, isWalkIn],
+  );
+
+  const needsGenericSetup = useMemo(
+    () => needsGenericSetupSwitch(serviceRooms, serviceVisibility, showSetup),
+    [serviceRooms, serviceVisibility, showSetup],
+  );
+
+  // Rooms with an object services config (even an empty `{}`) are rendered by
+  // BookingFormResourceServices; the legacy tenant-level switches are only for
+  // rooms without one.
+  const schemaDrivenServices = useMemo(
+    () => serviceRooms.some(hasSchemaServicesConfig),
+    [serviceRooms],
+  );
+
+  const needsGenericSecuritySwitch = useMemo(() => {
+    const securityRooms = getRoomsWithVisibleService(
+      serviceRooms,
+      "security",
+      serviceVisibility,
+    );
+    if (securityRooms.length === 0) return false;
+    // Show switch if any security room is not choice/checkbox/static mode
+    // (multi-room safe). Match showSecuritySwitch in BookingFormResourceServices.
+    return securityRooms.some((r) => {
+      const mode = getServiceSectionConfig(r, "security")?.mode;
+      return (
+        !isChoiceMode(mode) && mode !== "checkbox" && mode !== "static"
+      );
+    });
+  }, [serviceRooms, serviceVisibility]);
+
+  const needsCheckboxSecurity = useMemo(() => {
+    const securityRooms = getRoomsWithVisibleService(
+      serviceRooms,
+      "security",
+      serviceVisibility,
+    );
+    return securityRooms.some(
+      (r) => getServiceSectionConfig(r, "security")?.mode === "checkbox",
+    );
+  }, [serviceRooms, serviceVisibility]);
+
+  const needsInteractiveEquipment = useMemo(() => {
+    const equipmentRooms = getRoomsWithVisibleService(
+      serviceRooms,
+      "equipment",
+      serviceVisibility,
+    );
+    if (equipmentRooms.length === 0) return false;
+    return equipmentRooms.some((r) => {
+      const cfg = getServiceSectionConfig(r, "equipment");
+      // Legacy string[] services have no section config; use generic equipment UI.
+      if (!cfg) return true;
+      // Mirrors BookingFormResourceServices so a section never renders both UIs.
+      return !isSchemaDrivenEquipmentSection(cfg);
+    });
+  }, [serviceRooms, serviceVisibility]);
+
+  const cateringDescriptionHtml = useMemo(() => {
+    for (const room of serviceRooms) {
+      const html = getServiceSectionConfig(room, "catering")?.descriptionHtml;
+      if (html) return html;
+    }
+    return undefined;
+  }, [serviceRooms]);
 
   // Determine which services to show based on selected rooms and schema resources
   const showEquipment = useMemo(
-    () => selectedRooms.some((room) => room.services?.includes("equipment")),
-    [selectedRooms],
+    () => anyRoomHasVisibleService(serviceRooms, "equipment", serviceVisibility),
+    [serviceRooms, serviceVisibility],
   );
 
   const showStaffing = useMemo(
-    () => selectedRooms.some((room) => room.services?.includes("staffing")),
-    [selectedRooms],
+    () => anyRoomHasVisibleService(serviceRooms, "staffing", serviceVisibility),
+    [serviceRooms, serviceVisibility],
   );
 
   const showCatering = useMemo(
-    () => selectedRooms.some((room) => room.services?.includes("catering")),
-    [selectedRooms],
+    () => anyRoomHasVisibleService(serviceRooms, "catering", serviceVisibility),
+    [serviceRooms, serviceVisibility],
   );
 
   const showHireSecurity = useMemo(
-    () => selectedRooms.some((room) => room.services?.includes("security")),
-    [selectedRooms],
+    () => anyRoomHasVisibleService(serviceRooms, "security", serviceVisibility),
+    [serviceRooms, serviceVisibility],
   );
 
   const showCleaning = useMemo(
-    () => selectedRooms.some((room) => room.services?.includes("cleaning")),
-    [selectedRooms],
+    () => anyRoomHasVisibleService(serviceRooms, "cleaning", serviceVisibility),
+    [serviceRooms, serviceVisibility],
   );
 
   const {
@@ -173,12 +269,25 @@ export default function FormInput({
       sponsorEmail: "",
       mediaServicesDetails: "",
       equipmentServicesDetails: "",
-      staffingServicesDetails: "",
       catering: "",
       chartFieldForCatering: "",
       chartFieldForCleaning: "",
       chartFieldForSecurity: "",
       chartFieldForRoomSetup: "",
+      roomSetupByRoom: {},
+      setupDetailsByRoom: {},
+      chartFieldForRoomSetupByRoom: {},
+      furnishingsByRoom: {},
+      chartFieldForFurnishingsByRoom: {},
+      furnishingsDetails: "",
+      furnishingsDetailsByRoom: {},
+      equipmentServicesDetailsByRoom: {},
+      cateringByRoom: {},
+      chartFieldForCateringByRoom: {},
+      cleaningByRoom: {},
+      chartFieldForCleaningByRoom: {},
+      hireSecurityByRoom: {},
+      chartFieldForSecurityByRoom: {},
       hireSecurity: "",
       attendeeAffiliation: "",
       roomSetup: "",
@@ -195,10 +304,17 @@ export default function FormInput({
       // copy department + role from earlier in form
       department,
       role,
+      // Prefer live annex selections from room page over stale formData.
+      annexByRoom: annexByRoom ?? formData?.annexByRoom ?? {},
     },
     mode: "onBlur",
     resolver: undefined,
   });
+
+  // Keep form field in sync when user changes annex on the room selection page.
+  useEffect(() => {
+    setValue("annexByRoom", annexByRoom ?? {}, { shouldValidate: false });
+  }, [annexByRoom, setValue]);
 
   // different from other switches b/c services don't have yes/no columns in DB
   const [showEquipmentServices, setShowEquipmentServices] = useState(false);
@@ -245,12 +361,49 @@ export default function FormInput({
   const expectedAttendanceValue = watch("expectedAttendance");
   const isLargeEvent = parseInt(expectedAttendanceValue || "0") >= 75;
   const cateringValue = watch("catering");
-  const cateringServiceValue = watch("cateringService");
+  const cleaningValue = watch("cleaningService");
 
-  const shouldShowCateringChartField =
-    cateringValue === "yes" &&
-    !!cateringServiceValue &&
-    cateringServiceValue !== "Outside Catering";
+  const cateringRequiresCleaning = useMemo(
+    () =>
+      selectedRooms.some(
+        (room) =>
+          getResourceServicesConfig(room).catering?.forceCleaning === true,
+      ),
+    [selectedRooms],
+  );
+
+  // The rules below only drive the legacy booking-level switches. Rooms with
+  // a schema services config get per-room catering / cleaning / security in
+  // BookingFormResourceServices, which applies these rules room by room and
+  // mirrors the results into the flat fields.
+  const cleaningWasAutoSet = useRef(false);
+
+  useEffect(() => {
+    if (schemaDrivenServices) return;
+    if (cateringValue === "yes" && cateringRequiresCleaning) {
+      if (cleaningValue !== "yes") {
+        setValue("cleaningService", "yes", { shouldValidate: true });
+        cleaningWasAutoSet.current = true;
+      }
+    } else if (cleaningWasAutoSet.current && cleaningValue === "yes") {
+      setValue("cleaningService", "", { shouldValidate: true });
+      cleaningWasAutoSet.current = false;
+    }
+  }, [
+    cateringValue,
+    cleaningValue,
+    setValue,
+    cateringRequiresCleaning,
+    schemaDrivenServices,
+  ]);
+
+  // Drop stale catering chartfield errors when the field is hidden.
+  useEffect(() => {
+    if (cateringValue === "yes") return;
+    unregister("chartFieldForCatering");
+    clearErrors("chartFieldForCatering");
+    setValue("chartFieldForCatering", "", { shouldValidate: false });
+  }, [cateringValue, unregister, clearErrors, setValue]);
 
   const hireSecurityValue = watch("hireSecurity");
   // Track if hireSecurity was auto-set by attendance logic
@@ -274,6 +427,8 @@ export default function FormInput({
   }, [hireSecurityValue]);
 
   useEffect(() => {
+    // Per-room security is owned by BookingFormResourceServices.
+    if (schemaDrivenServices) return;
     // Do not auto-manage hireSecurity if the user has manually overridden it
     // BUT: if attendance crosses back above threshold (in auto-enabling direction),
     // reset the manual flag and auto-enable again
@@ -287,8 +442,14 @@ export default function FormInput({
       hireSecurityManuallySet.current = false;
     }
 
-    if (isLargeEvent) {
-      if (hireSecurityValue !== "yes") {
+    if (isLargeEvent && (needsGenericSecuritySwitch || needsCheckboxSecurity)) {
+      // Checkbox-mode (Garage Willoughby) uses a distinct value when opted in;
+      // for large events force a generic "yes" if security is not already set.
+      const alreadyRequested =
+        typeof hireSecurityValue === "string" &&
+        hireSecurityValue.trim().length > 0 &&
+        hireSecurityValue.trim().toLowerCase() !== "no";
+      if (!alreadyRequested) {
         setValue("hireSecurity", "yes", { shouldValidate: true });
         hireSecurityWasAutoSet.current = true;
         autoHireSecurityValueRef.current = "yes";
@@ -301,7 +462,14 @@ export default function FormInput({
         autoHireSecurityValueRef.current = "";
       }
     }
-  }, [isLargeEvent, hireSecurityValue, setValue]);
+  }, [
+    isLargeEvent,
+    hireSecurityValue,
+    setValue,
+    needsGenericSecuritySwitch,
+    needsCheckboxSecurity,
+    schemaDrivenServices,
+  ]);
 
   const validateExpectedAttendance = useCallback(
     (value: string) => {
@@ -332,15 +500,6 @@ export default function FormInput({
   // Add a state to track if we're currently fetching sponsor data
   const [isFetchingSponsor, setIsFetchingSponsor] = useState(false);
 
-  useEffect(() => {
-    if (
-      cateringValue !== "yes" ||
-      cateringServiceValue === "Outside Catering"
-    ) {
-      unregister("chartFieldForCatering");
-      clearErrors("chartFieldForCatering");
-    }
-  }, [cateringServiceValue, cateringValue, unregister, clearErrors]);
 
   // Watch sponsor email field specifically
   const sponsorEmail = watch("sponsorEmail");
@@ -519,11 +678,26 @@ export default function FormInput({
   // Common Services section used by both full form and modification form
   const servicesSection = (
     <Section title={formatSectionTitle("Services")}>
-      {!isWalkIn && showSetup && (
+      <BookingFormResourceServices
+        selectedRooms={serviceRooms}
+        control={control}
+        errors={errors}
+        trigger={trigger}
+        watch={watch}
+        setValue={setValue}
+        isWalkIn={isWalkIn}
+        isVIP={isVIP}
+        formatFieldLabel={formatFieldLabel}
+        showStaffingServices={showStaffingServices}
+        setShowStaffingServices={setShowStaffingServices}
+        formContext={formContext}
+        isLargeEvent={isLargeEvent}
+      />
+      {!isWalkIn && showSetup && needsGenericSetup && (
         <div style={{ marginBottom: 32 }}>
           <BookingFormSwitch
             id="roomSetup"
-            label="Setup?"
+            label="Room Setup"
             required={false}
             description={
               <p>
@@ -555,7 +729,7 @@ export default function FormInput({
           )}
         </div>
       )}
-      {showEquipment && (
+      {showEquipment && needsInteractiveEquipment && (
         <div style={{ marginBottom: 32 }}>
           <BookingFormEquipmentServices
             id="equipmentServices"
@@ -597,7 +771,8 @@ export default function FormInput({
             )}
         </div>
       )}
-      {showStaffing && (
+      {/* Legacy / non-schema rooms: staffing stays booking-level here. */}
+      {showStaffing && !schemaDrivenServices && (
         <div style={{ marginBottom: 32 }}>
           <BookingFormStaffingServices
             id="staffingServices"
@@ -607,61 +782,45 @@ export default function FormInput({
               showStaffingServices,
               setShowStaffingServices,
               formContext,
+              setValue,
             }}
           />
-          {watch("staffingServices") !== undefined &&
-            watch("staffingServices").length > 0 && (
-              <BookingFormTextField
-                id="staffingServicesDetails"
-                label="Staffing Services Details"
-                description={
-                  <p>
-                    If you selected any Staffing Services above, please describe
-                    your needs in detail.
-                    <br />
-                    Please specify the type of technical support you require and
-                    any specific requirements for your event.
-                  </p>
-                }
-                {...{ control, errors, trigger }}
-              />
-            )}
         </div>
       )}
-      {!isWalkIn && showCatering && (
+      {/* Legacy rooms without object services config keep flat catering/cleaning/security. */}
+      {!schemaDrivenServices && !isWalkIn && showCatering && (
         <div style={{ marginBottom: 32 }}>
           <BookingFormSwitch
             id="catering"
             label="Catering?"
-            description={<p>Select if you need catering for your event.</p>}
+            description={
+              cateringDescriptionHtml ? (
+                <div
+                  style={{ fontSize: "0.75rem" }}
+                  dangerouslySetInnerHTML={{ __html: cateringDescriptionHtml }}
+                />
+              ) : (
+                <p>Select if you need catering for your event.</p>
+              )
+            }
             required={false}
             {...{ control, errors, trigger }}
           />
           {cateringValue === "yes" && (
-            <>
-              <BookingFormDropdown
-                id="cateringService"
-                label="Catering Service"
-                options={["Outside Catering", "NYU Plated"]}
-                {...{ control, errors, trigger }}
-              />
-              {shouldShowCateringChartField && (
-                <BookingFormTextField
-                  id="chartFieldForCatering"
-                  label="ChartField for Catering Services"
-                  required
-                  pattern={{
-                    value: CHARTFIELD_REGEX,
-                    message: CHARTFIELD_PATTERN_MESSAGE,
-                  }}
-                  {...{ control, errors, trigger }}
-                />
-              )}
-            </>
+            <BookingFormTextField
+              id="chartFieldForCatering"
+              label="ChartField for Catering Services"
+              required
+              pattern={{
+                value: CHARTFIELD_REGEX,
+                message: CHARTFIELD_PATTERN_MESSAGE,
+              }}
+              {...{ control, errors, trigger }}
+            />
           )}
         </div>
       )}
-      {!isWalkIn && showCleaning && (
+      {!schemaDrivenServices && !isWalkIn && showCleaning && (
         <div style={{ marginBottom: 32 }}>
           <BookingFormSwitch
             id="cleaningService"
@@ -670,6 +829,7 @@ export default function FormInput({
               <p>Select if you need cleaning services for your event.</p>
             }
             required={false}
+            disabled={cateringValue === "yes" && cateringRequiresCleaning}
             {...{ control, errors, trigger }}
           />
           {watch("cleaningService") === "yes" && (
@@ -686,49 +846,53 @@ export default function FormInput({
           )}
         </div>
       )}
-      {!isWalkIn && showHireSecurity && (
-        <div style={{ marginBottom: 32 }}>
-          <BookingFormSwitch
-            id="hireSecurity"
-            label="Security?"
-            required={false}
-            disabled={isLargeEvent}
-            description={
-              <p>
-                {isLargeEvent && (
-                  <span
-                    style={{
-                      display: "block",
-                      marginBottom: "4px",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Security is required for events with more than 75 attendees.
-                  </span>
-                )}
-                Only for large events with 75+ attendees, and bookings in The
-                Garage where the Willoughby entrance will be in use. It is
-                required for the reservation holder to provide a chartfield so
-                that the Media Commons Team can obtain Campus Safety Security
-                Services.
-              </p>
-            }
-            {...{ control, errors, trigger }}
-          />
-          {watch("hireSecurity") === "yes" && (
-            <BookingFormTextField
-              id="chartFieldForSecurity"
-              label="ChartField for Security"
+      {!schemaDrivenServices &&
+        !isWalkIn &&
+        showHireSecurity &&
+        needsGenericSecuritySwitch && (
+          <div style={{ marginBottom: 32 }}>
+            <BookingFormSwitch
+              id="hireSecurity"
+              label="Security?"
               required={false}
-              pattern={{
-                value: CHARTFIELD_REGEX,
-                message: CHARTFIELD_PATTERN_MESSAGE,
-              }}
+              disabled={isLargeEvent}
+              description={
+                <p>
+                  {isLargeEvent && (
+                    <span
+                      style={{
+                        display: "block",
+                        marginBottom: "4px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Security is required for events with more than 75
+                      attendees.
+                    </span>
+                  )}
+                  Only for large events with 75+ attendees, and bookings in The
+                  Garage where the Willoughby entrance will be in use. It is
+                  required for the reservation holder to provide a chartfield so
+                  that the Media Commons Team can obtain Campus Safety Security
+                  Services.
+                </p>
+              }
               {...{ control, errors, trigger }}
             />
-          )}
-        </div>
-      )}
+            {watch("hireSecurity") === "yes" && (
+              <BookingFormTextField
+                id="chartFieldForSecurity"
+                label="ChartField for Security"
+                required={false}
+                pattern={{
+                  value: CHARTFIELD_REGEX,
+                  message: CHARTFIELD_PATTERN_MESSAGE,
+                }}
+                {...{ control, errors, trigger }}
+              />
+            )}
+          </div>
+        )}
     </Section>
   );
 

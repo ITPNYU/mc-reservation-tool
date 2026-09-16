@@ -1,4 +1,5 @@
 import { DEFAULT_TENANT } from "@/components/src/constants/tenants";
+import { isServiceRequested } from "@/components/src/utils/tenantUtils";
 import { NextRequest, NextResponse } from "next/server";
 
 import { TableNames } from "@/components/src/policy";
@@ -10,7 +11,8 @@ import {
 import admin from "@/lib/firebase/server/firebaseAdmin";
 import { applyEnvironmentCalendarIds } from "@/lib/utils/calendarEnvironment";
 import { toFirebaseTimestamp } from "@/components/src/client/utils/serverDate";
-import { formatInTimeZone } from "date-fns-tz";
+import { addDays } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 import { TIMEZONE } from "../shared";
 
@@ -45,13 +47,21 @@ const HEADERS = [
   "Closed At",
   "Room Setup Needed (Y/N)",
   "Room Setup Details",
+  "Additional Event Furniture",
+  "Furniture Chart Field",
   "Equipment Services (Y/N)",
   "Equipment Service Details",
   "Staffing Services (Y/N)",
   "Staffing Service Details",
   "Catering (Y/N)",
+  "Catering Rooms",
+  "Catering Chart Field",
   "Cleaning Services (Y/N)",
+  "Cleaning Rooms",
+  "Cleaning Chart Field",
   "Hire Security (Y/N)",
+  "Hire Security Rooms",
+  "Hire Security Chart Field",
 ] as const;
 
 const escapeCsv = (value: unknown): string => {
@@ -78,6 +88,18 @@ const safeFormat = (timestamp: unknown, fmt: string): string => {
   return date ? formatInTimeZone(date, TIMEZONE, fmt) : "";
 };
 
+const parseExportDate = (value: string | null): Date | null => {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const date = fromZonedTime(`${value}T00:00:00`, TIMEZONE);
+  return (
+    isNaN(date.getTime()) ||
+    formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd") !== value
+  )
+    ? null
+    : date;
+};
+
 const getBookingStatus = (booking: Booking): string => {
   if (booking.finalApprovedAt) return "Approved";
   if (booking.declinedAt) return "Declined";
@@ -98,6 +120,41 @@ const calculateTimeInUse = (startDate: unknown, endDate: unknown): number => {
     100
   );
 };
+
+type ByRoomMap = Record<string, unknown> | undefined;
+
+/**
+ * Rooms that requested a per-room service, joined with "; ". A plain "yes"
+ * lists just the room id; a choice value (e.g. a security post) is shown as
+ * "roomId: value".
+ */
+const requestedRooms = (byRoom: ByRoomMap): string =>
+  byRoom
+    ? Object.entries(byRoom)
+        .filter(([, v]) => isServiceRequested(v))
+        .map(([roomId, v]) => {
+          const value = String(v).trim();
+          return value.toLowerCase() === "yes" ? roomId : `${roomId}: ${value}`;
+        })
+        .join("; ")
+    : "";
+
+/** Chartfields for rooms that requested a per-room service, as "roomId: chart". */
+const requestedRoomChartFields = (
+  byRoom: ByRoomMap,
+  chartByRoom: ByRoomMap,
+): string =>
+  chartByRoom
+    ? Object.entries(chartByRoom)
+        .filter(
+          ([roomId, chart]) =>
+            isServiceRequested(byRoom?.[roomId]) &&
+            typeof chart === "string" &&
+            chart.trim(),
+        )
+        .map(([roomId, chart]) => `${roomId}: ${String(chart).trim()}`)
+        .join("; ")
+    : "";
 
 const countRooms = (roomId: string | number): number => {
   const roomIdStr = String(roomId);
@@ -142,7 +199,24 @@ const buildRow = (booking: Booking): string => {
     safeFormat(booking.closedAt, "M/d/yyyy h:mm a"),
     booking.roomSetup === "yes" ? "Yes" : "No",
     booking.setupDetails || "",
-    booking.equipmentServices && booking.equipmentServices.length > 0
+    booking.furnishingsByRoom
+      ? Object.entries(booking.furnishingsByRoom)
+          .filter(
+            ([, v]) => typeof v === "string" && v.toLowerCase() === "yes",
+          )
+          .map(([roomId]) => roomId)
+          .join("; ")
+      : "",
+    booking.chartFieldForFurnishingsByRoom
+      ? Object.entries(booking.chartFieldForFurnishingsByRoom)
+          .filter(
+            ([roomId]) => booking.furnishingsByRoom?.[roomId] === "yes",
+          )
+          .map(([roomId, chart]) => `${roomId}: ${chart}`)
+          .join("; ")
+      : "",
+    (booking.equipmentServices && booking.equipmentServices.length > 0) ||
+    booking.equipmentServicesDetails?.trim()
       ? "Yes"
       : "No",
     booking.equipmentServicesDetails || "",
@@ -151,8 +225,23 @@ const buildRow = (booking: Booking): string => {
       : "No",
     booking.staffingServicesDetails || "",
     booking.catering === "yes" ? "Yes" : "No",
+    requestedRooms(booking.cateringByRoom),
+    requestedRoomChartFields(
+      booking.cateringByRoom,
+      booking.chartFieldForCateringByRoom,
+    ),
     booking.cleaningService === "yes" ? "Yes" : "No",
-    booking.hireSecurity === "yes" ? "Yes" : "No",
+    requestedRooms(booking.cleaningByRoom),
+    requestedRoomChartFields(
+      booking.cleaningByRoom,
+      booking.chartFieldForCleaningByRoom,
+    ),
+    isServiceRequested(booking.hireSecurity) ? "Yes" : "No",
+    requestedRooms(booking.hireSecurityByRoom),
+    requestedRoomChartFields(
+      booking.hireSecurityByRoom,
+      booking.chartFieldForSecurityByRoom,
+    ),
   ];
 
   return values.map(escapeCsv).join(",");
@@ -160,6 +249,18 @@ const buildRow = (booking: Booking): string => {
 
 export async function GET(request: NextRequest) {
   const tenant = request.headers.get("x-tenant") || DEFAULT_TENANT;
+  const { searchParams } = new URL(request.url);
+  const startDateParam = searchParams.get("startDate");
+  const endDateParam = searchParams.get("endDate");
+  const startDate = parseExportDate(startDateParam);
+  const endDate = parseExportDate(endDateParam);
+
+  if (!startDate || !endDate || startDate > endDate) {
+    return NextResponse.json(
+      { error: "A valid startDate and endDate are required." },
+      { status: 400 },
+    );
+  }
 
   // Schema is small; fetched up front so room mapping (if needed in future
   // columns) is available before we start streaming rows.
@@ -180,10 +281,17 @@ export async function GET(request: NextRequest) {
   void rooms;
 
   const collectionName = getServerTenantCollection(TableNames.BOOKING, tenant);
+  const endDateExclusive = addDays(endDate, 1);
   const docStream = admin
     .firestore()
     .collection(collectionName)
-    .orderBy("requestNumber")
+    .where("startDate", ">=", admin.firestore.Timestamp.fromDate(startDate))
+    .where(
+      "startDate",
+      "<",
+      admin.firestore.Timestamp.fromDate(endDateExclusive),
+    )
+    .orderBy("startDate")
     .stream() as unknown as NodeJS.ReadableStream & { destroy: () => void };
 
   const encoder = new TextEncoder();

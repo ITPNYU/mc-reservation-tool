@@ -1,5 +1,6 @@
 import {
   MoreHoriz,
+  RoomService,
   TableBar,
   Headset,
   PeopleAlt,
@@ -43,6 +44,7 @@ import getBookingStatus from "../../hooks/getBookingStatus";
 import Loading from "../Loading";
 import { useAuth } from "../AuthProvider";
 import { DatabaseContext } from "../Provider";
+import { deriveFormServicesFlags } from "../../../../utils/resourceServicesUtils";
 import { useTenantSchema } from "../SchemaProvider";
 import BookMoreButton from "./BookMoreButton";
 import BookingTableFilters from "./BookingTableFilters";
@@ -77,21 +79,31 @@ export const Bookings: React.FC<BookingsProps> = ({
   const {
     resourceName,
     form,
+    resources,
     interimHighlightThresholdHours = 18,
   } = useTenantSchema();
-  const {
-    showSetup,
-    showEquipment,
-    showStaffing,
-    showCatering,
-    showSecurity: showHireSecurity,
-  } = form.services;
+  const derivedServiceFlags = useMemo(
+    () => deriveFormServicesFlags(resources ?? []),
+    [resources],
+  );
+  const showSetup =
+    derivedServiceFlags.showSetup || form.services.showSetup;
+  const showEquipment =
+    derivedServiceFlags.showEquipment || form.services.showEquipment;
+  const showStaffing =
+    derivedServiceFlags.showStaffing || form.services.showStaffing;
+  const showCatering =
+    derivedServiceFlags.showCatering || form.services.showCatering;
+  const showHireSecurity =
+    derivedServiceFlags.showSecurity || form.services.showSecurity;
+  const showFurnishings = derivedServiceFlags.showFurnishings;
   const hasServices =
     showSetup ||
     showEquipment ||
     showStaffing ||
     showCatering ||
-    showHireSecurity;
+    showHireSecurity ||
+    showFurnishings;
   const theme = useTheme();
   const params = useParams();
   const tenant = params?.tenant as string;
@@ -608,7 +620,7 @@ export const Bookings: React.FC<BookingsProps> = ({
                 }[] = [
                   {
                     label: "Setup",
-                    Icon: TableBar,
+                    Icon: RoomService,
                     requested: servicesRequested.setup || false,
                     serviceKey: "setup",
                     closeoutKey: "Setup Closeout",
@@ -672,6 +684,17 @@ export const Bookings: React.FC<BookingsProps> = ({
                       "Security Closedout",
                     ),
                   },
+                  {
+                    label: "Furniture",
+                    Icon: TableBar,
+                    requested: servicesRequested.furnishings || false,
+                    serviceKey: "furnishings",
+                    closeoutKey: "Furnishings Closeout",
+                    closedout: isServiceClosedOut(
+                      "Furnishings Closeout",
+                      "Furnishings Closedout",
+                    ),
+                  },
                 ];
 
                 return (
@@ -680,7 +703,8 @@ export const Bookings: React.FC<BookingsProps> = ({
                     style={{
                       display: "flex",
                       flexDirection: "row",
-                      gap: "6px",
+                      flexWrap: "nowrap",
+                      gap: "4px",
                     }}
                   >
                     {items.map(
@@ -700,7 +724,7 @@ export const Bookings: React.FC<BookingsProps> = ({
                                 flexDirection: "column",
                                 alignItems: "center",
                                 gap: "2px",
-                                padding: "4px 6px",
+                                padding: "4px 4px",
                                 borderRadius: "6px",
                               }}
                             >

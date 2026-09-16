@@ -4,6 +4,11 @@ import type {
   SchemaContextType,
 } from "@/components/src/client/routes/components/schemaTypes";
 import { generateDefaultSchema } from "@/components/src/client/routes/components/schemaTypes";
+import { normalizeResourceServices } from "./migrateResourceServices";
+
+function applyTenantResourceServices(resource: Resource): Resource {
+  return normalizeResourceServices(resource);
+}
 
 function normalizeResourceId(value: unknown, field: string): string {
   if (
@@ -26,11 +31,10 @@ function coerceResource(
   rawResource: Resource | Record<string, unknown>,
   index: number,
 ): Resource {
-  const {
-    roomId,
-    resourceId,
-    ...resource
-  } = rawResource as Record<string, unknown>;
+  const { roomId, resourceId, ...resource } = rawResource as Record<
+    string,
+    unknown
+  >;
   const canonicalId =
     resourceId === undefined
       ? normalizeResourceId(roomId, `resources[${index}].roomId`)
@@ -58,7 +62,9 @@ function coerceResources(
   return resources.map((resource, index) => {
     const coerced = coerceResource(resource, index);
     if (seen.has(coerced.resourceId)) {
-      throw new Error(`resources has duplicate resourceId "${coerced.resourceId}"`);
+      throw new Error(
+        `resources has duplicate resourceId "${coerced.resourceId}"`,
+      );
     }
     seen.add(coerced.resourceId);
     return coerced;
@@ -120,11 +126,12 @@ export function coerceTenantSchema(
         ...rawCc?.timeSensitiveRequestWarning,
       },
     },
-    resources: Array.isArray(raw.resources)
+    resources: (Array.isArray(raw.resources)
       ? coerceResources(
           raw.resources as Array<Resource | Record<string, unknown>>,
         )
-      : base.resources,
+      : base.resources
+    ).map((resource) => applyTenantResourceServices(resource)),
     attestations: Array.isArray(raw.attestations)
       ? (raw.attestations as SchemaContextType["attestations"])
       : base.attestations,

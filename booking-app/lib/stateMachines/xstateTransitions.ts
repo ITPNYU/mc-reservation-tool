@@ -229,7 +229,7 @@ export async function executeXStateTransition(
       if (reason) {
         event.reason = reason;
       }
-      if (email && eventType === "checkOut") {
+      if (email && (eventType === "checkOut" || eventType === "noShow")) {
         event.email = email;
       }
       actor.send(event);
@@ -568,6 +568,10 @@ export async function executeXStateTransition(
       if (typeof servicesApproved.setup === "boolean") {
         firestoreUpdates.setupServiceApproved = servicesApproved.setup;
       }
+      if (typeof servicesApproved.furnishings === "boolean") {
+        firestoreUpdates.furnishingsServiceApproved =
+          servicesApproved.furnishings;
+      }
 
       console.log(
         `🔄 UPDATING INDIVIDUAL SERVICE FIELDS [${tenant?.toUpperCase() || "UNKNOWN"}]:`,
@@ -580,6 +584,8 @@ export async function executeXStateTransition(
             cleaningServiceApproved: firestoreUpdates.cleaningServiceApproved,
             securityServiceApproved: firestoreUpdates.securityServiceApproved,
             setupServiceApproved: firestoreUpdates.setupServiceApproved,
+            furnishingsServiceApproved:
+              firestoreUpdates.furnishingsServiceApproved,
           },
         },
       );

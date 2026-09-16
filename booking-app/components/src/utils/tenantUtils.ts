@@ -3,6 +3,10 @@
  */
 
 import { TENANTS } from "../constants/tenants";
+import {
+  isPassiveSetupSelection,
+  type ServiceResourceLike,
+} from "./resourceServicesUtils";
 
 /**
  * NYU Identity API dept_code values that identify ITP / IMA / Low Res affiliated users.
@@ -86,18 +90,68 @@ export const getTenantFlags = (tenant?: string) => ({
 });
 
 /**
- * Detect Media Commons service requests from booking data
- * This function provides consistent service detection logic across the application
+ * True when a service field is a non-empty value other than case-insensitive "no".
+ * Use this instead of `=== "yes"` for legacy service scalars: multi-room bookings
+ * join distinct per-room values (e.g. hireSecurity "yes; willoughby").
  */
-export const getMediaCommonsServices = (data: any) => ({
-  staff:
-    !!data.staffingServicesDetails && data.staffingServicesDetails !== "no",
-  setup: !!data.setupDetails && data.setupDetails !== "no",
-  equipment:
-    (!!data.mediaServices && data.mediaServices !== "no") ||
-    (!!data.equipmentServices && data.equipmentServices !== "no") ||
-    (!!data.equipmentServicesDetails && data.equipmentServicesDetails !== "no"),
-  catering: !!data.catering && data.catering !== "no",
-  cleaning: !!data.cleaningService && data.cleaningService !== "no",
-  security: !!data.hireSecurity && data.hireSecurity !== "no",
-});
+export const isServiceRequested = (value: unknown): boolean => {
+  if (value == null) return false;
+  const normalized = String(value).trim().toLowerCase();
+  return normalized !== "" && normalized !== "no";
+};
+
+const isActiveSetupSelection = (
+  value: unknown,
+  resources: ServiceResourceLike[],
+): boolean => {
+  if (!isServiceRequested(value)) return false;
+  const raw = String(value).trim();
+  // Layout ids that are schema defaults without chartfields do not require setup staff.
+  if (isPassiveSetupSelection(resources, raw)) return false;
+  return true;
+};
+
+/**
+ * Detect Media Commons service requests from booking data.
+ * `resources` are the tenant schema resources (Firestore is the source of
+ * truth for service configs); they decide which room setup values are passive
+ * defaults rather than real setup requests.
+ */
+export const getMediaCommonsServices = (
+  data: any,
+  resources: ServiceResourceLike[],
+) => {
+  const byRoomValues = Object.values(data.roomSetupByRoom ?? {});
+  const setupFromByRoom = byRoomValues.some((v) =>
+    isActiveSetupSelection(v, resources),
+  );
+  // Legacy scalars remain additive so mixed schema+generic multi-room bookings
+  // still surface a genuine setup request from co-selected non-schema rooms.
+  // Passive schema defaults mirrored into setupDetails are ignored via
+  // isActiveSetupSelection / isPassiveSetupSelection (value + label).
+  const setupFromLegacy =
+    isActiveSetupSelection(data.setupDetails, resources) ||
+    (isServiceRequested(data.roomSetup) &&
+      String(data.roomSetup).trim().toLowerCase() !== "yes");
+  // Additional event furniture is its own service region in the MC machine
+  // ("Furnishings Request" / "Furnishings Closeout").
+  const furnishingsRequested = Object.values(
+    data.furnishingsByRoom ?? {},
+  ).some((v: unknown) => isServiceRequested(v));
+
+  return {
+    staff: isServiceRequested(data.staffingServices),
+    setup: setupFromByRoom || setupFromLegacy,
+    furnishings: furnishingsRequested,
+    equipment:
+      isServiceRequested(data.mediaServices) ||
+      isServiceRequested(data.equipmentServices) ||
+      isServiceRequested(data.equipmentServicesDetails) ||
+      Object.values(data.equipmentServicesDetailsByRoom ?? {}).some(
+        (v: unknown) => isServiceRequested(v),
+      ),
+    catering: isServiceRequested(data.catering),
+    cleaning: isServiceRequested(data.cleaningService),
+    security: isServiceRequested(data.hireSecurity),
+  };
+};

@@ -22,7 +22,9 @@ describe("coerceTenantSchema — timeSensitiveRequestWarning", () => {
       calendarConfig: { timeSensitiveRequestWarning: warning },
     };
     const c = coerceTenantSchema(doc, "mc");
-    expect(c.calendarConfig?.timeSensitiveRequestWarning).toMatchObject(warning);
+    expect(c.calendarConfig?.timeSensitiveRequestWarning).toMatchObject(
+      warning,
+    );
   });
 
   it("merges a partial nested warning over the defaults", () => {
@@ -47,7 +49,7 @@ describe("coerceTenantSchema — resources", () => {
       customField: { keep: true },
     };
 
-    const coerced = coerceTenantSchema({ resources: [resource] }, "mc");
+    const coerced = coerceTenantSchema({ resources: [resource] }, "itp");
 
     expect(coerced.resources[0]).toEqual({
       resourceId,
@@ -56,6 +58,37 @@ describe("coerceTenantSchema — resources", () => {
       customField: { keep: true },
     });
     expect(coerced.resources[0]).not.toHaveProperty("roomId");
+  });
+
+  it("does not seed MC service configs from code (Firestore is the source of truth)", () => {
+    const coerced = coerceTenantSchema(
+      {
+        resources: [
+          { roomId: "202", name: "Studio", capacity: 12 },
+          { roomId: "103", name: "Garage", capacity: 50, services: ["setup"] },
+        ],
+      },
+      "mc",
+    );
+
+    expect(coerced.resources[0].resourceId).toBe("202");
+    expect(coerced.resources[0].services).toBeUndefined();
+    // Legacy string[] services are normalized, not replaced by room defaults.
+    expect(coerced.resources[1].services).toEqual({
+      setup: { label: "Room Setup" },
+    });
+  });
+
+  it("keeps explicit services objects as written", () => {
+    const coerced = coerceTenantSchema(
+      {
+        resources: [
+          { resourceId: "202", name: "Studio", capacity: 12, services: {} },
+        ],
+      },
+      "mc",
+    );
+    expect(coerced.resources[0].services).toEqual({});
   });
 
   it("keeps a canonical resourceId and removes a matching legacy roomId", () => {
@@ -69,7 +102,7 @@ describe("coerceTenantSchema — resources", () => {
           },
         ],
       },
-      "mc",
+      "itp",
     );
 
     expect(coerced.resources[0].resourceId).toBe("canonical-id");
@@ -80,7 +113,7 @@ describe("coerceTenantSchema — resources", () => {
     expect(() =>
       coerceTenantSchema(
         { resources: [{ resourceId: "studio-a", roomId: 202 }] },
-        "mc",
+        "itp",
       ),
     ).toThrow("conflicting resourceId and roomId");
   });
@@ -89,12 +122,9 @@ describe("coerceTenantSchema — resources", () => {
     expect(() =>
       coerceTenantSchema(
         {
-          resources: [
-            { resourceId: "studio-a" },
-            { roomId: "studio-a" },
-          ],
+          resources: [{ resourceId: "studio-a" }, { roomId: "studio-a" }],
         },
-        "mc",
+        "itp",
       ),
     ).toThrow('duplicate resourceId "studio-a"');
   });

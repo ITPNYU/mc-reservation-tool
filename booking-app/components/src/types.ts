@@ -47,6 +47,8 @@ export type BookingRow = Booking & {
 export type BookingFormDetails = Booking & {
   headerMessage?: string;
   id?: string;
+  /** Per-room furnishings lines for the email template (serverBookingContents). */
+  furnishingsLines?: string[];
 };
 
 export type BookingStatus = {
@@ -84,6 +86,7 @@ export type BookingStatus = {
   cleaningServiceApproved?: boolean;
   securityServiceApproved?: boolean;
   setupServiceApproved?: boolean;
+  furnishingsServiceApproved?: boolean;
 };
 
 // the order here is the order these are displayed as table filters
@@ -180,7 +183,6 @@ export type Inputs = {
   equipmentServices: string;
   equipmentServicesDetails: string;
   staffingServices: string;
-  staffingServicesDetails: string;
   catering: string;
   hireSecurity: string;
   expectedAttendance: string;
@@ -191,6 +193,23 @@ export type Inputs = {
   chartFieldForCleaning: string;
   chartFieldForSecurity: string;
   chartFieldForRoomSetup: string;
+  roomSetupByRoom?: Record<string, string>;
+  setupDetailsByRoom?: Record<string, string>;
+  chartFieldForRoomSetupByRoom?: Record<string, string>;
+  furnishingsByRoom?: Record<string, string>;
+  chartFieldForFurnishingsByRoom?: Record<string, string>;
+  furnishingsDetails?: string;
+  furnishingsDetailsByRoom?: Record<string, string>;
+  equipmentServicesDetailsByRoom?: Record<string, string>;
+  /** Per-room catering / cleaning / security. Legacy scalars above are kept in sync as aggregates. */
+  cateringByRoom?: Record<string, string>;
+  chartFieldForCateringByRoom?: Record<string, string>;
+  cleaningByRoom?: Record<string, string>;
+  chartFieldForCleaningByRoom?: Record<string, string>;
+  hireSecurityByRoom?: Record<string, string>;
+  chartFieldForSecurityByRoom?: Record<string, string>;
+  /** Selected auxiliary spaces keyed by parent room id → option values. */
+  annexByRoom?: Record<string, string[]>;
   webcheckoutCartNumber?: string;
   // Individual service fields for pregame parsing
   equipment?: string;
@@ -198,6 +217,21 @@ export type Inputs = {
   cleaning?: string;
   // origin of the booking
   origin?: BookingOrigin;
+};
+
+/** Form field keys whose values are plain strings (excludes maps/booleans). */
+export type StringInputKeys = {
+  [K in keyof Inputs]: Inputs[K] extends string | undefined ? K : never;
+}[keyof Inputs];
+
+export type MediaCommonsServiceFlags = {
+  staff?: boolean;
+  equipment?: boolean;
+  catering?: boolean;
+  cleaning?: boolean;
+  security?: boolean;
+  setup?: boolean;
+  furnishings?: boolean;
 };
 
 export type DepartmentType = {
@@ -321,7 +355,7 @@ export type RoomSetting = {
   isWalkIn?: boolean;
   isWalkInCanBookTwo?: boolean;
   isEquipment?: boolean;
-  services?: string[];
+  services?: string[] | import("@/components/src/client/routes/components/schemaTypes").ResourceServicesConfig;
   staffingServices?: string[]; // Specific staffing service options for this room
   staffingSections?: { name: string; indexes: number[] }[];
   // Auto-approval configuration
@@ -345,6 +379,7 @@ export type RoomSetting = {
       catering: boolean; // Allow auto-approval with catering requests
       cleaning: boolean; // Allow auto-approval with cleaning requests
       security: boolean; // Allow auto-approval with security requests
+      furnishings?: boolean; // Allow auto-approval with additional event furniture requests
     };
   };
   maxHour?: {
@@ -434,6 +469,12 @@ export interface UserApiData {
 export type Filters = {
   dateRange: string | Date[];
   sortField: string;
+  /**
+   * Sort direction for the server-side fetch. Defaults to "desc". "All
+   * Future" views pass "asc" so the LIMIT-bounded window holds the nearest
+   * upcoming bookings instead of the farthest-future ones.
+   */
+  sortDirection?: "asc" | "desc";
   searchQuery?: string;
   /** Set on the USER /my-bookings view to scope server-side fetch to one user. */
   userEmail?: string;
